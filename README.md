@@ -4,8 +4,6 @@
 
 ___
 
-## How to run the backend using docker-compose
-
 ## How to run the frontend
 + (One-time) Install Expo: Run `npm install -g expo-cli`
 + Go to the root folder
