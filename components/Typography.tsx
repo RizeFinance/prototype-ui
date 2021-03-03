@@ -24,18 +24,13 @@ export const styles = StyleSheet.create({
         lineHeight: 36,
         fontFamily: 'Roadgeek',
     },
-    h5: {
-        fontSize: 18,
-        lineHeight: 27,
-        fontFamily: 'Roadgeek',
-    },
     body: {
-        fontSize: 16,
+        fontSize: 18,
         lineHeight: 24,
         fontFamily: 'Roadgeek',
     },
     bodySmall: {
-        fontSize: 14,
+        fontSize: 16,
         lineHeight: 21,
         fontFamily: 'Roadgeek',
     }
@@ -49,7 +44,6 @@ export type TypeProps = TextProps & {
 const Type = (defaultStyle: StyleProp<TextStyle>): React.FC<TypeProps> => {
     return ({ style, textAlign, color, ...props }: TypeProps): JSX.Element => (
         <Text
-            allowFontScaling={false}
             style={[
                 defaultStyle,
                 { color: useThemeColor('body') },
@@ -66,6 +60,5 @@ export const Heading1 = Type(styles.h1);
 export const Heading2 = Type(styles.h2);
 export const Heading3 = Type(styles.h3);
 export const Heading4 = Type(styles.h4);
-export const Heading5 = Type(styles.h5);
 export const Body = Type(styles.body);
 export const BodySmall = Type(styles.bodySmall);
