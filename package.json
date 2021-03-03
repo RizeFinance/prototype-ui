@@ -32,6 +32,7 @@
     "react-native-gesture-handler": "~1.8.0",
     "react-native-safe-area-context": "3.1.9",
     "react-native-screens": "~2.15.0",
+    "react-native-svg": "^12.1.0",
     "react-native-web": "~0.13.12"
   },
   "devDependencies": {
@@ -44,6 +45,7 @@
     "eslint-config-react": "^1.1.7",
     "eslint-plugin-react": "^7.22.0",
     "jest-expo": "~40.0.0",
+    "react-native-svg-transformer": "^0.14.3",
     "typescript": "~4.0.0"
   },
   "private": true

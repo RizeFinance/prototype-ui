@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Button from '../components/Button';
+import CheckBox from '../components/Checkbox';
 import Input from '../components/Input';
 import Screen from '../components/Screen';
 import { Heading3 } from '../components/Typography';
@@ -42,6 +43,9 @@ export default function LoginScreen(): JSX.Element {
                 title='Create Account'
                 disabled={true}
             />
+            <CheckBox checked={false}>
+                
+            </CheckBox>
         </Screen>
     );
 }
