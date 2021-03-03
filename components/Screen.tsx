@@ -18,7 +18,7 @@ const Screen = (props: ScreenProps): JSX.Element => {
         },
         content: {
             flex: 1,
-            paddingHorizontal: 16,
+            paddingHorizontal: 32,
         }
     });
     
