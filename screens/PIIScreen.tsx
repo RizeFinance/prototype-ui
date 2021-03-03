@@ -5,7 +5,7 @@ import Screen from '../components/Screen';
 export default function PIIScreen(): JSX.Element {
     return (
         <Screen>
-            <Text>Disclosures Screen</Text>
+            <Text>PII Screen</Text>
         </Screen>
     );
 }

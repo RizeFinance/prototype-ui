@@ -5,7 +5,7 @@ import Screen from '../components/Screen';
 export default function ProcessingApplicationScreen(): JSX.Element {
     return (
         <Screen>
-            <Text>Disclosures Screen</Text>
+            <Text>Processing Application Screen</Text>
         </Screen>
     );
 }
