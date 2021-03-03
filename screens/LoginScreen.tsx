@@ -1,12 +1,11 @@
 import * as React from 'react';
-import { Text } from 'react-native';
 import Screen from '../components/Screen';
+import { Heading3 } from '../components/Typography';
 
 export default function LoginScreen(): JSX.Element {
     return (
         <Screen>
-            <Text>Login Screen.</Text>
+            <Heading3 textAlign='center'>Create Account</Heading3>
         </Screen>
     );
 }
-
