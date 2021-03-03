@@ -4,6 +4,7 @@ import * as React from 'react';
 import { ColorSchemeName } from 'react-native';
 
 import LoginScreen from '../screens/LoginScreen';
+import PDFReaderScreen from '../screens/PDFReaderScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
@@ -23,6 +24,7 @@ function RootNavigator() {
     return (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Root" component={LoginScreen} />
+            <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
         </Stack.Navigator>
     );
 }
