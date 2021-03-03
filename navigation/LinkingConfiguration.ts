@@ -1,15 +1,15 @@
 import * as Linking from 'expo-linking';
 
 export default {
-  prefixes: [Linking.makeUrl('/')],
-  config: {
-    screens: {
-      Root: {
+    prefixes: [Linking.makeUrl('/')],
+    config: {
         screens: {
-          NotFoundScreen: 'one',
+            Root: {
+                screens: {
+                    NotFoundScreen: 'one',
+                },
+            },
+            NotFound: '*',
         },
-      },
-      NotFound: '*',
     },
-  },
 };

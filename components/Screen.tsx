@@ -20,7 +20,7 @@ const Screen = (props: ScreenProps): JSX.Element => {
             flex: 1,
             paddingHorizontal: 16,
         }
-    })
+    });
     
     return (
         <Container
