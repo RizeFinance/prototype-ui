@@ -7,7 +7,7 @@ import LoginScreen from '../screens/LoginScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
-export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
+export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
         <NavigationContainer
             linking={LinkingConfiguration}
