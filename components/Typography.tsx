@@ -3,7 +3,7 @@ import { StyleProp, StyleSheet, Text, TextProps, TextStyle } from 'react-native'
 import Colors from '../constants/Colors';
 import { useThemeColor } from './Themed';
 
-export const styles = StyleSheet.create({
+export const fontStyles = StyleSheet.create({
     h1: {
         fontSize: 72,
         lineHeight: 108,
@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
         fontFamily: 'Roadgeek',
     },
     h3: {
-        fontSize: 32,
+        fontSize: 36,
         lineHeight: 48,
         fontFamily: 'Roadgeek',
     },
@@ -56,9 +56,9 @@ const Type = (defaultStyle: StyleProp<TextStyle>): React.FC<TypeProps> => {
     );
 };
 
-export const Heading1 = Type(styles.h1);
-export const Heading2 = Type(styles.h2);
-export const Heading3 = Type(styles.h3);
-export const Heading4 = Type(styles.h4);
-export const Body = Type(styles.body);
-export const BodySmall = Type(styles.bodySmall);
+export const Heading1 = Type(fontStyles.h1);
+export const Heading2 = Type(fontStyles.h2);
+export const Heading3 = Type(fontStyles.h3);
+export const Heading4 = Type(fontStyles.h4);
+export const Body = Type(fontStyles.body);
+export const BodySmall = Type(fontStyles.bodySmall);
