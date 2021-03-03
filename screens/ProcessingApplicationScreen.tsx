@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
+import Screen from '../components/Screen';
 
-export default function NotFoundScreen() {
-  return (
-    <View>
-      <Text>Disclosures Screen</Text>
-    </View>
-  );
+export default function ProcessingApplicationScreen(): JSX.Element {
+    return (
+        <Screen>
+            <Text>Disclosures Screen</Text>
+        </Screen>
+    );
 }
 
