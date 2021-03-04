@@ -1,11 +1,30 @@
 import React,{useState} from 'react';
-import {Pressable, PressableProps,StyleSheet} from 'react-native';
+import {Pressable, View, PressableProps, Text, StyleSheet} from 'react-native';
 import * as Svg from '../assets/svg';
-import { useThemeColor } from './Themed';
 
 export type CheckboxProps = PressableProps & {
+    text: string;
     checked: boolean;   
 }
+
+const defaultStyles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+    },
+    pressable: {
+        display: 'flex',
+        flexDirection: 'row',
+    },
+    pressableDisabled: {
+        opacity: 0.5,
+    },
+    checkbox: {
+        marginRight: 16
+    },
+    smallTextCheckbox: {
+        marginRight: 8
+    }
+});
 
 const Checkbox = (props: CheckboxProps): JSX.Element => {
     const { ...otherProps } = props;
@@ -18,17 +37,35 @@ const Checkbox = (props: CheckboxProps): JSX.Element => {
         setChecked(newCheckedValue);
     };
 
+    const renderChildren = (props: CheckboxProps): JSX.Element => {
+        return (
+            <>
+                {!!props.text && (
+                    <Text>
+                        {props.text}
+                    </Text>
+                )}
+            </>
+        );
+    };
+
     return(
-        <Pressable
-            {...otherProps}
-            onPress={onPressablePress}
-            
-        >
-            <CheckBoxSvg
-                height={24}
-                width={24}
-            />
-        </Pressable>
+        <View
+            style={[
+                defaultStyles.container]}>
+            <Pressable
+                style={defaultStyles.pressable}
+                {...otherProps}
+                onPress={onPressablePress}
+            >
+                <CheckBoxSvg
+                    height={24}
+                    width={24}
+                    style={defaultStyles.checkbox}
+                />
+            </Pressable>
+            {renderChildren(props)}
+        </View>
     );
 };
 
