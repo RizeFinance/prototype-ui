@@ -3,7 +3,6 @@ import {Pressable, View, PressableProps, Text, StyleSheet} from 'react-native';
 import * as Svg from '../assets/svg';
 
 export type CheckboxProps = PressableProps & {
-    text: string;
     checked: boolean;   
 }
 
@@ -40,11 +39,9 @@ const Checkbox = (props: CheckboxProps): JSX.Element => {
     const renderChildren = (props: CheckboxProps): JSX.Element => {
         return (
             <>
-                {!!props.text && (
-                    <Text>
-                        {props.text}
-                    </Text>
-                )}
+                <View style={{ flex: 1 }}>
+                    {props.children}
+                </View>
             </>
         );
     };
