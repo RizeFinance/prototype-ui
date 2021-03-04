@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { Image, StyleSheet, View} from 'react-native';
-import Button from '../components/Button';
-import Input from '../components/Input';
-import Screen from '../components/Screen';
+import { Image, StyleSheet, View } from 'react-native';
+import { Button, Input, Screen } from '../components';
 import { Heading3 } from '../components/Typography';
 import { Formik } from 'formik';
 import validator from 'validator';
