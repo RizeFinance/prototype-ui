@@ -32,6 +32,22 @@ export default {
     web: {
         favicon: './assets/images/favicon.png'
     },
+    packagerOpts: {
+        config: 'metro.config.js',
+        sourceExts: [
+            'expo.ts',
+            'expo.tsx',
+            'expo.js',
+            'expo.jsx',
+            'ts',
+            'tsx',
+            'js',
+            'jsx',
+            'json',
+            'wasm',
+            'svg',
+        ],
+    },
     extra: {
         rize: {
             programId: process.env.RIZE_PROGRAM_ID,
