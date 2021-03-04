@@ -1,10 +1,12 @@
-import React,{useState} from 'react';
-import {Pressable, View, PressableProps, StyleSheet} from 'react-native';
+import React,{useState, PropsWithChildren} from 'react';
+import {Pressable, View, StyleSheet} from 'react-native';
 import * as Svg from '../assets/svg';
 
-export type CheckboxProps = PressableProps & {
-    checked: boolean;   
-}
+export type CheckboxProps =  {
+    checked: boolean;
+    disabled?: boolean;
+    onChange?: (checked: boolean) => void;
+};
 
 const defaultStyles = StyleSheet.create({
     container: {
@@ -25,18 +27,17 @@ const defaultStyles = StyleSheet.create({
     }
 });
 
-const Checkbox = (props: CheckboxProps): JSX.Element => {
-    const { ...otherProps } = props;
+const Checkbox = (props: PropsWithChildren<CheckboxProps>): JSX.Element => {
     const [checked, setChecked] = useState<boolean>(props.checked);
     const CheckBoxSvg = checked ? Svg.CheckboxChecked : Svg.CheckboxUnchecked;
 
     const onPressablePress = (): void => {
         const newCheckedValue = !checked;
-
-        setChecked(newCheckedValue);
+        props.onChange(newCheckedValue);
+        setChecked(newCheckedValue); 
     };
 
-    const renderChildren = (props: CheckboxProps): JSX.Element => {
+    const renderChildren = (props: PropsWithChildren<CheckboxProps>): JSX.Element => {
         return (
             <>
                 <View style={{ flex: 1 }}>
@@ -51,7 +52,6 @@ const Checkbox = (props: CheckboxProps): JSX.Element => {
             style={[defaultStyles.container]}>
             <Pressable
                 style={defaultStyles.pressable}
-                {...otherProps}
                 onPress={onPressablePress}
             >
                 <CheckBoxSvg
