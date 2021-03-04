@@ -11,6 +11,8 @@ import RizeClient from '../utils/rizeClient';
 import { ComplianceWorkflow } from '@rize/rize-js/types/lib/core/compliance-workflow';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
+import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { Customer } from '@rize/rize-js/types/lib/core/customer';
 
 const logo = require('../assets/images/logo.png');
 
@@ -24,6 +26,8 @@ interface LoginScreenProps {
 
 export default function LoginScreen({ navigation }: LoginScreenProps): JSX.Element {
     const { setCustomer } = useCustomer();
+    const { setComplianceWorkflow } = useComplianceWorkflow();
+
     const rize = RizeClient.getInstance();
 
     const initialValues: LoginFields = {
@@ -63,6 +67,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps): JSX.Eleme
         );
         const customer = await rize.customer.get(newComplianceWorkflow.customer.uid);
 
+        await setComplianceWorkflow(newComplianceWorkflow);
         await setCustomer(customer);
 
         navigation.navigate('Disclosures');
@@ -76,22 +81,24 @@ export default function LoginScreen({ navigation }: LoginScreenProps): JSX.Eleme
         );
         const customer = await rize.customer.get(newComplianceWorkflow.customer.uid);
 
+        await setComplianceWorkflow(newComplianceWorkflow);
         await setCustomer(customer);
 
         navigation.navigate('Disclosures');
     };
 
-    const redirectToCurrentStep = async (workflow: ComplianceWorkflow): Promise<void> => {
+    const redirectToCurrentStep = async (workflow: ComplianceWorkflow, customer: Customer): Promise<void> => {
         if (workflow.summary.current_step === 1) {
             navigation.navigate('Disclosures');
         } else if (workflow.summary.current_step === 2) {
-            // check if Patriot Act is not yet acknowledged
-            if (!workflow.accepted_documents.find(x => x.external_storage_name === 'usa_ptrt_0')) {
+            // Check if Patriot Act is not yet acknowledged
+            const isPatriotActAcknowledged = !!workflow.accepted_documents
+                .find(x => x.external_storage_name === 'usa_ptrt_0');
+
+            if (!isPatriotActAcknowledged) {
                 navigation.navigate('PatriotAct');
             } else {
-                const customer = await rize.customer.get(workflow.customer.uid);
-
-                // check if there are no customer details yet
+                // Check if there are no customer details yet
                 if (!customer.details.first_name) {
                     navigation.navigate('PII');
                 } else {
@@ -112,15 +119,18 @@ export default function LoginScreen({ navigation }: LoginScreenProps): JSX.Eleme
         } else {
             const customer = existingCustomers.data[0];
             
+            await setCustomer(customer);
+            
             switch (customer.status) {
                 case 'initiated': {
-                    // check for the latest workflow of the customer
+                    // Get the latest workflow of the customer
                     const latestWorkflow = await rize.complianceWorkflow.viewLatest(customer.uid);
 
                     if (latestWorkflow.summary.status === 'expired') {
                         await renewComplianceWorkflow(latestWorkflow);
                     } else {
-                        await redirectToCurrentStep(latestWorkflow);
+                        await setComplianceWorkflow(latestWorkflow);
+                        await redirectToCurrentStep(latestWorkflow, customer);
                     }
 
                     break;

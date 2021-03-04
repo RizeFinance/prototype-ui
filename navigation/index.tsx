@@ -2,6 +2,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
 import { ColorSchemeName } from 'react-native';
+import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
 import { CustomerProvider } from '../contexts/Customer';
 import BankingDisclosuresScreen from '../screens/BankingDisclosuresScreen';
 import DisclosuresScreen from '../screens/DisclosuresScreen';
@@ -29,15 +30,17 @@ const Stack = createStackNavigator<RootStackParamList>();
 function RootNavigator() {
     return (
         <CustomerProvider>
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Login" component={LoginScreen} />
-                <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />
-                <Stack.Screen name="Result" component={ResultScreen} />
-                <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
-                <Stack.Screen name="PatriotAct" component={PatriotActScreen} />
-                <Stack.Screen name="PII" component={PIIScreen} />
-                <Stack.Screen name="BankingDisclosures" component={BankingDisclosuresScreen} />
-            </Stack.Navigator>
+            <ComplianceWorkflowProvider>
+                <Stack.Navigator screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />
+                    <Stack.Screen name="Result" component={ResultScreen} />
+                    <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
+                    <Stack.Screen name="PatriotAct" component={PatriotActScreen} />
+                    <Stack.Screen name="PII" component={PIIScreen} />
+                    <Stack.Screen name="BankingDisclosures" component={BankingDisclosuresScreen} />
+                </Stack.Navigator>
+            </ComplianceWorkflowProvider>
         </CustomerProvider>
     );
 }
