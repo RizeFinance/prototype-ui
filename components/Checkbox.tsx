@@ -33,7 +33,9 @@ const Checkbox = (props: PropsWithChildren<CheckboxProps>): JSX.Element => {
 
     const onPressablePress = (): void => {
         const newCheckedValue = !checked;
-        props.onChange(newCheckedValue);
+        if(props.onChange) {
+            props.onChange(newCheckedValue);
+        }
         setChecked(newCheckedValue); 
     };
 
