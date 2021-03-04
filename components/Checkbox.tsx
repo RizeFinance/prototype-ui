@@ -1,5 +1,5 @@
 import React,{useState, PropsWithChildren} from 'react';
-import {Pressable, View, StyleSheet} from 'react-native';
+import {Pressable, View, StyleSheet, Body} from 'react-native';
 import * as Svg from '../assets/svg';
 
 export type CheckboxProps =  {
@@ -43,7 +43,13 @@ const Checkbox = (props: PropsWithChildren<CheckboxProps>): JSX.Element => {
         return (
             <>
                 <View style={{ flex: 1 }}>
-                    {props.children}
+                    {typeof(props.children) === 'string' ? (
+                        <Body>
+                            {props.children}
+                        </Body>
+                    ) : (
+                        props.children
+                    )}
                 </View>
             </>
         );
