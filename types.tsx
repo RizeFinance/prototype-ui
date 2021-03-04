@@ -2,21 +2,18 @@ export type PDFReaderParams = {
   url: string;
 }
 
+export type ResultParams = {
+  status: 'approved' | 'rejected' | 'manual_review';
+}
+
 export type RootStackParamList = {
-  Root: undefined;
-  NotFound: undefined;
-  PDFReader: PDFReaderParams;
-};
-
-export type BottomTabParamList = {
-  TabOne: undefined;
-  TabTwo: undefined;
-};
-
-export type TabOneParamList = {
-  TabOneScreen: undefined;
-};
-
-export type TabTwoParamList = {
-  TabTwoScreen: undefined;
+    BankingDisclosures: undefined;
+    Disclosures: undefined;
+    Login: undefined;
+    PatriotAct: undefined;
+    PII: undefined;
+    ProcessingApplication: undefined;
+    Result: ResultParams;
+    PDFReader: PDFReaderParams;
+    NotFound: undefined;
 };
