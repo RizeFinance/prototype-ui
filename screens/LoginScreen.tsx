@@ -155,7 +155,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps): JSX.Eleme
     };
 
     return (
-        <Screen useScrollView>
+        <Screen
+            useScrollView
+            bounces={false}
+        >
             <View style={{
                 alignSelf: 'center'
             }}>
@@ -185,6 +188,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps): JSX.Eleme
                             value={values.email}
                             errorText={errors.email}
                             editable={!isSubmitting}
+                            onSubmitEditing={(): void => handleSubmit()}
                         />
                         <Button
                             title='Submit'

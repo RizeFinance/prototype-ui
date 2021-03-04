@@ -4,11 +4,13 @@ export default {
     prefixes: [Linking.makeUrl('/')],
     config: {
         screens: {
-            Root: {
-                screens: {
-                    NotFoundScreen: 'one',
-                },
-            },
+            Login: 'login',
+            ProcessingApplication: 'processing-application',
+            Result: 'result',
+            Disclosures: 'disclosures',
+            PatriotAct: 'patriot-act',
+            PII: 'pii',
+            BankingDisclosures: 'banking-disclosures',
             NotFound: '*',
         },
     },
