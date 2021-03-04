@@ -1,14 +1,15 @@
 import React from 'react';
-import { Pressable, PressableProps, StyleSheet } from 'react-native';
+import { Pressable, PressableProps, StyleSheet, ViewStyle } from 'react-native';
 import { useThemeColor } from './Themed';
 import { Body } from './Typography';
 
-export type ButtonProps = PressableProps & {
+export type ButtonProps = Omit<PressableProps, 'style'> & {
     title: string;
+    style?: ViewStyle;
 }
 
 const Button = (props: ButtonProps): JSX.Element => {
-    const { title, ...otherProps } = props;
+    const { title, style, ...otherProps } = props;
 
     const primary = useThemeColor('primary');
     const primaryAccent = useThemeColor('primaryAccent');
@@ -31,7 +32,8 @@ const Button = (props: ButtonProps): JSX.Element => {
         <Pressable
             style={[
                 defaultStyles.pressable,
-                props.disabled && defaultStyles.pressableDisabled
+                props.disabled && defaultStyles.pressableDisabled,
+                style
             ]}
             {...otherProps}
         >

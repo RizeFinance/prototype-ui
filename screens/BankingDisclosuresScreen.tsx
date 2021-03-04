@@ -5,7 +5,7 @@ import Screen from '../components/Screen';
 export default function BankingDisclosuresScreen(): JSX.Element {
     return (
         <Screen>
-            <Text>Disclosures Screen</Text>
+            <Text>Banking Disclosures Screen</Text>
         </Screen>
     );
 }

@@ -1,11 +1,33 @@
+import { RouteProp } from '@react-navigation/native';
 import * as React from 'react';
-import { Text } from 'react-native';
 import Screen from '../components/Screen';
+import { Heading3 } from '../components/Typography';
+import { RootStackParamList } from '../types';
 
-export default function ResultScreen(): JSX.Element {
+interface ResultScreenProps {
+    route: RouteProp<RootStackParamList, 'Result'>;
+}
+
+export default function ResultScreen({ route }: ResultScreenProps): JSX.Element {
+    let message = 'Your application';
+
+    switch (route.params.status) {
+        case 'approved':
+            message += ' was Approved.';
+            break;
+        case 'rejected':
+            message += ' was Rejected.';
+            break;
+        case 'manual_review':
+            message += ' is Under Manual Review.';
+            break;
+    }
+
     return (
         <Screen>
-            <Text>Disclosures Screen</Text>
+            <Heading3 style={{ marginTop: 100 }}>
+                {message}
+            </Heading3>
         </Screen>
     );
 }
