@@ -59,9 +59,7 @@ export default function PatriotActScreen({ navigation }: PatriotActScreenProps):
     
     return (
         <Screen useScrollView>
-            <Heading3
-                textAlign='center'
-            >
+            <Heading3 textAlign='center'>
                 USA Patriot Act Notice
             </Heading3>
             
