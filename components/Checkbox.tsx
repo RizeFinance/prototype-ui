@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import {Pressable, View, PressableProps, Text, StyleSheet} from 'react-native';
+import {Pressable, View, PressableProps, StyleSheet} from 'react-native';
 import * as Svg from '../assets/svg';
 
 export type CheckboxProps = PressableProps & {
@@ -48,8 +48,7 @@ const Checkbox = (props: CheckboxProps): JSX.Element => {
 
     return(
         <View
-            style={[
-                defaultStyles.container]}>
+            style={[defaultStyles.container]}>
             <Pressable
                 style={defaultStyles.pressable}
                 {...otherProps}
