@@ -1,5 +1,6 @@
-import React,{useState, PropsWithChildren} from 'react';
-import {Pressable, View, StyleSheet, Body} from 'react-native';
+import React, {useState, PropsWithChildren} from 'react';
+import {Pressable, View, StyleSheet} from 'react-native';
+import { Body } from './Typography';
 import * as Svg from '../assets/svg';
 
 export type CheckboxProps =  {
