@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env' });
+
 export default {
     name: 'rize-compliance-demo-ui',
     slug: 'rize-compliance-demo-ui',
@@ -44,5 +47,11 @@ export default {
             'wasm',
             'svg',
         ],
-    }
+    },
+    extra: {
+        rize: {
+            programId: process.env.RIZE_PROGRAM_ID,
+            hmac: process.env.RIZE_HMAC,
+        },
+    },
 };

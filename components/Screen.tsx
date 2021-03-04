@@ -1,12 +1,20 @@
 import React from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 
-export type ScreenProps = View['props'] & {
+export type ScreenProps = View['props'] & ScrollView['props'] & {
     useScrollView?: boolean;
 }
 
 const Screen = (props: ScreenProps): JSX.Element => {
-    const { useScrollView, ...otherProps } = props;
+    const {
+        useScrollView,
+        style,
+        bounces = true,
+        showsHorizontalScrollIndicator = false,
+        keyboardShouldPersistTaps = 'handled',
+        ...otherProps
+    } = props;
+    
     const Container = useScrollView ? ScrollView : View;
 
     const defaultStyles = StyleSheet.create({
@@ -19,20 +27,27 @@ const Screen = (props: ScreenProps): JSX.Element => {
         content: {
             flex: 1,
             paddingHorizontal: 32,
+            paddingVertical: 40,
         }
     });
     
     return (
         <Container
-            bounces={false}
-            showsHorizontalScrollIndicator={false}
-            keyboardShouldPersistTaps='handled'
+            bounces={bounces}
+            showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
+            keyboardShouldPersistTaps={keyboardShouldPersistTaps}
             style={defaultStyles.container}
         >
             <SafeAreaView
                 style={defaultStyles.safeAreaView}
             >
-                <View style={defaultStyles.content} {...otherProps} />
+                <View
+                    style={[
+                        defaultStyles.content,
+                        style
+                    ]}
+                    {...otherProps}
+                />
             </SafeAreaView>
         </Container>
     );

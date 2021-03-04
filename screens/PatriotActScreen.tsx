@@ -5,7 +5,7 @@ import Screen from '../components/Screen';
 export default function PatriotActScreen(): JSX.Element {
     return (
         <Screen>
-            <Text>Disclosures Screen</Text>
+            <Text>Patriot Act Screen</Text>
         </Screen>
     );
 }
