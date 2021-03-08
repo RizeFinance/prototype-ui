@@ -1,31 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import cloneDeep from 'lodash/cloneDeep';
+import { Pressable, View, StyleSheet, } from 'react-native';
+import * as Network from 'expo-network';
+import { ComplianceDocumentAcknowledgementRequest, ComplianceWorkflow } from '@rize/rize-js/lib/core/compliance-workflow';
+
 import Checkbox from '../components/Checkbox';
 import { Screen } from '../components';
-import { Pressable, View, StyleSheet, } from 'react-native';
 import { Heading3, BodySmall, Body } from '../components/Typography';
 import Button from '../components/Button';
 import { useThemeColor } from '../components/Themed';
 import RizeClient from '../utils/rizeClient';
 import { useCustomer } from '../contexts/Customer';
-import { ComplianceDocumentAcknowledgementRequest } from '@rize/rize-js/lib/core/compliance-workflow';
-
+import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 
 export default function DisclosuresScreen(): JSX.Element {
-    const { customer } = useCustomer();
-    const primary = useThemeColor('primary');
+    const { complianceWorkflow, setComplianceWorkflow } = useComplianceWorkflow();
+
     const rize = RizeClient.getInstance();
     const navigation = useNavigation();
-    const [termsAndConditions, setTermsAndConditions] = useState([]);
-    const [workflowId, setWorkflowId] = useState<string>();
-    const [AllCheckBoxSelected, setAllCheckBoxSelected] = useState(false);
+    
+    const { customer } = useCustomer();
+    const [termsAndConditions, setTermsAndConditions] = useState<any>([]);
+    const [AllCheckBoxSelected, setAllCheckBoxSelected] = useState<boolean>(false);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+    const termsOfUse = termsAndConditions.find(x => x.external_storage_name === 'eft_auth_0');
+    const privacyPolicy = termsAndConditions.find(x => x.external_storage_name === 'e_comm_disc_0');
+    const eSign = termsAndConditions.find(x => x.external_storage_name === 'e_sign_0');
+
+    const primary = useThemeColor('primary');
 
     const styles = StyleSheet.create({
-        heading: {
-            marginTop: 40,
-            marginBottom: 40,
-        },
         checkboxHolder: {
             marginBottom: 15
         },
@@ -33,8 +39,8 @@ export default function DisclosuresScreen(): JSX.Element {
             marginBottom: 40,
         },
         underline: {
-            borderBottomColor: primary,
-            borderBottomWidth: 2,
+            textDecorationLine: 'underline',
+            textDecorationColor: primary
         }
     });
 
@@ -45,24 +51,21 @@ export default function DisclosuresScreen(): JSX.Element {
         });
     };
 
-    const getComplianceWorkflow = async () => {
-        const latestWorkflow = await rize.complianceWorkflow.viewLatest(customer.uid);
-        setWorkflowId(latestWorkflow.uid);
-        setTermsAndConditions(latestWorkflow.current_step_documents_pending);
-    };
-
     const handleSubmit = async (): Promise<void> => {
-
-        await rize.complianceWorkflow.acknowledgeComplianceDocuments(
-            workflowId,
+        setIsSubmitting(true);
+        const ipAddress = await Network.getIpAddressAsync();
+        const updatedComplianceWorkflow = await rize.complianceWorkflow.acknowledgeComplianceDocuments(
+            complianceWorkflow.uid,
             customer.uid,
             ...termsAndConditions.map(doc => ({
-                documentUid: doc.uid,
                 accept: 'yes',
-                userName: doc,
-                ipAddress: doc
+                documentUid: doc.uid,
+                ipAddress: ipAddress,
+                userName: complianceWorkflow.customer.email,
             } as ComplianceDocumentAcknowledgementRequest ))
         );
+
+        await setComplianceWorkflow(updatedComplianceWorkflow);
 
         navigation.navigate('PatriotAct');
     };
@@ -79,41 +82,47 @@ export default function DisclosuresScreen(): JSX.Element {
     }, [termsAndConditions]);
 
     useEffect(() => {
-        getComplianceWorkflow();
+        setTermsAndConditions(complianceWorkflow.current_step_documents_pending);
     }, []);
 
+    const renderDocumentCheckbox = (doc: ComplianceWorkflow, index: number): JSX.Element => {
+        return (
+            <View key={index}>
+                <View style={styles.checkboxHolder}>
+                    <Pressable onPress={(): void => { onPressButton(doc.compliance_document_url, doc.external_storage_name); }}>
+                        <Checkbox
+                            key={index}
+                            checked={false}
+                            onChange={(checked): void => setDocSelected(index, checked)}
+                        >
+                            <Body>
+                                I agree to <Body style={styles.underline}>{doc.name}.</Body>
+                            </Body>
+                        </Checkbox>
+                    </Pressable>
+                </View>
+            </View>
+        );
+    };
+
     return (
-        <Screen style={{ justifyContent: 'space-between' }}>
-            <Heading3 style={styles.heading} textAlign='center'>Rize Disclosures</Heading3>
+        <Screen>
+            <Heading3 textAlign='center'>Rize Disclosures</Heading3>
+            <Body>&nbsp;</Body>
+            <Body>&nbsp;</Body>
 
             <View style={styles.checkboxesContainer}>
-                {termsAndConditions.map((doc, index) => (
-                    <View key={index}>
-                        <View style={styles.checkboxHolder}>
-                            <Pressable onPress={(): void => { onPressButton(doc.compliance_document_url, doc.external_storage_name); }}>
-                                <Checkbox
-                                    key={index}
-                                    checked={false}
-                                    onChange={(checked): void => setDocSelected(index, checked)}
-                                >
-                                    <View style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                                        <Body style={{ backgroundColor: 'red', flexShrink: 1 }}>I agree to</Body>
-                                        <View style={styles.underline}>
-                                            <Body>{doc.name}</Body>
-                                        </View>
-                                    </View>
-                                </Checkbox>
-                            </Pressable>
-                        </View>
-                    </View>
-                ))}
+                {termsOfUse && renderDocumentCheckbox(termsOfUse, termsAndConditions.indexOf(termsOfUse))}
+                {privacyPolicy && renderDocumentCheckbox(privacyPolicy, termsAndConditions.indexOf(privacyPolicy))}
+                {eSign && renderDocumentCheckbox(eSign, termsAndConditions.indexOf(eSign))}
             </View>
 
-            <View style={{ alignSelf: 'flex-end' }}>
-                <BodySmall>By clicking &quot;I Agree&quot; I have read and agreed to the Terms of Use, Privacy Policy and E-sign Disclosures and Agreement.</BodySmall>
+            <View>
+                <BodySmall textAlign='center'>By clicking &quot;I Agree&quot; I have read and agreed to the Terms of Use, Privacy Policy and E-sign Disclosures and Agreement.</BodySmall>
+                <BodySmall>&nbsp;</BodySmall>
                 <Button
                     title='I Agree'
-                    disabled={!AllCheckBoxSelected}
+                    disabled={!AllCheckBoxSelected || isSubmitting}
                     onPress={(): Promise<void> => handleSubmit()}
                 />
             </View>
