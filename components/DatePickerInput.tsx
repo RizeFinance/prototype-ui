@@ -69,13 +69,42 @@ const DatePickerInput = (props: DatePickerInputProps): JSX.Element => {
         setModalVisible(true);
     };
 
-    const onPressConfirm = (): void => {
-        setDate(temporaryDate);
+    const onConfirm = (date: Date | undefined): void => {
+        setDate(date);
         setModalVisible(false);
 
         if (props.onChange) {
-            props.onChange(temporaryDate ?? new Date());
+            props.onChange(date ?? new Date());
         }
+    };
+
+    const onPressConfirm = (): void => {
+        onConfirm(temporaryDate);
+    };
+
+    const renderPicker = (): JSX.Element => {
+        if (!modalVisible) {
+            return <></>;
+        }
+
+        return (
+            <DateTimePicker
+                value={temporaryDate ?? new Date()}
+                mode={'date'}
+                display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                onChange={(e, d): void => {
+                    if (e.type === 'dismissed') {
+                        setModalVisible(false);
+                    } else {
+                        if (Platform.OS === 'ios') {
+                            setTemporaryDate(d);
+                        } else {
+                            onConfirm(d);
+                        }
+                    }
+                }}
+            />
+        );
     };
 
     useEffect(() => {
@@ -115,11 +144,7 @@ const DatePickerInput = (props: DatePickerInputProps): JSX.Element => {
                     defaultStyles.pressableText,
                     !!props.placeholder && !date && defaultStyles.placeholder
                 ]}>
-                    {!date ? (
-                        props.placeholder
-                    ) : (
-                        moment(date).format('MM/DD/yyyy')
-                    )}
+                    {!date ? props.placeholder : moment(date).format('MM/DD/yyyy')}
                 </Body>
             </Pressable>
             {!!props.errorText && (
@@ -129,30 +154,27 @@ const DatePickerInput = (props: DatePickerInputProps): JSX.Element => {
                     {props.errorText}
                 </BodySmall>
             )}
-            <Modal
-                animationType='fade'
-                transparent={true}
-                visible={modalVisible}
-            >
-                <SafeAreaView style={defaultStyles.safeAreaView}>
-                    <View
-                        style={defaultStyles.wrapper}
-                    >
-                        <DateTimePicker
-                            value={temporaryDate ?? new Date()}
-                            mode={'date'}
-                            display={Platform.OS === 'ios' ? 'inline' : 'default'}
-                            onChange={(e, d): void => {
-                                setTemporaryDate(d);
-                            }}
-                        />
-                        <Button
-                            title='Confirm'
-                            onPress={onPressConfirm}
-                        />
-                    </View>
-                </SafeAreaView>
-            </Modal>
+            {Platform.OS === 'ios' ? (
+                <Modal
+                    animationType='fade'
+                    transparent={true}
+                    visible={modalVisible}
+                >
+                    <SafeAreaView style={defaultStyles.safeAreaView}>
+                        <View
+                            style={defaultStyles.wrapper}
+                        >
+                            {renderPicker()}
+                            <Button
+                                title='Confirm'
+                                onPress={onPressConfirm}
+                            />
+                        </View>
+                    </SafeAreaView>
+                </Modal>
+            ) : (
+                renderPicker()
+            )}
         </View>
     );
 };
