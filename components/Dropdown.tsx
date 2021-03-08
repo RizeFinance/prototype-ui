@@ -1,26 +1,35 @@
 import React from 'react';
-import { StyleProp, StyleSheet, TextInput, TextStyle, View, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
+import RNPickerSelect, { Item } from 'react-native-picker-select';
 import { useThemeColor } from './Themed';
 import { Body, BodySmall, fontStyles } from './Typography';
 
-export type InputProps = Omit<TextInput['props'], 'style'> & {
+export type DropdownProps = {
+    items: Item[],
+    value?: string;
     label?: string;
+    placeholder?: string;
     errorText?: string;
-    labelStyle?: TextStyle;
+    labelStyle?: TextStyle,
     inputStyle?: StyleProp<TextStyle>;
     containerStyle?: ViewStyle;
+    onChange?: (value: any, index: number) => void;
 }
 
-const Input = (props: InputProps): JSX.Element => {
+const Dropdown = (props: DropdownProps): JSX.Element => {
     const {
+        items,
+        value,
         label,
+        placeholder,
         errorText,
         labelStyle,
         inputStyle,
         containerStyle,
-        ...otherProps
+        onChange,
     } = props;
-    
+
+    const body = useThemeColor('body');
     const border = useThemeColor('border');
     const error = useThemeColor('error');
 
@@ -32,14 +41,15 @@ const Input = (props: InputProps): JSX.Element => {
             marginHorizontal: 8,
             marginBottom: 4,
         },
-        textInput: {
+        input: {
+            color: body,
             borderRadius: 4,
             borderColor: border,
             borderWidth: 2,
             padding: 10,
             lineHeight: 18,
         },
-        errorTextInput: {
+        errorInput: {
             borderColor: error
         },
         errorText: {
@@ -48,6 +58,25 @@ const Input = (props: InputProps): JSX.Element => {
             marginTop: 4,
         }
     });
+
+    let actualInputStyle: TextStyle = {
+        ...fontStyles.body,
+        ...defaultStyles.input
+    };
+
+    if (errorText) {
+        actualInputStyle = {
+            ...actualInputStyle,
+            ...defaultStyles.errorInput
+        };
+    }
+
+    if (inputStyle) {
+        actualInputStyle = {
+            ...actualInputStyle,
+            ...StyleSheet.flatten(inputStyle)
+        };
+    }
 
     return (
         <View style={[
@@ -64,14 +93,23 @@ const Input = (props: InputProps): JSX.Element => {
                     {label}
                 </Body>
             )}
-            <TextInput
-                style={[
-                    fontStyles.body,
-                    defaultStyles.textInput,
-                    !!errorText && defaultStyles.errorTextInput,
-                    inputStyle
-                ]}
-                {...otherProps}
+            <RNPickerSelect
+                useNativeAndroidPickerStyle={false}
+                onValueChange={(value, index): void => {
+                    if (onChange) {
+                        onChange(value, index);
+                    }
+                }}
+                style={{
+                    inputIOS: actualInputStyle,
+                    inputAndroid: actualInputStyle,
+                    inputWeb: actualInputStyle,
+                }}
+                placeholder={{
+                    label: placeholder ?? '',
+                }}
+                items={items}
+                value={value}
             />
             {!!errorText && (
                 <BodySmall
@@ -84,4 +122,4 @@ const Input = (props: InputProps): JSX.Element => {
     );
 };
 
-export default Input;
+export default Dropdown;
