@@ -1,5 +1,9 @@
+export type PDFReaderParams = {
+  url: string;
+}
+
 export type ResultParams = {
-    status: 'approved' | 'rejected' | 'manual_review';
+  status: 'approved' | 'rejected' | 'manual_review';
 }
 
 export type RootStackParamList = {
@@ -10,5 +14,6 @@ export type RootStackParamList = {
     PII: undefined;
     ProcessingApplication: undefined;
     Result: ResultParams;
+    PDFReader: PDFReaderParams;
     NotFound: undefined;
 };

@@ -12,6 +12,7 @@ import PatriotActScreen from '../screens/PatriotActScreen';
 import PIIScreen from '../screens/PIIScreen';
 import ProcessingApplicationScreen from '../screens/ProcessingApplicationScreen';
 import ResultScreen from '../screens/ResultScreen';
+import PDFReaderScreen from '../screens/PDFReaderScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
@@ -39,6 +40,7 @@ function RootNavigator() {
                     <Stack.Screen name="PatriotAct" component={PatriotActScreen} />
                     <Stack.Screen name="PII" component={PIIScreen} />
                     <Stack.Screen name="BankingDisclosures" component={BankingDisclosuresScreen} />
+                    <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
                 </Stack.Navigator>
             </ComplianceWorkflowProvider>
         </CustomerProvider>
