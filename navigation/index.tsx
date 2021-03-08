@@ -15,6 +15,7 @@ import ResultScreen from '../screens/ResultScreen';
 import PDFReaderScreen from '../screens/PDFReaderScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
+import ConfirmPIIScreen from '../screens/ConfirmPIIScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
@@ -50,6 +51,7 @@ function RootNavigator() {
                         <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
                         <Stack.Screen name="PatriotAct" component={PatriotActScreen} />
                         <Stack.Screen name="PII" component={PIIScreen} />
+                        <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} />
                         <Stack.Screen name="BankingDisclosures" component={BankingDisclosuresScreen} />
                         <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
                     </Stack.Navigator>

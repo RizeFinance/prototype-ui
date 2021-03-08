@@ -7,30 +7,26 @@ import states from '../constants/States';
 import * as Yup from 'yup';
 import StringMask from 'string-mask';
 import utils from '../utils/utils';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { PIIFields, RootStackParamList } from '../types';
+import moment from 'moment';
 
-interface PIIFields {
-    firstName: string;
-    middleName: string;
-    lastName: string;
-    suffix: string;
-    dob?: Date;
-    address1: string;
-    address2: string;
-    city: string;
-    state: string;
-    zip: string;
-    phone: string;
-    ssn: string;
+interface PIIScreenProps {
+    navigation: StackNavigationProp<RootStackParamList, 'PII'>;
 }
 
-export default function PIIScreen(): JSX.Element {
+type PIIScreenFields = Omit<PIIFields, 'dob'> & {
+    dob?: Date;
+}
+
+export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
     const styles = StyleSheet.create({
         formGroup: {
             marginVertical: 10
         }
     });
 
-    const initialValues: PIIFields = {
+    const initialValues: PIIScreenFields = {
         firstName: '',
         middleName: '',
         lastName: '',
@@ -59,8 +55,8 @@ export default function PIIScreen(): JSX.Element {
         state: Yup.string().required('State is required.'),
         zip: Yup.string()
             .required('Zip Code is required.')
-            .min(14, 'Invalid Zip Code.')
-            .max(14, 'Invalid Zip Code.')
+            .min(5, 'Invalid Zip Code.')
+            .max(5, 'Invalid Zip Code.')
             .matches(/^\d+$/, 'Invalid Zip Code.'),
         phone: Yup.string()
             .required('Phone Number is required.')
@@ -75,8 +71,13 @@ export default function PIIScreen(): JSX.Element {
     const phoneFormatter = new StringMask('(000) 000-0000');
     const ssnFormatter = new StringMask('AAA-AA-AAAA');
 
-    const onSubmit = async (values: PIIFields): Promise<void> => {
-        // TODO implementation
+    const onSubmit = async (values: PIIScreenFields): Promise<void> => {
+        navigation.navigate('ConfirmPII', {
+            fieldValues: {
+                ...values,
+                dob: moment(values.dob).format('yyyy-MM-DD')
+            }
+        });
     };
 
     return (
@@ -176,8 +177,9 @@ export default function PIIScreen(): JSX.Element {
                                 }))}
                                 onChange={(value) => {
                                     setFieldValue('state', value ?? '');
+                                    setFieldTouched('state', true, false);
                                 }}
-                                errorText={errors.state}
+                                errorText={!touched.state ? '' : errors.state}
                             />
                             <Input
                                 placeholder='Zip Code'
