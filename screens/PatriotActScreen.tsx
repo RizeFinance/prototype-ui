@@ -1,7 +1,7 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik } from 'formik';
 import * as React from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Button from '../components/Button';
 import Screen from '../components/Screen';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
@@ -17,6 +17,12 @@ interface PatriotActScreenProps {
 export default function PatriotActScreen({ navigation }: PatriotActScreenProps): JSX.Element {
     const { complianceWorkflow, setComplianceWorkflow } = useComplianceWorkflow();
     const rize = RizeClient.getInstance();
+
+    const styles = StyleSheet.create({
+        content: {
+            paddingHorizontal: 24
+        }
+    });
 
     const onSubmit = async (): Promise<void> => {
         if (complianceWorkflow) {
@@ -70,11 +76,7 @@ export default function PatriotActScreen({ navigation }: PatriotActScreenProps):
             <Body>&nbsp;</Body>
             <Body>&nbsp;</Body>
 
-            <View
-                style={{
-                    paddingHorizontal: 32
-                }}
-            >
+            <View style={styles.content}>
                 <Body>
                     Important Information About Procedures for Opening a New Account
                 </Body>
