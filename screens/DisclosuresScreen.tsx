@@ -41,6 +41,10 @@ export default function DisclosuresScreen(): JSX.Element {
         underline: {
             textDecorationLine: 'underline',
             textDecorationColor: primary
+        },
+        footer: {
+            flex: 1,
+            justifyContent: 'flex-end'
         }
     });
 
@@ -117,7 +121,7 @@ export default function DisclosuresScreen(): JSX.Element {
                 {eSign && renderDocumentCheckbox(eSign, termsAndConditions.indexOf(eSign))}
             </View>
 
-            <View>
+            <View style={styles.footer}>
                 <BodySmall textAlign='center'>By clicking &quot;I Agree&quot; I have read and agreed to the Terms of Use, Privacy Policy and E-sign Disclosures and Agreement.</BodySmall>
                 <BodySmall>&nbsp;</BodySmall>
                 <Button
