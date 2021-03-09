@@ -1,5 +1,5 @@
 import { RouteProp } from '@react-navigation/native';
-import * as React from 'react';
+import React, { useState } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Pressable, StyleSheet } from 'react-native';
 import { Screen, Button } from '../components';
@@ -8,6 +8,7 @@ import { Heading3, Body } from '../components/Typography';
 import { useThemeColor } from '../components/Themed';
 import RizeClient from '../utils/rizeClient';
 import { useCustomer } from '../contexts/Customer';
+
 interface ConfirmPIIScreenProps {
     route: RouteProp<RootStackParamList, 'ConfirmPII'>;
     navigation: StackNavigationProp<RootStackParamList, 'PII'>;
@@ -16,6 +17,8 @@ interface ConfirmPIIScreenProps {
 export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreenProps): JSX.Element {
     const data = route.params.fieldValues;
     const { customer } = useCustomer();
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
     const rize = RizeClient.getInstance();
     const gray = useThemeColor('gray');
     const primary = useThemeColor('primary');
@@ -33,7 +36,7 @@ export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreen
     };
 
     const handleSubmit = async (): Promise<void> => {
-
+        setIsSubmitting(true);
         const updatedCustomer = await rize.customer.update(customer.uid, customer.email, {
             first_name: data.firstName,
             middle_name: data.middleName,
@@ -85,8 +88,9 @@ export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreen
             <Button
                 title='Confirm Information'
                 onPress={(): Promise<void> => handleSubmit()}
+                disabled={isSubmitting}
                 style={{
-                    marginTop: 30
+                    marginTop: 20
                 }}
             />
         </Screen>
