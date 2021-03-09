@@ -65,22 +65,22 @@ export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreen
             <Heading3 textAlign='center'>Confirm Your Personal Information</Heading3>
             <Body>&nbsp;</Body>
             <Body>&nbsp;</Body>
-            <Body>First name</Body>
+            <Body fontWeight='semibold'>First name</Body>
             <Body style={{ color: gray}}>{data.firstName}</Body>
             <Body>&nbsp;</Body>
-            <Body>Last name</Body>
+            <Body fontWeight='semibold'>Last name</Body>
             <Body style={{ color: gray}}>{data.lastName}</Body>
             <Body>&nbsp;</Body>
-            <Body>Date of Birth</Body>
+            <Body fontWeight='semibold'>Date of Birth</Body>
             <Body style={{ color: gray}}>{data.dob}</Body>
             <Body>&nbsp;</Body>
-            <Body>Address</Body>
+            <Body fontWeight='semibold'>Address</Body>
             <Body style={{ color: gray}}>{`${data.address1} ${data.address2}, ${data.city}, ${data.state} ${data.zip}`}</Body>
             <Body>&nbsp;</Body>
-            <Body>Phone Number</Body>
+            <Body fontWeight='semibold'>Phone Number</Body>
             <Body style={{ color: gray}}>{data.phone}</Body>
             <Body>&nbsp;</Body>
-            <Body>Social Security Number</Body>
+            <Body fontWeight='semibold'>Social Security Number</Body>
             <Body style={{ color: gray}}>{data.ssn}</Body>
             <Body>&nbsp;</Body>
             <Pressable onPress={(): void => { onPressEditButton(); }} disabled={isSubmitting}>
