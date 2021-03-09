@@ -4,28 +4,26 @@ import { Screen } from '../components';
 import { Heading3 } from '../components/Typography';
 import { RootStackParamList } from '../types';
 
-interface ResultScreenProps {
-    route: RouteProp<RootStackParamList, 'Result'>;
+interface ApplicationUnapprovedScreenProps {
+    route: RouteProp<RootStackParamList, 'ApplicationUnapproved'>;
 }
 
-export default function ResultScreen({ route }: ResultScreenProps): JSX.Element {
+export default function ApplicationUnapprovedScreen({ route }: ApplicationUnapprovedScreenProps): JSX.Element {
     let message = 'Your application';
 
     switch (route.params.status) {
-        case 'approved':
-            message += ' was Approved.';
-            break;
         case 'rejected':
-            message += ' was Rejected.';
+            message += ' was rejected.';
             break;
         case 'manual_review':
-            message += ' is Under Manual Review.';
+        case 'under_review':
+            message += ' is under manual review.';
             break;
     }
 
     return (
         <Screen>
-            <Heading3 style={{ marginTop: 100 }}>
+            <Heading3 textAlign='center' style={{ marginTop: 100 }}>
                 {message}
             </Heading3>
         </Screen>
