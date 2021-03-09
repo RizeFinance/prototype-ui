@@ -4,7 +4,8 @@ import { Heading3, Body, BodySmall } from '../components/Typography';
 import { View, Pressable, StyleSheet } from 'react-native';
 import { useThemeColor } from '../components/Themed';
 import { useNavigation } from '@react-navigation/native';
-import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import cloneDeep from 'lodash/cloneDeep';
+import { ComplianceDocumentSelection, useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 import { useCustomer } from '../contexts/Customer';
 import RizeClient from '../utils/rizeClient';
 import * as Network from 'expo-network';
@@ -12,22 +13,28 @@ import { ComplianceDocumentAcknowledgementRequest } from '@rize/rize-js/lib/core
 
 export default function BankingDisclosuresScreen(): JSX.Element {
 
-    const [ termsAndConditions, setTermsAndConditions ] = useState<any>([]);
+    const {
+        complianceWorkflow,
+        bankingDisclosures,
+        setComplianceWorkflow,
+        setBankingDisclosures,
+        loadBankingDisclosures
+    } = useComplianceWorkflow();
 
-    const { complianceWorkflow, setComplianceWorkflow } = useComplianceWorkflow();
+    const navigation = useNavigation();
+
+    const { customer } = useCustomer();
 
     const [ checkboxSelected, setCheckboxSelected ] = useState<boolean>(false);
 
     const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
 
-    const primary = useThemeColor('primary');
-    const depositAgreement = termsAndConditions.find(x => x.name === 'Deposit Agreement');
+    const depositAgreement = bankingDisclosures.find(x => x.name === 'Deposit Agreement');
 
     const rize = RizeClient.getInstance();
-    const navigation = useNavigation();
-
-    const { customer } = useCustomer();
     
+    const primary = useThemeColor('primary');
+
     const styles = StyleSheet.create({
         checkboxHolder: {
             marginBottom: 15
@@ -46,38 +53,68 @@ export default function BankingDisclosuresScreen(): JSX.Element {
     });
 
     useEffect(() => {
-        setTermsAndConditions(complianceWorkflow.current_step_documents_pending);
+        if (bankingDisclosures.length === 0) {
+            loadBankingDisclosures();
+        }
     }, []);
+
+    useEffect(() => {
+        const hasUnselectedBox = bankingDisclosures.find(doc => !doc.selected);
+        setCheckboxSelected(!hasUnselectedBox);
+    }, [bankingDisclosures]);
+
+    const setDocSelected = (docIndex: number, selected: boolean): void => {
+        const docsClone = cloneDeep(bankingDisclosures);
+        docsClone[docIndex].selected = selected;
+        setBankingDisclosures(docsClone);
+    };
+    
+    const onPressButton = (link: string, externalStorageName): void => {
+        navigation.navigate('PDFReader', {
+            url: link,
+            filename: `${externalStorageName}.pdf`,
+        });
+    };
+
 
     const handleSubmit = async (): Promise<void> => {
         setIsSubmitting(true);
-        const ipAddress = await Network.getIpAddressAsync();
-        const updatedComplianceWorkflow = await rize.complianceWorkflow.acknowledgeComplianceDocuments(
-            complianceWorkflow.uid,
-            customer.uid,
-            ...termsAndConditions.map(doc => ({
-                accept: 'yes',
-                documentUid: doc.uid,
-                ipAddress: ipAddress,
-                userName: complianceWorkflow.customer.email,
-            } as ComplianceDocumentAcknowledgementRequest ))
-        );
 
-        await setComplianceWorkflow(updatedComplianceWorkflow);
+        try {
+            const unacceptedDocs = bankingDisclosures.filter(x => !x.alreadyAccepted);
 
-        navigation.navigate('ProcessingApplication');
+            if (unacceptedDocs.length > 0) {
+                const ipAddress = await Network.getIpAddressAsync();
+                const updatedComplianceWorkflow = await rize.complianceWorkflow.acknowledgeComplianceDocuments(
+                    complianceWorkflow.uid,
+                    customer.uid,
+                    ...unacceptedDocs.map(doc => ({
+                        accept: 'yes',
+                        documentUid: doc.uid,
+                        ipAddress: ipAddress,
+                        userName: complianceWorkflow.customer.email,
+                    } as ComplianceDocumentAcknowledgementRequest))
+                );
+
+                await setComplianceWorkflow(updatedComplianceWorkflow);
+            }
+
+            navigation.navigate('ProcessingApplication');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const generateCheckBox = ( disclosure: string): JSX.Element => {
+    const generateCheckBox = ( doc: ComplianceDocumentSelection, index: number): JSX.Element => {
         return (
             <View>
                 <View style={styles.checkboxHolder}>
-                    <Pressable>
+                    <Pressable onPress={(): void => { onPressButton(doc.compliance_document_url, doc.external_storage_name); }}>
                         <Checkbox 
                             checked={false}
-                            onChange={(checked): void => setCheckboxSelected(checked)}>
+                            onChange={(checked): void => setDocSelected(index, checked)}>
                             <Body>
-                                I agree to <Body style={styles.underline}>{disclosure}</Body>
+                                I agree to <Body style={styles.underline}>{doc.name}</Body>
                             </Body>
                         </Checkbox>
                     </Pressable>
@@ -93,7 +130,7 @@ export default function BankingDisclosuresScreen(): JSX.Element {
             <Body>&nbsp;</Body>
 
             <View style={styles.checkboxesContainer}>
-                {depositAgreement && generateCheckBox(depositAgreement.name)}
+                {depositAgreement && generateCheckBox(depositAgreement,bankingDisclosures.indexOf(depositAgreement))}
             </View>
 
             <View style={styles.footer}>
