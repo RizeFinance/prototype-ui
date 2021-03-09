@@ -69,10 +69,9 @@ export default function BankingDisclosuresScreen(): JSX.Element {
         setBankingDisclosures(docsClone);
     };
     
-    const onPressButton = (link: string, externalStorageName): void => {
+    const onPressButton = (link: string): void => {
         navigation.navigate('PDFReader', {
             url: link,
-            filename: `${externalStorageName}.pdf`,
         });
     };
 
@@ -109,7 +108,7 @@ export default function BankingDisclosuresScreen(): JSX.Element {
         return (
             <View>
                 <View style={styles.checkboxHolder}>
-                    <Pressable onPress={(): void => { onPressButton(doc.compliance_document_url, doc.external_storage_name); }}>
+                    <Pressable onPress={(): void => { onPressButton(doc.compliance_document_url); }}>
                         <Checkbox 
                             checked={false}
                             onChange={(checked): void => setDocSelected(index, checked)}>
