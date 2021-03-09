@@ -15,15 +15,21 @@ export type ComplianceDocumentSelection = ComplianceDocument & {
 export type ComplianceWorkflowContextProps = {
     complianceWorkflow?: ComplianceWorkflow;
     disclosures: ComplianceDocumentSelection[];
+    bankingDisclosures: ComplianceDocumentSelection[];
     setComplianceWorkflow: (complianceWorkflow: ComplianceWorkflow) => Promise<void>;
     setDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
+    setBankingDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
+    loadBankingDisclosures: () => Promise<void>;
 }
 
 export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowContextProps>({
     complianceWorkflow: undefined,
     disclosures: [],
+    bankingDisclosures: [],
     setComplianceWorkflow: () => Promise.resolve(),
     setDisclosures: () => Promise.resolve(),
+    setBankingDisclosures: () => Promise.resolve(),
+    loadBankingDisclosures: () => Promise.resolve(),
 });
 
 export interface ComplianceWorkflowProviderProps {
@@ -34,11 +40,13 @@ export interface ComplianceWorkflowProviderProps {
 export type ComplianceWorkflowProviderState = {
     complianceWorkflow?: ComplianceWorkflow;
     disclosures: ComplianceDocumentSelection[];
+    bankingDisclosures: ComplianceDocumentSelection[];
 }
 
 const initialState = {
     complianceWorkflow: undefined,
     disclosures: [],
+    bankingDisclosures: []
 };
 
 export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkflowProviderProps, ComplianceWorkflowProviderState> {
@@ -95,6 +103,30 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
         });
 
         await this.promisedSetState({ disclosures: allDisclosures });
+    }
+
+    loadBankingDisclosures = async (): Promise<void> => {
+        const {
+            all_documents: all,
+            accepted_documents: accepted,
+            current_step_documents_pending: pending
+        } = await this.state.complianceWorkflow;
+
+        const acceptedBankingDisclosures = accepted.filter(x => x.name === 'Deposit Agreement');
+        const pendingBankingDisclosures = pending.filter(x => x.name === 'Deposit Agreement');
+        const allDisclosures = all.filter(x => x.name === 'Deposit Agreement').map(x => {
+            const acceptedBankingDisc = acceptedBankingDisclosures.find(acc => acc.name === x.name);
+            const pendingBankingDisc = pendingBankingDisclosures.find(acc => acc.name === x.name);
+            
+            return {
+                ...x,
+                selected: !!acceptedBankingDisc,
+                uid: acceptedBankingDisc?.uid ?? pendingBankingDisc.uid,
+                alreadyAccepted: !!acceptedBankingDisc
+            } as ComplianceDocumentSelection;
+        });
+
+        await this.promisedSetState({ bankingDisclosures: allDisclosures });
     }
 
     redirectToCurrentStep = async (workflow: ComplianceWorkflow, customer: Customer): Promise<void> => {
@@ -170,10 +202,15 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
         await this.promisedSetState({ disclosures });
     }
 
+    setBankingDisclosures = async (bankingDisclosures: ComplianceDocumentSelection[]): Promise<void> => {
+        await this.promisedSetState({ bankingDisclosures });
+    }
+
     render(): JSX.Element {
         const {
             complianceWorkflow,
-            disclosures
+            disclosures,
+            bankingDisclosures,
         } = this.state;
 
         return (
@@ -181,8 +218,12 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
                 value={{
                     complianceWorkflow: complianceWorkflow,
                     disclosures: disclosures,
+                    bankingDisclosures: bankingDisclosures,
                     setComplianceWorkflow: this.setComplianceWorkflow,
                     setDisclosures: this.setDisclosures,
+                    setBankingDisclosures: this.setBankingDisclosures,
+                    loadBankingDisclosures: this.loadBankingDisclosures
+                    
                 }}
             >
                 {this.props.children}
