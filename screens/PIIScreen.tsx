@@ -11,9 +11,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { PIIFields, RootStackParamList } from '../types';
 import moment from 'moment';
 import { useCustomer } from '../contexts/Customer';
+import { RouteProp } from '@react-navigation/core';
 
 interface PIIScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'PII'>;
+    route: RouteProp<RootStackParamList, 'PII'>;
 }
 
 type PIIScreenFields = Omit<PIIFields, 'dob'> & {

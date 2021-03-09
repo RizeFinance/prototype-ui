@@ -6,11 +6,7 @@ import { Formik } from 'formik';
 import validator from 'validator';
 import { useCustomer } from '../contexts/Customer';
 import RizeClient from '../utils/rizeClient';
-import { ComplianceWorkflow } from '@rize/rize-js/types/lib/core/compliance-workflow';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types';
 import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
-import { Customer } from '@rize/rize-js/types/lib/core/customer';
 
 const logo = require('../assets/images/logo.png');
 
@@ -18,11 +14,7 @@ interface LoginFields {
     email: string;
 }
 
-interface LoginScreenProps {
-    navigation: StackNavigationProp<RootStackParamList, 'Login'>;
-}
-
-export default function LoginScreen({ navigation }: LoginScreenProps): JSX.Element {
+export default function LoginScreen(): JSX.Element {
     const { setCustomer } = useCustomer();
     const { setComplianceWorkflow } = useComplianceWorkflow();
 
@@ -67,43 +59,6 @@ export default function LoginScreen({ navigation }: LoginScreenProps): JSX.Eleme
 
         await setComplianceWorkflow(newComplianceWorkflow);
         await setCustomer(customer);
-
-        navigation.navigate('Disclosures');
-    };
-
-    const renewComplianceWorkflow = async (workflow: ComplianceWorkflow): Promise<void> => {
-        const newComplianceWorkflow = await rize.complianceWorkflow.renew(
-            new Date().getTime().toString(),
-            workflow.customer.uid,
-            workflow.customer.email
-        );
-        const customer = await rize.customer.get(newComplianceWorkflow.customer.uid);
-
-        await setComplianceWorkflow(newComplianceWorkflow);
-        await setCustomer(customer);
-
-        navigation.navigate('Disclosures');
-    };
-
-    const redirectToCurrentStep = async (workflow: ComplianceWorkflow, customer: Customer): Promise<void> => {
-        if (workflow.summary.current_step === 1) {
-            navigation.navigate('Disclosures');
-        } else if (workflow.summary.current_step === 2) {
-            // Check if Patriot Act is not yet acknowledged
-            const isPatriotActAcknowledged = !!workflow.accepted_documents
-                .find(x => x.external_storage_name === 'usa_ptrt_0');
-
-            if (!isPatriotActAcknowledged) {
-                navigation.navigate('PatriotAct');
-            } else {
-                // Check if there are no customer details yet
-                if (!customer.details.first_name) {
-                    navigation.navigate('PII');
-                } else {
-                    navigation.navigate('BankingDisclosures');
-                }
-            }
-        }
     };
 
     const onSubmit = async (values: LoginFields): Promise<void> => {
@@ -116,40 +71,8 @@ export default function LoginScreen({ navigation }: LoginScreenProps): JSX.Eleme
             await createNewComplianceWorkflow(values.email);
         } else {
             const customer = existingCustomers.data[0];
-            
+
             await setCustomer(customer);
-            
-            switch (customer.status) {
-                case 'initiated': {
-                    // Get the latest workflow of the customer
-                    const latestWorkflow = await rize.complianceWorkflow.viewLatest(customer.uid);
-
-                    if (latestWorkflow.summary.status === 'expired') {
-                        await renewComplianceWorkflow(latestWorkflow);
-                    } else {
-                        await setComplianceWorkflow(latestWorkflow);
-                        await redirectToCurrentStep(latestWorkflow, customer);
-                    }
-
-                    break;
-                }
-                case 'queued':
-                case 'identity_verified':
-                    navigation.navigate('ProcessingApplication');
-                    break;
-                case 'active':
-                    navigation.navigate('Home');
-                    break;
-                case 'manual_review':
-                case 'under_review':
-                    navigation.navigate('ApplicationUnapproved', { status: customer.status });
-                    break;
-                case 'rejected':
-                    navigation.navigate('ApplicationUnapproved', { status: 'rejected' });
-                    break;
-                default:
-                    break;
-            }
         }
     };
 

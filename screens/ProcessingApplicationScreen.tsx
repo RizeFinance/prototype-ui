@@ -11,7 +11,6 @@ export default function ProcessingApplicationScreen(): JSX.Element {
     let timeout = null;
 
     const refreshCustomerPeriodically = async (): Promise<void> => {
-        console.log('HIT');
         await refreshCustomer();
         timeout = setTimeout(() => {
             refreshCustomerPeriodically();
