@@ -133,7 +133,7 @@ export default function BankingDisclosuresScreen(): JSX.Element {
             </View>
 
             <View style={styles.footer}>
-                <BodySmall textAlign='center'>By clicking &quot;I Agree&quot; I am agreeing to the Deposit agreement and disclosure and to text and phone calls. </BodySmall>
+                <BodySmall textAlign='center'>By clicking &quot;I Agree&quot; I am agreeing to the Deposit agreement and disclosure. </BodySmall>
                 <BodySmall>&nbsp;</BodySmall>
                 <Button
                     title='I Agree'
