@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
 import cloneDeep from 'lodash/cloneDeep';
 import { Pressable, View, StyleSheet, } from 'react-native';
 import * as Network from 'expo-network';
@@ -13,8 +12,14 @@ import { useThemeColor } from '../components/Themed';
 import RizeClient from '../utils/rizeClient';
 import { useCustomer } from '../contexts/Customer';
 import { ComplianceDocumentSelection, useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types';
 
-export default function DisclosuresScreen(): JSX.Element {
+interface DisclosuresScreenProps {
+    navigation: StackNavigationProp<RootStackParamList, 'Disclosures'>;
+}
+
+export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps): JSX.Element {
     const {
         complianceWorkflow,
         disclosures,
@@ -25,7 +30,6 @@ export default function DisclosuresScreen(): JSX.Element {
     const { customer } = useCustomer();
 
     const rize = RizeClient.getInstance();
-    const navigation = useNavigation();
 
     const [allCheckBoxSelected, setAllCheckBoxSelected] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -53,10 +57,9 @@ export default function DisclosuresScreen(): JSX.Element {
         }
     });
 
-    const onPressButton = (link: string, externalStorageName): void => {
+    const onPressButton = (link: string): void => {
         navigation.navigate('PDFReader', {
-            url: link,
-            filename: `${externalStorageName}.pdf`,
+            url: link
         });
     };
 
@@ -103,7 +106,7 @@ export default function DisclosuresScreen(): JSX.Element {
         return (
             <View key={index}>
                 <View style={styles.checkboxHolder}>
-                    <Pressable onPress={(): void => { onPressButton(doc.compliance_document_url, doc.external_storage_name); }}>
+                    <Pressable onPress={(): void => { onPressButton(doc.compliance_document_url); }}>
                         <Checkbox
                             key={index}
                             checked={doc.selected}
