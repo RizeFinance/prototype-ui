@@ -1,21 +1,25 @@
 import { RouteProp } from '@react-navigation/native';
 import * as React from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { Pressable, StyleSheet } from 'react-native';
 import { Screen, Button } from '../components';
 import { RootStackParamList } from '../types';
 import { Heading3, Body } from '../components/Typography';
 import { useThemeColor } from '../components/Themed';
+import RizeClient from '../utils/rizeClient';
+import { useCustomer } from '../contexts/Customer';
 interface ConfirmPIIScreenProps {
     route: RouteProp<RootStackParamList, 'ConfirmPII'>;
+    navigation: StackNavigationProp<RootStackParamList, 'PII'>;
 }
 
-export default function ConfirmPIIScreen({ route }: ConfirmPIIScreenProps): JSX.Element {
+export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreenProps): JSX.Element {
     const data = route.params.fieldValues;
+    const { customer } = useCustomer();
+    const rize = RizeClient.getInstance();
     const gray = useThemeColor('gray');
     const primary = useThemeColor('primary');
-    const navigation = useNavigation();
-
+    
     const styles = StyleSheet.create({
         editButton: {
             textDecorationLine: 'underline',
@@ -28,8 +32,28 @@ export default function ConfirmPIIScreen({ route }: ConfirmPIIScreenProps): JSX.
         navigation.navigate('PII');
     };
 
-    const handleSubmit = () => {
-        navigation.navigate('BankingDisclosures');
+    const handleSubmit = async (): Promise<void> => {
+
+        const updatedCustomer = await rize.customer.update(customer.uid, customer.email, {
+            first_name: data.firstName,
+            middle_name: data.middleName,
+            last_name: data.lastName,
+            suffix: data.suffix,
+            phone: data.phone.replace(/\D/g,''),
+            ssn: data.ssn,
+            dob: data.dob,
+            address: {
+                street1: data.address1,
+                street2: data.address2,
+                city: data.city,
+                state: data.state,
+                postal_code: data.zip,
+            },
+        });
+
+        if(updatedCustomer) {
+            navigation.navigate('BankingDisclosures');
+        }
     };
     
     return (
@@ -60,7 +84,7 @@ export default function ConfirmPIIScreen({ route }: ConfirmPIIScreenProps): JSX.
             </Pressable>
             <Button
                 title='Confirm Information'
-                onPress={(): void => handleSubmit()}
+                onPress={(): Promise<void> => handleSubmit()}
                 style={{
                     marginTop: 30
                 }}
