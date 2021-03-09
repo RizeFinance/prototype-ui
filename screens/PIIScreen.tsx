@@ -39,7 +39,7 @@ function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
                 setFieldValue('middleName', details.middle_name);
                 setFieldValue('lastName', details.last_name);
                 setFieldValue('suffix', details.suffix);
-                setFieldValue('dob', new Date(details.dob));
+                setFieldValue('dob', details.dob ? new Date(details.dob) : undefined);
                 setFieldValue('address1', details.address.street1);
                 setFieldValue('address2', details.address.street2);
                 setFieldValue('city', details.address.city);
