@@ -138,13 +138,14 @@ export default function LoginScreen({ navigation }: LoginScreenProps): JSX.Eleme
                     navigation.navigate('ProcessingApplication');
                     break;
                 case 'active':
-                    navigation.navigate('Result', { status: 'approved' });
+                    navigation.navigate('Home');
                     break;
                 case 'manual_review':
-                    navigation.navigate('Result', { status: 'manual_review' });
+                case 'under_review':
+                    navigation.navigate('ApplicationUnapproved', { status: customer.status });
                     break;
                 case 'rejected':
-                    navigation.navigate('Result', { status: 'rejected' });
+                    navigation.navigate('ApplicationUnapproved', { status: 'rejected' });
                     break;
                 default:
                     break;

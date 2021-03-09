@@ -5,8 +5,9 @@ export default {
     config: {
         screens: {
             Login: 'login',
+            Home: 'home',
             ProcessingApplication: 'processing-application',
-            Result: 'result',
+            ApplicationUnapproved: 'application-unapproved',
             Disclosures: 'disclosures',
             PatriotAct: 'patriot-act',
             PII: 'pii',

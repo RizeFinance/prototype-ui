@@ -2,8 +2,8 @@ export type PDFReaderParams = {
   url: string;
 }
 
-export type ResultParams = {
-  status: 'approved' | 'rejected' | 'manual_review';
+export type ApplicationUnapprovedParams = {
+  status: 'rejected' | 'manual_review' | 'under_review';
 }
 
 export type PIIFields = {
@@ -33,7 +33,8 @@ export type RootStackParamList = {
   PII: undefined;
   ConfirmPII: ConfirmPIIParams;
   ProcessingApplication: undefined;
-  Result: ResultParams;
+  ApplicationUnapproved: ApplicationUnapprovedParams;
   PDFReader: PDFReaderParams;
+  Home: undefined;
   NotFound: undefined;
 };
