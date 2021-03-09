@@ -10,12 +10,12 @@ import DisclosuresScreen from '../screens/DisclosuresScreen';
 import LoginScreen from '../screens/LoginScreen';
 import PatriotActScreen from '../screens/PatriotActScreen';
 import PIIScreen from '../screens/PIIScreen';
+import ConfirmPIIScreen from '../screens/ConfirmPIIScreen';
 import ProcessingApplicationScreen from '../screens/ProcessingApplicationScreen';
 import ApplicationUnapprovedScreen from '../screens/ApplicationUnapprovedScreen';
 import PDFReaderScreen from '../screens/PDFReaderScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
-import ConfirmPIIScreen from '../screens/ConfirmPIIScreen';
 import HomeScreen from '../screens/HomeScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
