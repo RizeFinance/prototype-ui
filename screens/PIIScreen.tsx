@@ -135,10 +135,10 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                             <DatePickerInput
                                 label='Date of Birth'
                                 placeholder='Month/Date/Year'
-                                errorText={!touched.dob ? '' : errors.dob}
+                                errorText={!touched.dob as boolean ? '' : errors.dob as string}
                                 onChange={(date: Date) => {
                                     setFieldValue('dob', date);
-                                    setFieldTouched('dob', true);
+                                    setFieldTouched('dob', true, false);
                                 }}
                             />
                         </View>
