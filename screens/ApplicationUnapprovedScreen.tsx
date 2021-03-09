@@ -13,17 +13,17 @@ export default function ApplicationUnapprovedScreen({ route }: ApplicationUnappr
 
     switch (route.params.status) {
         case 'rejected':
-            message += ' was Rejected.';
+            message += ' was rejected.';
             break;
         case 'manual_review':
         case 'under_review':
-            message += ' is Under Manual Review.';
+            message += ' is under manual review.';
             break;
     }
 
     return (
         <Screen>
-            <Heading3 style={{ marginTop: 100 }}>
+            <Heading3 textAlign='center' style={{ marginTop: 100 }}>
                 {message}
             </Heading3>
         </Screen>
