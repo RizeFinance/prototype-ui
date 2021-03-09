@@ -57,10 +57,9 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
         }
     });
 
-    const onPressButton = (link: string, externalStorageName): void => {
+    const onPressButton = (link: string): void => {
         navigation.navigate('PDFReader', {
-            url: link,
-            filename: `${externalStorageName}.pdf`,
+            url: link
         });
     };
 
@@ -107,7 +106,7 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
         return (
             <View key={index}>
                 <View style={styles.checkboxHolder}>
-                    <Pressable onPress={(): void => { onPressButton(doc.compliance_document_url, doc.external_storage_name); }}>
+                    <Pressable onPress={(): void => { onPressButton(doc.compliance_document_url); }}>
                         <Checkbox
                             key={index}
                             checked={doc.selected}
