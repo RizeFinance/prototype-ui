@@ -85,6 +85,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
         ]}>
             {!!label && (
                 <Body
+                    fontWeight='semibold'
                     style={[
                         defaultStyles.label,
                         labelStyle
@@ -113,6 +114,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
             />
             {!!errorText && (
                 <BodySmall
+                    fontWeight='semibold'
                     style={defaultStyles.errorText}
                 >
                     {errorText}

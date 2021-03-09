@@ -56,6 +56,7 @@ const Input = (props: InputProps): JSX.Element => {
         ]}>
             {!!label && (
                 <Body
+                    fontWeight='semibold'
                     style={[
                         defaultStyles.label,
                         labelStyle
@@ -75,6 +76,7 @@ const Input = (props: InputProps): JSX.Element => {
             />
             {!!errorText && (
                 <BodySmall
+                    fontWeight='semibold'
                     style={defaultStyles.errorText}
                 >
                     {errorText}

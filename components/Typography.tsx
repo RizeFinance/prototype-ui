@@ -36,6 +36,9 @@ export const fontStyles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 21,
         fontFamily: 'OpenSans-Regular',
+    },
+    bodySmallSemibold: {
+        fontFamily: 'OpenSans-SemiBold',
     }
 });
 
@@ -80,4 +83,18 @@ export const Body: React.FC<BodyProps> = ({style, fontWeight, ...props}: BodyPro
     return Type(bodyStyles)({ style, ...props });
 };
 
-export const BodySmall = Type(fontStyles.bodySmall);
+export type BodySmallProps = TypeProps & {
+    fontWeight?: 'regular' | 'semibold';
+}
+
+export const BodySmall: React.FC<BodySmallProps> = ({style, fontWeight, ...props}: BodySmallProps) => {
+    const bodySmallStyles: StyleProp<TextStyle> = [fontStyles.bodySmall];
+
+    switch (fontWeight) {
+        case 'semibold':
+            bodySmallStyles.push(fontStyles.bodySmallSemibold);
+            break;
+    }
+
+    return Type(bodySmallStyles)({ style, ...props });
+};

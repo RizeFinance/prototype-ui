@@ -125,6 +125,7 @@ const DatePickerInput = (props: DatePickerInputProps): JSX.Element => {
         ]}>
             {!!props.label && (
                 <Body
+                    fontWeight='semibold'
                     style={[
                         defaultStyles.label,
                         props.labelStyle
@@ -149,6 +150,7 @@ const DatePickerInput = (props: DatePickerInputProps): JSX.Element => {
             </Pressable>
             {!!props.errorText && (
                 <BodySmall
+                    fontWeight='semibold'
                     style={defaultStyles.errorText}
                 >
                     {props.errorText}
