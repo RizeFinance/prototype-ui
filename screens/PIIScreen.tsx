@@ -1,5 +1,5 @@
-import { Formik } from 'formik';
-import React from 'react';
+import { Formik, useFormikContext } from 'formik';
+import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, DatePickerInput, Dropdown, Input, Screen } from '../components';
 import { Heading3 } from '../components/Typography';
@@ -10,6 +10,7 @@ import utils from '../utils/utils';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { PIIFields, RootStackParamList } from '../types';
 import moment from 'moment';
+import { useCustomer } from '../contexts/Customer';
 
 interface PIIScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'PII'>;
@@ -19,10 +20,48 @@ type PIIScreenFields = Omit<PIIFields, 'dob'> & {
     dob?: Date;
 }
 
+const phoneFormatter = new StringMask('(000) 000-0000');
+const ssnFormatter = new StringMask('AAA-AA-AAAA');
+
+function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
+    const { refreshCustomer } = useCustomer();
+
+    const { setFieldValue } = useFormikContext<PIIScreenFields>();
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', async () => {
+            const updatedCustomer = await refreshCustomer();
+
+            if (updatedCustomer) {
+                const details = updatedCustomer.details;
+
+                setFieldValue('firstName', details.first_name);
+                setFieldValue('middleName', details.middle_name);
+                setFieldValue('lastName', details.last_name);
+                setFieldValue('suffix', details.suffix);
+                setFieldValue('dob', new Date(details.dob));
+                setFieldValue('address1', details.address.street1);
+                setFieldValue('address2', details.address.street2);
+                setFieldValue('city', details.address.city);
+                setFieldValue('state', details.address.state);
+                setFieldValue('zip', details.address.postal_code);
+                setFieldValue('phone', phoneFormatter.apply(details.phone));
+            }
+        });
+
+        return unsubscribe;
+    }, [navigation]);
+
+    return <></>;
+}
+
 export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
     const styles = StyleSheet.create({
         formGroup: {
             marginVertical: 10
+        },
+        submitButton: {
+            marginTop: 30
         }
     });
 
@@ -68,9 +107,6 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
             .matches(/[A-Za-z0-9]{3}-[A-Za-z0-9]{2}-[A-Za-z0-9]{4}/, 'Invalid Social Security Number.')
     });
 
-    const phoneFormatter = new StringMask('(000) 000-0000');
-    const ssnFormatter = new StringMask('AAA-AA-AAAA');
-
     const onSubmit = async (values: PIIScreenFields): Promise<void> => {
         navigation.navigate('ConfirmPII', {
             fieldValues: {
@@ -92,6 +128,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
             >
                 {({ handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, values, errors, isValid, isSubmitting, dirty, touched }) => (
                     <>
+                        <FetchPreviousValues navigation={navigation} />
                         <View style={styles.formGroup}>
                             <Input
                                 label='First Name'
@@ -136,6 +173,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                                 label='Date of Birth'
                                 placeholder='Month/Date/Year'
                                 errorText={!touched.dob as boolean ? '' : errors.dob as string}
+                                value={values.dob}
                                 onChange={(date: Date) => {
                                     setFieldValue('dob', date);
                                     setFieldTouched('dob', true, false);
@@ -175,6 +213,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                                     label: x.name,
                                     value: x.code
                                 }))}
+                                value={values.state}
                                 onChange={(value) => {
                                     setFieldValue('state', value ?? '');
                                     setFieldTouched('state', true, false);
@@ -259,9 +298,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                             title='Submit Information'
                             disabled={!dirty || !isValid || isSubmitting}
                             onPress={(): void => handleSubmit()}
-                            style={{
-                                marginTop: 30
-                            }}
+                            style={styles.submitButton}
                         />
                     </>
                 )}

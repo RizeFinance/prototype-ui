@@ -1,14 +1,17 @@
 import { Customer } from '@rize/rize-js/types/lib/core/customer';
 import React, { useContext } from 'react';
+import RizeClient from '../utils/rizeClient';
 
 export type CustomerContextProps = {
     customer?: Customer;
     setCustomer: (customer: Customer) => Promise<void>;
+    refreshCustomer: () => Promise<Customer>;
 }
 
 export const CustomerContext = React.createContext<CustomerContextProps>({
     customer: undefined,
     setCustomer: () => Promise.resolve(),
+    refreshCustomer: () => Promise.resolve(null),
 });
 
 export interface CustomerProviderProps {
@@ -30,6 +33,8 @@ export class CustomerProvider extends React.Component<CustomerProviderProps, Cus
         this.state = initialState;
     }
 
+    rize = RizeClient.getInstance();
+
     promisedSetState = async <K extends keyof CustomerProviderState>(
         state: Pick<CustomerProviderState, K> | ((prevState: Readonly<CustomerProviderState>, props: Readonly<CustomerProviderProps>) => (Pick<CustomerProviderState, K> | CustomerProviderState | null)) | null
     ): Promise<void> => {
@@ -42,6 +47,16 @@ export class CustomerProvider extends React.Component<CustomerProviderProps, Cus
         await this.promisedSetState({ customer });
     }
 
+    refreshCustomer = async (): Promise<Customer> => {
+        if (!this.state.customer) {
+            return undefined;
+        }
+
+        const customer = await this.rize.customer.get(this.state.customer.uid);
+        await this.promisedSetState({ customer });
+        return customer;
+    }
+
     render(): JSX.Element {
         const { customer } = this.state;
 
@@ -49,7 +64,8 @@ export class CustomerProvider extends React.Component<CustomerProviderProps, Cus
             <CustomerContext.Provider
                 value={{
                     customer: customer,
-                    setCustomer: this.setCustomer
+                    setCustomer: this.setCustomer,
+                    refreshCustomer: this.refreshCustomer
                 }}
             >
                 {this.props.children}
