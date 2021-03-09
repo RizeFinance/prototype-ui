@@ -5,6 +5,7 @@ const defaultColors = {
     primaryAccent: '#ffffff',
     border: '#d4dbe1',
     background: 'white',
+    gray: '#6e8090',
 };
 
 export default {

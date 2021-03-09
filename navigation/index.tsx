@@ -10,6 +10,7 @@ import DisclosuresScreen from '../screens/DisclosuresScreen';
 import LoginScreen from '../screens/LoginScreen';
 import PatriotActScreen from '../screens/PatriotActScreen';
 import PIIScreen from '../screens/PIIScreen';
+import ConfirmPIIScreen from '../screens/ConfirmPIIScreen';
 import ProcessingApplicationScreen from '../screens/ProcessingApplicationScreen';
 import ResultScreen from '../screens/ResultScreen';
 import PDFReaderScreen from '../screens/PDFReaderScreen';
