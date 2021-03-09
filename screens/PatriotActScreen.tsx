@@ -18,8 +18,11 @@ export default function PatriotActScreen({ navigation }: PatriotActScreenProps):
     const rize = RizeClient.getInstance();
 
     const styles = StyleSheet.create({
+        heading: {
+            marginBottom: 4
+        },
         content: {
-            paddingHorizontal: 24
+            paddingHorizontal: 16
         }
     });
 
@@ -64,7 +67,7 @@ export default function PatriotActScreen({ navigation }: PatriotActScreenProps):
     
     return (
         <Screen useScrollView>
-            <Heading3 textAlign='center'>
+            <Heading3 textAlign='center' style={styles.heading}>
                 USA Patriot Act Notice
             </Heading3>
             

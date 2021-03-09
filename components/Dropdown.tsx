@@ -47,7 +47,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
             borderColor: border,
             borderWidth: 2,
             padding: 10,
-            lineHeight: 18,
+            lineHeight: 20,
         },
         errorInput: {
             borderColor: error

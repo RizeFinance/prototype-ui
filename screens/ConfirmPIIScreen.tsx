@@ -84,7 +84,7 @@ export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreen
             <Body style={{ color: gray}}>{data.ssn}</Body>
             <Body>&nbsp;</Body>
             <Pressable onPress={(): void => { onPressEditButton(); }} disabled={isSubmitting}>
-                <Body textAlign='center' style={styles.editButton}>&#60; Edit Information</Body>
+                <Body textAlign='center' fontWeight='semibold' style={styles.editButton}>&#60; Edit Information</Body>
             </Pressable>
             <Button
                 title='Confirm Information'

@@ -7,32 +7,35 @@ export const fontStyles = StyleSheet.create({
     h1: {
         fontSize: 72,
         lineHeight: 108,
-        fontFamily: 'Roadgeek',
+        fontFamily: 'OpenSans-Regular',
     },
     h2: {
         fontSize: 48,
         lineHeight: 72,
-        fontFamily: 'Roadgeek',
+        fontFamily: 'OpenSans-Regular',
     },
     h3: {
-        fontSize: 36,
+        fontSize: 32,
         lineHeight: 48,
-        fontFamily: 'Roadgeek',
+        fontFamily: 'OpenSans-Regular',
     },
     h4: {
         fontSize: 24,
         lineHeight: 36,
-        fontFamily: 'Roadgeek',
+        fontFamily: 'OpenSans-Regular',
     },
     body: {
-        fontSize: 18,
+        fontSize: 16,
         lineHeight: 24,
-        fontFamily: 'Roadgeek',
+        fontFamily: 'OpenSans-Regular',
+    },
+    bodySemibold: {
+        fontFamily: 'OpenSans-SemiBold',
     },
     bodySmall: {
-        fontSize: 16,
+        fontSize: 14,
         lineHeight: 21,
-        fontFamily: 'Roadgeek',
+        fontFamily: 'OpenSans-Regular',
     }
 });
 
@@ -60,5 +63,21 @@ export const Heading1 = Type(fontStyles.h1);
 export const Heading2 = Type(fontStyles.h2);
 export const Heading3 = Type(fontStyles.h3);
 export const Heading4 = Type(fontStyles.h4);
-export const Body = Type(fontStyles.body);
+
+export type BodyProps = TypeProps & {
+    fontWeight?: 'regular' | 'semibold';
+}
+
+export const Body: React.FC<BodyProps> = ({style, fontWeight, ...props}: BodyProps) => {
+    const bodyStyles: StyleProp<TextStyle> = [fontStyles.body];
+
+    switch (fontWeight) {
+        case 'semibold':
+            bodyStyles.push(fontStyles.bodySemibold);
+            break;
+    }
+
+    return Type(bodyStyles)({ style, ...props });
+};
+
 export const BodySmall = Type(fontStyles.bodySmall);

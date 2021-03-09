@@ -18,7 +18,8 @@ const Button = (props: ButtonProps): JSX.Element => {
         pressable: {
             backgroundColor: primary,
             borderRadius: 4,
-            padding: 8
+            padding: 8,
+            paddingBottom: 11,
         },
         pressableDisabled: {
             opacity: 0.5,
@@ -40,6 +41,7 @@ const Button = (props: ButtonProps): JSX.Element => {
             <Body
                 style={defaultStyles.pressableText}
                 textAlign='center'
+                fontWeight='semibold'
             >
                 {title}
             </Body>
