@@ -15,7 +15,7 @@ const Screen = (props: ScreenProps): JSX.Element => {
         keyboardShouldPersistTaps = 'handled',
         ...otherProps
     } = props;
-    
+
     const Container = useScrollView ? ScrollView : View;
 
     const background = useThemeColor('background');
@@ -27,6 +27,7 @@ const Screen = (props: ScreenProps): JSX.Element => {
         },
         safeAreaView: {
             flex: 1,
+            backgroundColor: background,
         },
         content: {
             flex: 1,
@@ -34,16 +35,16 @@ const Screen = (props: ScreenProps): JSX.Element => {
             paddingVertical: 40,
         }
     });
-    
+
     return (
-        <Container
-            bounces={bounces}
-            showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
-            keyboardShouldPersistTaps={keyboardShouldPersistTaps}
-            style={defaultStyles.container}
+        <SafeAreaView
+            style={defaultStyles.safeAreaView}
         >
-            <SafeAreaView
-                style={defaultStyles.safeAreaView}
+            <Container
+                bounces={bounces}
+                showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
+                keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+                style={defaultStyles.container}
             >
                 <View
                     style={[
@@ -52,8 +53,8 @@ const Screen = (props: ScreenProps): JSX.Element => {
                     ]}
                     {...otherProps}
                 />
-            </SafeAreaView>
-        </Container>
+            </Container>
+        </SafeAreaView >
     );
 };
 
