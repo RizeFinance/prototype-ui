@@ -27,7 +27,8 @@ export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreen
         editButton: {
             textDecorationLine: 'underline',
             textDecorationColor: primary,
-            color: primary
+            color: primary,
+            marginTop: 20
         }
     });
 
@@ -82,7 +83,7 @@ export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreen
             <Body>Social Security Number</Body>
             <Body style={{ color: gray}}>{data.ssn}</Body>
             <Body>&nbsp;</Body>
-            <Pressable onPress={(): void => { onPressEditButton(); }}>
+            <Pressable onPress={(): void => { onPressEditButton(); }} disabled={isSubmitting}>
                 <Body textAlign='center' style={styles.editButton}>&#60; Edit Information</Body>
             </Pressable>
             <Button
