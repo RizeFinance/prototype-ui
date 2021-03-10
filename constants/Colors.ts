@@ -1,7 +1,7 @@
 const defaultColors = {
     body: '#2a3a47',
     error: '#d3475d',
-    primary: '#6559f5',
+    primary: '#586CB7',
     primaryAccent: '#ffffff',
     border: '#d4dbe1',
     background: 'white',
