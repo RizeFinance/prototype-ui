@@ -57,6 +57,9 @@ function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
 
 export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
     const styles = StyleSheet.create({
+        heading: {
+            marginBottom: 10
+        },
         formGroup: {
             marginVertical: 10
         },
@@ -118,7 +121,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
 
     return (
         <Screen useScrollView>
-            <Heading3 textAlign='center'>
+            <Heading3 textAlign='center' style={styles.heading}>
                 Enter Your Personal Information
             </Heading3>
             <Formik

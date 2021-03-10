@@ -16,7 +16,8 @@ export default function useCachedResources(): boolean {
                 await Font.loadAsync({
                     ...Ionicons.font,
                     'space-mono': require('../assets/fonts/SpaceMono-Regular.ttf'),
-                    'Roadgeek': require('../assets/fonts/Roadgeek-2005-Mittelschrift.ttf'),
+                    'OpenSans-Regular': require('../assets/fonts/OpenSans-Regular.ttf'),
+                    'OpenSans-SemiBold': require('../assets/fonts/OpenSans-SemiBold.ttf'),
                 });
             } catch (e) {
                 // We might want to provide this error information to an error reporting service
