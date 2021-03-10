@@ -28,11 +28,15 @@ export default function ProcessingApplicationScreen(): JSX.Element {
     };
 
     useEffect(() => {
-        if(customer.status === 'initiated') {
-            rize.customer.verifyIdentity(customer.uid);
-        }
+        const verificationCheck = async (): Promise<void> => {
+            if (customer.status === 'initiated') {
+                await rize.customer.verifyIdentity(customer.uid);
+            }
+    
+            refreshCustomerPeriodically();
+        };
 
-        refreshCustomerPeriodically();
+        verificationCheck();
 
         return (): void => clearTimeout(timeout);
     }, []);

@@ -32,20 +32,20 @@ function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
         const unsubscribe = navigation.addListener('focus', async () => {
             const updatedCustomer = await refreshCustomer();
 
-            if (updatedCustomer) {
+            if (updatedCustomer && updatedCustomer.details.first_name) {
                 const details = updatedCustomer.details;
 
-                setFieldValue('firstName', details.first_name);
-                setFieldValue('middleName', details.middle_name);
-                setFieldValue('lastName', details.last_name);
-                setFieldValue('suffix', details.suffix);
+                setFieldValue('firstName', details.first_name ?? '');
+                setFieldValue('middleName', details.middle_name ?? '');
+                setFieldValue('lastName', details.last_name ?? '');
+                setFieldValue('suffix', details.suffix ?? '');
                 setFieldValue('dob', details.dob ? new Date(details.dob) : undefined);
-                setFieldValue('address1', details.address.street1);
-                setFieldValue('address2', details.address.street2);
-                setFieldValue('city', details.address.city);
-                setFieldValue('state', details.address.state);
-                setFieldValue('zip', details.address.postal_code);
-                setFieldValue('phone', phoneFormatter.apply(details.phone));
+                setFieldValue('address1', details.address.street1 ?? '');
+                setFieldValue('address2', details.address.street2 ?? '');
+                setFieldValue('city', details.address.city ?? '');
+                setFieldValue('state', details.address.state ?? '');
+                setFieldValue('zip', details.address.postal_code ?? '');
+                setFieldValue('phone', details.phone ? phoneFormatter.apply(details.phone) : '');
             }
         });
 

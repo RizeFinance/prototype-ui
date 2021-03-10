@@ -38,25 +38,30 @@ export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreen
 
     const handleSubmit = async (): Promise<void> => {
         setIsSubmitting(true);
-        const updatedCustomer = await rize.customer.update(customer.uid, customer.email, {
-            first_name: data.firstName,
-            middle_name: data.middleName,
-            last_name: data.lastName,
-            suffix: data.suffix,
-            phone: data.phone.replace(/\D/g,''),
-            ssn: data.ssn,
-            dob: data.dob,
-            address: {
-                street1: data.address1,
-                street2: data.address2,
-                city: data.city,
-                state: data.state,
-                postal_code: data.zip,
-            },
-        });
 
-        if(updatedCustomer) {
-            navigation.navigate('BankingDisclosures');
+        try {
+            const updatedCustomer = await rize.customer.update(customer.uid, customer.email, {
+                first_name: data.firstName,
+                middle_name: data.middleName,
+                last_name: data.lastName,
+                suffix: data.suffix,
+                phone: data.phone.replace(/\D/g,''),
+                ssn: data.ssn,
+                dob: data.dob,
+                address: {
+                    street1: data.address1,
+                    street2: data.address2,
+                    city: data.city,
+                    state: data.state,
+                    postal_code: data.zip,
+                },
+            });
+    
+            if(updatedCustomer) {
+                navigation.navigate('BankingDisclosures');
+            }
+        } finally {
+            setIsSubmitting(false);
         }
     };
     
