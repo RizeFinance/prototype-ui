@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Button, Input, Screen } from '../components';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
@@ -21,6 +21,7 @@ interface ForgotPasswordFields {
 
 export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScreenProps): JSX.Element {
     const { forgotPassword } = useAuth();
+    const [message, setMesage] = useState<string>('');
 
     const initialValues: ForgotPasswordFields = {
         email: ''
@@ -68,7 +69,14 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
     };
 
     const onSubmit = async (values: ForgotPasswordFields): Promise<void> => {
+        setMesage('');
         const result = await forgotPassword(values.email);
+        if (result.success) {
+            setMesage('The password reset link has now been sent to your email address.');
+        }
+        else {
+            setMesage('Failed to send reset link to your email address.');
+        }
     };
 
     return (
@@ -87,7 +95,9 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
                 />
             </View>
             <Heading3 textAlign='center'>Forgot Password</Heading3>
-
+            {!!message &&
+                <BodySmall textAlign='center' style={styles.message}>{message}</BodySmall>
+            }
             <Formik
                 initialValues={initialValues}
                 onSubmit={onSubmit}
