@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Button, Input, Screen } from '../components';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
@@ -7,6 +7,10 @@ import * as Yup from 'yup';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import { useThemeColor } from '../components/Themed';
+import { useAuth } from '../contexts/Auth';
+import { useCustomer } from '../contexts/Customer';
+import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import RizeClient from '../utils/rizeClient';
 
 const logo = require('../assets/images/logo.png');
 
@@ -21,6 +25,13 @@ interface SignupFields {
 }
 
 export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Element {
+    const { register } = useAuth();
+    const { setCustomer } = useCustomer();
+    const { setComplianceWorkflow } = useComplianceWorkflow();
+    const [commonError, setCommonError] = useState<string>('');
+
+    const rize = RizeClient.getInstance();
+
     const initialValues: SignupFields = {
         email: '',
         password: '',
@@ -35,6 +46,10 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
             width: 200,
             marginTop: -30,
             marginBottom: -10
+        },
+        commonError: {
+            marginTop: 4,
+            marginBottom: -20,
         },
         inputContainer: {
             marginTop: 35,
@@ -104,9 +119,23 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
         navigation.navigate('Login');
     };
 
-    // eslint-disable-next-line
     const onSubmit = async (values: SignupFields): Promise<void> => {
-        // TODO: Implement onSubmit
+        setCommonError('');
+
+        const result = await register(values.email, values.password);
+
+        if (!result.success) {
+            setCommonError('Unable to register user.');
+        } else {
+            if (!result.data.accessToken) {
+                navigation.navigate('Login', { message: 'A verification link has been sent to your email address. Please verify before you log in.' });
+            } else {
+                await setComplianceWorkflow(result.data.workflow);
+                const customer = await rize.customer.get(result.data.workflow.customer.uid);
+
+                await setCustomer(customer);
+            }
+        }
     };
 
     return (
@@ -125,6 +154,9 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
                 />
             </View>
             <Heading3 textAlign='center'>Create Account</Heading3>
+            {!!commonError &&
+                <BodySmall color='error' textAlign='center' style={styles.commonError}>{commonError}</BodySmall>
+            }
             <Formik
                 initialValues={initialValues}
                 onSubmit={onSubmit}

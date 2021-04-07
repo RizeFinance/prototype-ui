@@ -18,6 +18,7 @@ import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import HomeScreen from '../screens/HomeScreen';
 import SignupScreen from '../screens/SignupScreen';
+import { AuthProvider } from '../contexts/Auth';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
@@ -37,7 +38,7 @@ function MainStackScreen() {
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
     return (
-        <>
+        <AuthProvider>
             {!customer ? (
                 <Stack.Navigator screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Login" component={LoginScreen} />
@@ -70,7 +71,7 @@ function MainStackScreen() {
                     </Stack.Navigator>
                 </ComplianceWorkflowProvider>
             )}
-        </>
+        </AuthProvider>
     );
 }
 
