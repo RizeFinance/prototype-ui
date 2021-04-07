@@ -1,11 +1,18 @@
 import * as React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Button, Input, Screen } from '../components';
-import { BodySmall, Heading3 } from '../components/Typography';
+import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types';
+import { useThemeColor } from '../components/Themed';
 
 const logo = require('../assets/images/logo.png');
+
+interface SignupScreenProps {
+    navigation: StackNavigationProp<RootStackParamList, 'PII'>;
+}
 
 interface SignupFields {
     email: string;
@@ -13,12 +20,14 @@ interface SignupFields {
     confirmPassword: string;
 }
 
-export default function SignupScreen(): JSX.Element {
+export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Element {
     const initialValues: SignupFields = {
         email: '',
         password: '',
         confirmPassword: '',
     };
+
+    const primary = useThemeColor('primary');
 
     const styles = StyleSheet.create({
         logo: {
@@ -34,6 +43,12 @@ export default function SignupScreen(): JSX.Element {
         passwordRulesSection: {
             marginTop: 4,
             marginBottom: 12,
+        },
+        alreadyHaveAccount: {
+            textDecorationLine: 'underline',
+            textDecorationColor: primary,
+            color: primary,
+            marginTop: 20
         }
     });
 
@@ -83,6 +98,10 @@ export default function SignupScreen(): JSX.Element {
         }
 
         return {};
+    };
+
+    const onPressAlreadyHaveAccount = (): void => {
+        navigation.navigate('Login');
     };
 
     // eslint-disable-next-line
@@ -195,6 +214,10 @@ export default function SignupScreen(): JSX.Element {
                                 disabled={!dirty || !isValid || isSubmitting}
                                 onPress={(): void => handleSubmit()}
                             />
+
+                            <Pressable onPress={(): void => { onPressAlreadyHaveAccount(); }} disabled={isSubmitting}>
+                                <Body textAlign='center' fontWeight='semibold' style={styles.alreadyHaveAccount}>I already have an account.</Body>
+                            </Pressable>
                         </>
                     );
                 }}
