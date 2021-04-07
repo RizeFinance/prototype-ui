@@ -1,4 +1,4 @@
-import { Customer } from '@rize/rize-js/types/lib/core/customer';
+import { Customer } from '@rizefinance/rize-js/types/lib/core/customer';
 import React, { useContext } from 'react';
 import RizeClient from '../utils/rizeClient';
 

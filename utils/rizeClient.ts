@@ -1,4 +1,4 @@
-import Rize from '@rize/rize-js';
+import Rize from '@rizefinance/rize-js';
 import config from '../config/config';
 
 class RizeClient {
