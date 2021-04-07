@@ -41,7 +41,7 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
             height: 200,
             width: 200,
             marginTop: -30,
-            marginBottom: -50
+            marginBottom: -25
         },
         message: {
             marginTop: 4,
