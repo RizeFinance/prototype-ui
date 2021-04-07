@@ -15,7 +15,7 @@ import RizeClient from '../utils/rizeClient';
 const logo = require('../assets/images/logo.png');
 
 interface SignupScreenProps {
-    navigation: StackNavigationProp<RootStackParamList, 'PII'>;
+    navigation: StackNavigationProp<RootStackParamList, 'Signup'>;
 }
 
 interface SignupFields {
