@@ -5,6 +5,7 @@ import { Body, BodySmall, fontStyles } from './Typography';
 
 export type InputProps = Omit<TextInput['props'], 'style'> & {
     label?: string;
+    errorState?: boolean;
     errorText?: string;
     labelStyle?: TextStyle;
     inputStyle?: StyleProp<TextStyle>;
@@ -14,6 +15,7 @@ export type InputProps = Omit<TextInput['props'], 'style'> & {
 const Input = (props: InputProps): JSX.Element => {
     const {
         label,
+        errorState,
         errorText,
         labelStyle,
         inputStyle,
@@ -69,7 +71,7 @@ const Input = (props: InputProps): JSX.Element => {
                 style={[
                     fontStyles.body,
                     defaultStyles.textInput,
-                    !!errorText && defaultStyles.errorTextInput,
+                    (errorState || !!errorText) && defaultStyles.errorTextInput,
                     inputStyle
                 ]}
                 {...otherProps}

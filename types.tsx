@@ -29,6 +29,7 @@ export type RootStackParamList = {
   BankingDisclosures: undefined;
   Disclosures: undefined;
   Login: undefined;
+  Signup: undefined;
   PatriotAct: undefined;
   PII: undefined;
   ConfirmPII: ConfirmPIIParams;

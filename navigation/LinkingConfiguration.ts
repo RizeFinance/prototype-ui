@@ -7,6 +7,7 @@ export default {
             Main: {
                 screens: {
                     Login: 'login',
+                    Signup: 'signup',
                     Home: 'home',
                     ProcessingApplication: 'processing-application',
                     ApplicationUnapproved: 'application-unapproved',

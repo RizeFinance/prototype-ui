@@ -1,7 +1,7 @@
 import { StackNavigationProp } from '@react-navigation/stack';
-import { ComplianceWorkflow } from '@rize/rize-js/types/lib/core/compliance-workflow';
-import { Customer } from '@rize/rize-js/types/lib/core/customer';
-import { ComplianceDocument } from '@rize/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
+import { ComplianceWorkflow } from '@rizefinance/rize-js/types/lib/core/compliance-workflow';
+import { Customer } from '@rizefinance/rize-js/types/lib/core/customer';
+import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 import React, { useContext } from 'react';
 import { RootStackParamList } from '../types';
 import RizeClient from '../utils/rizeClient';

@@ -17,6 +17,7 @@ import PDFReaderScreen from '../screens/PDFReaderScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import HomeScreen from '../screens/HomeScreen';
+import SignupScreen from '../screens/SignupScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
@@ -40,6 +41,7 @@ function MainStackScreen() {
             {!customer ? (
                 <Stack.Navigator screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="Signup" component={SignupScreen} />
                 </Stack.Navigator>
             ) : (
                 <ComplianceWorkflowProvider navigation={navigation}>
