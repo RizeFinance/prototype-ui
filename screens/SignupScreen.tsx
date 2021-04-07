@@ -45,7 +45,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
             height: 200,
             width: 200,
             marginTop: -30,
-            marginBottom: -10
+            marginBottom: -25
         },
         commonError: {
             marginTop: 4,

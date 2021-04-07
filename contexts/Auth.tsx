@@ -4,6 +4,7 @@ import AuthService from '../services/AuthService';
 export type AuthContextProps = {
     accessToken?: string;
     refreshToken?: string;
+    login: (userName: string, password: string) => Promise<any>;
     register: (username: string, password: string) => Promise<any>;
     forgotPassword: (email: string) => Promise<any>;
 }
@@ -11,23 +12,24 @@ export type AuthContextProps = {
 export const AuthContext = React.createContext<AuthContextProps>({
     accessToken: undefined,
     refreshToken: undefined,
+    login: () => Promise.resolve(),
     register: () => Promise.resolve(null),
     forgotPassword: () => Promise.resolve(null)
 });
 
-export interface AuthProviderProps {
-    children?: JSX.Element;
-}
-
 export type AuthProviderState = {
-    accessToken: string;
-    refreshToken: string;
-}
+    accessToken?: string;
+    refreshToken?: string
+};
 
 const initialState = {
     accessToken: undefined,
-    refreshToken: undefined,
+    refreshToken: undefined
 };
+
+export interface AuthProviderProps {
+    children?: JSX.Element;
+}
 
 export class AuthProvider extends React.Component<AuthProviderProps, AuthProviderState> {
     constructor(props: AuthProviderProps) {
@@ -43,6 +45,37 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
             this.setState(state, () => { resolve(); });
         });
     }
+
+    login = async (userName: string, password: string): Promise<any> => {
+        try {
+            const { data } = await AuthService.authorize(userName, password);
+            if (data && data.accessToken) {            
+                await this.promisedSetState({
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken
+                });
+            }
+
+            return {
+                success: true,
+                data
+            };
+        } catch (err) {
+            if (err.status === 403) {
+                return {
+                    success: false,
+                    message: 'Wrong email or password.' 
+                };
+            } else if (err.status === 429) {
+                return {
+                    success: false,
+                    message: 'Too many login attempts.' 
+                };
+            } else {
+                throw err;
+            }
+        }
+    };
 
     register = async (username: string, password: string): Promise<any> => {
         try {
@@ -81,6 +114,7 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
                 value={{
                     accessToken: accessToken,
                     refreshToken: refreshToken,
+                    login: this.login,
                     register: this.register,
                     forgotPassword: this.forgotPassword
                 }}

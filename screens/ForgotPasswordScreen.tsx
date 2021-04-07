@@ -34,7 +34,7 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
             height: 200,
             width: 200,
             marginTop: -30,
-            marginBottom: -10
+            marginBottom: -25
         },
         message: {
             marginTop: 4,

@@ -1,13 +1,13 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
-import { Button, Input, Screen } from '../components';
-import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { Formik } from 'formik';
 import validator from 'validator';
-import { useThemeColor } from '../components/Themed';
+import { useAuth } from '../contexts/Auth';
+import { Button, Input, Screen } from '../components';
+import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { useCustomer } from '../contexts/Customer';
-import RizeClient from '../utils/rizeClient';
-import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { useThemeColor } from '../components/Themed';
+import CustomerService from '../services/CustomerService';
 import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -15,22 +15,23 @@ import { StackNavigationProp } from '@react-navigation/stack';
 const logo = require('../assets/images/logo.png');
 
 interface LoginScreenProps {
-    navigation: StackNavigationProp<RootStackParamList, 'ForgotPassword'>;
+    navigation: StackNavigationProp<RootStackParamList, 'Login'>;
     route: RouteProp<RootStackParamList, 'Login'>;
 }
 
 interface LoginFields {
     email: string;
+    password: string;
 }
 
 export default function LoginScreen({ navigation, route }: LoginScreenProps): JSX.Element {
+    const auth = useAuth();
     const { setCustomer } = useCustomer();
-    const { setComplianceWorkflow } = useComplianceWorkflow();
-
-    const rize = RizeClient.getInstance();
-
+    const [commonError, setCommonError] = useState<string>('');
+    
     const initialValues: LoginFields = {
-        email: ''
+        email: '',
+        password: ''
     };
 
     const primary = useThemeColor('primary');
@@ -40,14 +41,24 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
             height: 200,
             width: 200,
             marginTop: -30,
-            marginBottom: -10
+            marginBottom: -25
         },
         message: {
             marginTop: 4,
         },
+        commonError: {
+            marginTop: 4,
+            marginBottom: -20,
+        },
         inputContainer: {
             marginTop: 35,
             marginBottom: 30,
+        },
+        underline: {
+            marginTop: 20,
+            textDecorationLine: 'underline',
+            textDecorationColor: primary,
+            color: primary,
         },
         forgotAccount: {
             textDecorationLine: 'underline',
@@ -67,33 +78,38 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
             errors.email = 'Invalid email address.';
         }
 
+        if (validator.isEmpty(values.password, { ignore_whitespace: true })) {
+            errors.password = 'Password is required.';
+        }
+
         return errors;
     };
 
-    const createNewComplianceWorkflow = async (email: string): Promise<void> => {
-        const newComplianceWorkflow = await rize.complianceWorkflow.create(
-            new Date().getTime().toString(),
-            email
-        );
-        const customer = await rize.customer.get(newComplianceWorkflow.customer.uid);
+    const onSubmit = async (values: LoginFields): Promise<void> => {
+        setCommonError('');
+        const authData = await auth.login(values.email, values.password);
+        
+        if(!authData.success) {
+            setCommonError(authData.message);
+            return;
+        }
 
-        await setComplianceWorkflow(newComplianceWorkflow);
-        await setCustomer(customer);
+        const customerResponse = await CustomerService.getCustomer(authData.data.accessToken);
+
+        const customer = customerResponse.data;
+
+        const rizeCustomer = {
+            ...customer,
+            uid: customer.rize_uid,
+            external_uid: customer.uid
+        };
+        delete rizeCustomer.rize_uid;
+
+        await setCustomer(rizeCustomer);
     };
 
-    const onSubmit = async (values: LoginFields): Promise<void> => {
-        const existingCustomers = await rize.customer.getList({
-            email: values.email,
-            include_initiated: true
-        });
-
-        if (existingCustomers.count === 0) {
-            await createNewComplianceWorkflow(values.email);
-        } else {
-            const customer = existingCustomers.data[0];
-
-            await setCustomer(customer);
-        }
+    const gotoSignupScreen = () => {
+        navigation.navigate('Signup');
     };
 
     const onPressForgotPassword = (): void => {
@@ -115,35 +131,55 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
                     style={styles.logo}
                 />
             </View>
-            <Heading3 textAlign='center'>Create Account</Heading3>
+            <Heading3 textAlign='center'>Login</Heading3>
             {!!route.params?.message &&
                 <BodySmall textAlign='center' style={styles.message}>{route.params.message}</BodySmall>
+            }
+            {!!commonError &&
+                <BodySmall color='error' textAlign='center' style={styles.commonError}>{commonError}</BodySmall>
             }
             <Formik
                 initialValues={initialValues}
                 onSubmit={onSubmit}
                 validate={validateForm}
             >
-                {({ handleChange, handleBlur, handleSubmit, values, errors, isValid, isSubmitting, dirty }) => (
+                {({ handleChange, handleBlur, handleSubmit, values, errors, isValid, isSubmitting, dirty, touched }) => (
                     <>
-                        <Input
-                            label='Email'
-                            containerStyle={styles.inputContainer}
-                            autoCapitalize={'none'}
-                            keyboardType='email-address'
-                            textContentType='emailAddress'
-                            onChangeText={handleChange('email')}
-                            onBlur={handleBlur('email')}
-                            value={values.email}
-                            errorText={errors.email}
-                            editable={!isSubmitting}
-                            onSubmitEditing={(): void => handleSubmit()}
-                        />
+                        <View style={styles.inputContainer}>
+                            <Input
+                                label='Email'
+                                autoCapitalize={'none'}
+                                keyboardType='email-address'
+                                textContentType='emailAddress'
+                                onChangeText={handleChange('email')}
+                                onBlur={handleBlur('email')}
+                                value={values.email}
+                                errorText={touched.email && errors.email}
+                                editable={!isSubmitting}
+                                onSubmitEditing={(): void => handleSubmit()}
+                            />
+                            <Input
+                                label='Password'
+                                textContentType='password'
+                                onChangeText={handleChange('password')}
+                                onBlur={handleBlur('password')}
+                                value={values.password}
+                                secureTextEntry
+                                errorText={touched.password && errors.password}
+                                editable={!isSubmitting}
+                                onSubmitEditing={(): void => handleSubmit()}
+                            />
+                        </View>
                         <Button
-                            title='Submit'
+                            title='Login'
                             disabled={!dirty || !isValid || isSubmitting}
                             onPress={(): void => handleSubmit()}
                         />
+                        <Pressable onPress={(): void => gotoSignupScreen()}>
+                            <Body textAlign='center' fontWeight='semibold' style={styles.underline}>
+                                I need to create an account
+                            </Body>
+                        </Pressable>
                         <Pressable onPress={(): void => { onPressForgotPassword(); }} disabled={isSubmitting}>
                             <Body textAlign='center' fontWeight='semibold' style={styles.forgotAccount}>Forgot password</Body>
                         </Pressable>

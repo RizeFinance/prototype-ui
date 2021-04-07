@@ -1,6 +1,6 @@
+import * as React from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme, useNavigation } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
-import * as React from 'react';
 import { ColorSchemeName, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
 import { CustomerProvider, useCustomer } from '../contexts/Customer';
@@ -8,6 +8,7 @@ import BankingDisclosuresScreen from '../screens/BankingDisclosuresScreen';
 import DisclosuresScreen from '../screens/DisclosuresScreen';
 
 import LoginScreen from '../screens/LoginScreen';
+import SignupScreen from '../screens/SignupScreen';
 import PatriotActScreen from '../screens/PatriotActScreen';
 import PIIScreen from '../screens/PIIScreen';
 import ConfirmPIIScreen from '../screens/ConfirmPIIScreen';
@@ -17,7 +18,6 @@ import PDFReaderScreen from '../screens/PDFReaderScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import HomeScreen from '../screens/HomeScreen';
-import SignupScreen from '../screens/SignupScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import { AuthProvider } from '../contexts/Auth';
 
