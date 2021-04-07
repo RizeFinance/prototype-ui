@@ -36,7 +36,6 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
         super(props);
 
         this.state = initialState;
-        this.login = this.login.bind(this);
     }
 
     promisedSetState = async <K extends keyof AuthProviderState>(
