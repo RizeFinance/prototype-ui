@@ -1,6 +1,6 @@
+import * as React from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme, useNavigation } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
-import * as React from 'react';
 import { ColorSchemeName, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
 import { CustomerProvider, useCustomer } from '../contexts/Customer';
@@ -18,7 +18,7 @@ import PDFReaderScreen from '../screens/PDFReaderScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import HomeScreen from '../screens/HomeScreen';
-import { AuthProvider, useAuth } from '../contexts/Auth';
+import { AuthProvider } from '../contexts/Auth';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
@@ -35,12 +35,11 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 function MainStackScreen() {
     const { customer } = useCustomer();
-    const auth = useAuth();
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
     return (
         <AuthProvider>
-            {!auth.isAuthenticated ? (
+            {!customer ? (
                 <Stack.Navigator screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Login" component={LoginScreen} />
                     <Stack.Screen name="Signup" component={SignupScreen} />

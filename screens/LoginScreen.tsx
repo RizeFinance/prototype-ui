@@ -2,27 +2,34 @@ import * as React from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Formik } from 'formik';
 import validator from 'validator';
-import { useNavigation } from '@react-navigation/native';
 
 import { useAuth } from '../contexts/Auth';
 import { Button, Input, Screen } from '../components';
-import { Body, Heading3 } from '../components/Typography';
+import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { useCustomer } from '../contexts/Customer';
 import RizeClient from '../utils/rizeClient';
 import { useThemeColor } from '../components/Themed';
+import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { RouteProp } from '@react-navigation/core';
+import { RootStackParamList } from '../types';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 const logo = require('../assets/images/logo.png');
+
+interface LoginScreenProps {
+    navigation: StackNavigationProp<RootStackParamList, 'Login'>;
+    route: RouteProp<RootStackParamList, 'Login'>;
+}
 
 interface LoginFields {
     email: string;
     password: string;
 }
 
-export default function LoginScreen(): JSX.Element {
+export default function LoginScreen({ navigation, route }: LoginScreenProps): JSX.Element {
     const auth = useAuth();
     const { setCustomer } = useCustomer();
-
-    const navigation = useNavigation();
+    
     const rize = RizeClient.getInstance();
     const primary = useThemeColor('primary');
     
@@ -44,6 +51,12 @@ export default function LoginScreen(): JSX.Element {
         },
         passwordInput: {
             marginTop: 10,
+        },
+        message: {
+            marginTop: 4,
+        },
+        inputContainer: {
+            marginTop: 35,
             marginBottom: 30,
         },
         underline: {
@@ -107,6 +120,9 @@ export default function LoginScreen(): JSX.Element {
                 />
             </View>
             <Heading3 textAlign='center'>Login</Heading3>
+            {!!route.params?.message &&
+                <BodySmall textAlign='center' style={styles.message}>{route.params.message}</BodySmall>
+            }
             <Formik
                 initialValues={initialValues}
                 onSubmit={onSubmit}
@@ -154,8 +170,4 @@ export default function LoginScreen(): JSX.Element {
             </Formik>
         </Screen>
     );
-}
-
-function createNewComplianceWorkflow(email: string) {
-    throw new Error('Function not implemented.');
 }
