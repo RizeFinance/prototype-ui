@@ -57,7 +57,8 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
         underline: {
             marginTop: 20,
             textDecorationLine: 'underline',
-            textDecorationColor: primary
+            textDecorationColor: primary,
+            color: primary,
         },
         forgotAccount: {
             textDecorationLine: 'underline',
@@ -175,7 +176,7 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
                             onPress={(): void => handleSubmit()}
                         />
                         <Pressable onPress={(): void => gotoSignupScreen()}>
-                            <Body textAlign='center' style={styles.underline}>
+                            <Body textAlign='center' fontWeight='semibold' style={styles.underline}>
                                 I need to create an account
                             </Body>
                         </Pressable>
