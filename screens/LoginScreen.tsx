@@ -1,20 +1,26 @@
 import * as React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Button, Input, Screen } from '../components';
-import { Heading3 } from '../components/Typography';
+import { BodySmall, Heading3 } from '../components/Typography';
 import { Formik } from 'formik';
 import validator from 'validator';
 import { useCustomer } from '../contexts/Customer';
 import RizeClient from '../utils/rizeClient';
 import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { RouteProp } from '@react-navigation/core';
+import { RootStackParamList } from '../types';
 
 const logo = require('../assets/images/logo.png');
+
+interface LoginScreenProps {
+    route: RouteProp<RootStackParamList, 'Login'>;
+}
 
 interface LoginFields {
     email: string;
 }
 
-export default function LoginScreen(): JSX.Element {
+export default function LoginScreen({ route }: LoginScreenProps): JSX.Element {
     const { setCustomer } = useCustomer();
     const { setComplianceWorkflow } = useComplianceWorkflow();
 
@@ -30,6 +36,9 @@ export default function LoginScreen(): JSX.Element {
             width: 200,
             marginTop: -30,
             marginBottom: -10
+        },
+        message: {
+            marginTop: 4,
         },
         inputContainer: {
             marginTop: 35,
@@ -92,6 +101,9 @@ export default function LoginScreen(): JSX.Element {
                 />
             </View>
             <Heading3 textAlign='center'>Create Account</Heading3>
+            {!!route.params?.message &&
+                <BodySmall textAlign='center' style={styles.message}>{route.params.message}</BodySmall>
+            }
             <Formik
                 initialValues={initialValues}
                 onSubmit={onSubmit}

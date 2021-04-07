@@ -5,6 +5,9 @@ export type Config = {
         programId: string;
         hmac: string;
     };
+    api: {
+        baseUrl: string;
+    };
 }
 
 export default {

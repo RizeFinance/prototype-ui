@@ -25,10 +25,14 @@ export type ConfirmPIIParams = {
   fieldValues: PIIFields;
 }
 
+export type LoginParams = {
+  message?: string;
+}
+
 export type RootStackParamList = {
   BankingDisclosures: undefined;
   Disclosures: undefined;
-  Login: undefined;
+  Login: LoginParams;
   Signup: undefined;
   PatriotAct: undefined;
   PII: undefined;
