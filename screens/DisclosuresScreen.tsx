@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import { Pressable, View, StyleSheet, } from 'react-native';
 import * as Network from 'expo-network';
-import { ComplianceDocumentAcknowledgementRequest } from '@rize/rize-js/lib/core/compliance-workflow';
+import { ComplianceDocumentAcknowledgementRequest } from '@rizefinance/rize-js/lib/core/compliance-workflow';
 
 import Checkbox from '../components/Checkbox';
 import { Screen } from '../components';

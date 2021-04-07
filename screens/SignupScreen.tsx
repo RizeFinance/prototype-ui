@@ -210,7 +210,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
                                 />
                             </View>
                             <Button
-                                title='Submit'
+                                title='Create Account'
                                 disabled={!dirty || !isValid || isSubmitting}
                                 onPress={(): void => handleSubmit()}
                             />
