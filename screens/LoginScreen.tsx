@@ -12,6 +12,7 @@ import CustomerService from '../services/CustomerService';
 import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useState } from 'react';
 
 const logo = require('../assets/images/logo.png');
 
@@ -29,6 +30,7 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
     const auth = useAuth();
     const { setCustomer } = useCustomer();
     const primary = useThemeColor('primary');
+    const [commonError, setCommonError] = useState<string>('');
     
     const initialValues: LoginFields = {
         email: '',
@@ -44,6 +46,10 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
         },
         message: {
             marginTop: 4,
+        },
+        commonError: {
+            marginTop: 4,
+            marginBottom: -20,
         },
         inputContainer: {
             marginTop: 35,
@@ -74,9 +80,15 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
     };
 
     const onSubmit = async (values: LoginFields): Promise<void> => {
+        setCommonError('');
         const authData = await auth.login(values.email, values.password);
+        
+        if(!authData.success) {
+            setCommonError(authData.message);
+            return;
+        }
 
-        const customerResponse = await CustomerService.getCustomer(authData.accessToken);
+        const customerResponse = await CustomerService.getCustomer(authData.data.accessToken);
 
         const customer = customerResponse.data;
 
@@ -112,6 +124,9 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
             <Heading3 textAlign='center'>Login</Heading3>
             {!!route.params?.message &&
                 <BodySmall textAlign='center' style={styles.message}>{route.params.message}</BodySmall>
+            }
+            {!!commonError &&
+                <BodySmall color='error' textAlign='center' style={styles.commonError}>{commonError}</BodySmall>
             }
             <Formik
                 initialValues={initialValues}

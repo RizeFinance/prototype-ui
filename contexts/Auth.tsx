@@ -46,16 +46,34 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
     }
 
     login = async (userName: string, password: string): Promise<any> => {
-        const { data } = await AuthService.authorize(userName, password);
-        
-        if (data && data.accessToken) {            
-            await this.promisedSetState({
-                accessToken: data.accessToken,
-                refreshToken: data.refreshToken
-            });
-        }
+        try {
+            const { data } = await AuthService.authorize(userName, password);
+            if (data && data.accessToken) {            
+                await this.promisedSetState({
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken
+                });
+            }
 
-        return data;
+            return {
+                success: true,
+                data
+            };
+        } catch (err) {
+            if (err.status === 403) {
+                return {
+                    success: false,
+                    message: 'Wrong email or password.' 
+                };
+            } else if (err.status === 429) {
+                return {
+                    success: false,
+                    message: 'Too many login attempts.' 
+                };
+            } else {
+                throw err;
+            }
+        }
     };
 
     register = async (username: string, password: string): Promise<any> => {
