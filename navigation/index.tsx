@@ -8,6 +8,7 @@ import BankingDisclosuresScreen from '../screens/BankingDisclosuresScreen';
 import DisclosuresScreen from '../screens/DisclosuresScreen';
 
 import LoginScreen from '../screens/LoginScreen';
+import SignupScreen from '../screens/SignupScreen';
 import PatriotActScreen from '../screens/PatriotActScreen';
 import PIIScreen from '../screens/PIIScreen';
 import ConfirmPIIScreen from '../screens/ConfirmPIIScreen';
@@ -17,6 +18,7 @@ import PDFReaderScreen from '../screens/PDFReaderScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import HomeScreen from '../screens/HomeScreen';
+import { AuthProvider, useAuth } from '../contexts/Auth';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
@@ -33,13 +35,15 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 function MainStackScreen() {
     const { customer } = useCustomer();
+    const auth = useAuth();
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
     return (
-        <>
-            {!customer ? (
+        <AuthProvider>
+            {!auth.isAuthenticated ? (
                 <Stack.Navigator screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="Signup" component={SignupScreen} />
                 </Stack.Navigator>
             ) : (
                 <ComplianceWorkflowProvider navigation={navigation}>
@@ -68,7 +72,7 @@ function MainStackScreen() {
                     </Stack.Navigator>
                 </ComplianceWorkflowProvider>
             )}
-        </>
+        </AuthProvider>
     );
 }
 

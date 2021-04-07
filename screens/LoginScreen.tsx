@@ -1,27 +1,34 @@
 import * as React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
-import { Button, Input, Screen } from '../components';
-import { Heading3 } from '../components/Typography';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Formik } from 'formik';
 import validator from 'validator';
+import { useNavigation } from '@react-navigation/native';
+
+import { useAuth } from '../contexts/Auth';
+import { Button, Input, Screen } from '../components';
+import { Body, Heading3 } from '../components/Typography';
 import { useCustomer } from '../contexts/Customer';
 import RizeClient from '../utils/rizeClient';
-import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { useThemeColor } from '../components/Themed';
 
 const logo = require('../assets/images/logo.png');
 
 interface LoginFields {
     email: string;
+    password: string;
 }
 
 export default function LoginScreen(): JSX.Element {
+    const auth = useAuth();
     const { setCustomer } = useCustomer();
-    const { setComplianceWorkflow } = useComplianceWorkflow();
 
+    const navigation = useNavigation();
     const rize = RizeClient.getInstance();
-
+    const primary = useThemeColor('primary');
+    
     const initialValues: LoginFields = {
-        email: ''
+        email: '',
+        password: ''
     };
 
     const styles = StyleSheet.create({
@@ -29,11 +36,20 @@ export default function LoginScreen(): JSX.Element {
             height: 200,
             width: 200,
             marginTop: -30,
-            marginBottom: -10
+            marginBottom: -50
         },
-        inputContainer: {
-            marginTop: 35,
+        emailInput: {
+            marginTop: 10,
+            marginBottom: 10,
+        },
+        passwordInput: {
+            marginTop: 10,
             marginBottom: 30,
+        },
+        underline: {
+            marginTop: 10,
+            textDecorationLine: 'underline',
+            textDecorationColor: primary
         }
     });
 
@@ -47,33 +63,32 @@ export default function LoginScreen(): JSX.Element {
             errors.email = 'Invalid email address.';
         }
 
+        if (validator.isEmpty(values.password, { ignore_whitespace: true })) {
+            errors.password = 'Password is required.';
+        }
+
         return errors;
     };
 
-    const createNewComplianceWorkflow = async (email: string): Promise<void> => {
-        const newComplianceWorkflow = await rize.complianceWorkflow.create(
-            new Date().getTime().toString(),
-            email
-        );
-        const customer = await rize.customer.get(newComplianceWorkflow.customer.uid);
+    const onSubmit = async (values: LoginFields): Promise<void> => {
+        try {
+            await auth.login(values.email, values.password);
 
-        await setComplianceWorkflow(newComplianceWorkflow);
-        await setCustomer(customer);
+            const existingCustomers = await rize.customer.getList({
+                email: values.email,
+                include_initiated: true
+            });
+    
+            const customer = existingCustomers.data[0];
+            console.log('customer: ', customer);
+            await setCustomer(customer);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
-    const onSubmit = async (values: LoginFields): Promise<void> => {
-        const existingCustomers = await rize.customer.getList({
-            email: values.email,
-            include_initiated: true
-        });
-
-        if (existingCustomers.count === 0) {
-            await createNewComplianceWorkflow(values.email);
-        } else {
-            const customer = existingCustomers.data[0];
-
-            await setCustomer(customer);
-        }
+    const gotoSignupScreen = () => {
+        navigation.navigate('Signup');
     };
 
     return (
@@ -91,7 +106,7 @@ export default function LoginScreen(): JSX.Element {
                     style={styles.logo}
                 />
             </View>
-            <Heading3 textAlign='center'>Create Account</Heading3>
+            <Heading3 textAlign='center'>Login</Heading3>
             <Formik
                 initialValues={initialValues}
                 onSubmit={onSubmit}
@@ -101,7 +116,7 @@ export default function LoginScreen(): JSX.Element {
                     <>
                         <Input
                             label='Email'
-                            containerStyle={styles.inputContainer}
+                            containerStyle={styles.emailInput}
                             autoCapitalize={'none'}
                             keyboardType='email-address'
                             textContentType='emailAddress'
@@ -112,14 +127,35 @@ export default function LoginScreen(): JSX.Element {
                             editable={!isSubmitting}
                             onSubmitEditing={(): void => handleSubmit()}
                         />
+                        <Input
+                            label='Password'
+                            containerStyle={styles.passwordInput}
+                            textContentType='password'
+                            onChangeText={handleChange('password')}
+                            onBlur={handleBlur('password')}
+                            value={values.password}
+                            secureTextEntry
+                            errorText={errors.password}
+                            editable={!isSubmitting}
+                            onSubmitEditing={(): void => handleSubmit()}
+                        />
                         <Button
-                            title='Submit'
+                            title='Login'
                             disabled={!dirty || !isValid || isSubmitting}
                             onPress={(): void => handleSubmit()}
                         />
+                        <Pressable onPress={(): void => gotoSignupScreen()}>
+                            <Body textAlign='center' style={styles.underline}>
+                                I need to create an account
+                            </Body>
+                        </Pressable>
                     </>
                 )}
             </Formik>
         </Screen>
     );
+}
+
+function createNewComplianceWorkflow(email: string) {
+    throw new Error('Function not implemented.');
 }
