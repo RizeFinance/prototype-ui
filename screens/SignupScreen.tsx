@@ -188,6 +188,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
                                     label='Password'
                                     autoCapitalize={'none'}
                                     textContentType='newPassword'
+                                    secureTextEntry={true}
                                     onChangeText={handleChange('password')}
                                     onBlur={handleBlur('password')}
                                     value={values.password}
@@ -233,6 +234,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
                                     label='Confirm Password'
                                     autoCapitalize={'none'}
                                     textContentType='newPassword'
+                                    secureTextEntry={true}
                                     onChangeText={handleChange('confirmPassword')}
                                     onBlur={handleBlur('confirmPassword')}
                                     value={values.confirmPassword}
