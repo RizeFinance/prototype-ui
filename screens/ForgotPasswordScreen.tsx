@@ -11,18 +11,18 @@ import { useAuth } from '../contexts/Auth';
 
 const logo = require('../assets/images/logo.png');
 
-interface ForgotScreenProps {
+interface ForgotPasswordScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'PII'>;
 }
 
-interface ForgotFields {
+interface ForgotPasswordFields {
     email: string;
 }
 
-export default function ForgotScreen({ navigation }: ForgotScreenProps): JSX.Element {
-    const { forgot } = useAuth();
+export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScreenProps): JSX.Element {
+    const { forgotPassword } = useAuth();
 
-    const initialValues: ForgotFields = {
+    const initialValues: ForgotPasswordFields = {
         email: ''
     };
 
@@ -50,7 +50,7 @@ export default function ForgotScreen({ navigation }: ForgotScreenProps): JSX.Ele
         }
     });
 
-    const validateForm = (values: ForgotFields): any => {
+    const validateForm = (values: ForgotPasswordFields): any => {
         const errors: any = {};
 
         if (validator.isEmpty(values.email, { ignore_whitespace: true })) {
@@ -67,8 +67,8 @@ export default function ForgotScreen({ navigation }: ForgotScreenProps): JSX.Ele
         navigation.navigate('Login');
     };
 
-    const onSubmit = async (values: ForgotFields): Promise<void> => {
-        const result = await forgot(values.email);
+    const onSubmit = async (values: ForgotPasswordFields): Promise<void> => {
+        const result = await forgotPassword(values.email);
     };
 
     return (

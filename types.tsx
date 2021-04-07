@@ -34,7 +34,7 @@ export type RootStackParamList = {
   Disclosures: undefined;
   Login: LoginParams;
   Signup: undefined;
-  Forgot: undefined;
+  ForgotPassword: undefined;
   PatriotAct: undefined;
   PII: undefined;
   ConfirmPII: ConfirmPIIParams;
