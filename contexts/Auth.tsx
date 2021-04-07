@@ -65,7 +65,7 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
 
     forgotPassword = async (email: string): Promise<any> => {
         try {
-            await AuthService.forgotPassword(email);
+            return await AuthService.forgotPassword(email);
         } catch (err) {
             return {
                 success: false
