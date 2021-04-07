@@ -1,18 +1,21 @@
 import * as React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Button, Input, Screen } from '../components';
-import { BodySmall, Heading3 } from '../components/Typography';
+import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { Formik } from 'formik';
 import validator from 'validator';
+import { useThemeColor } from '../components/Themed';
 import { useCustomer } from '../contexts/Customer';
 import RizeClient from '../utils/rizeClient';
 import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../types';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 const logo = require('../assets/images/logo.png');
 
 interface LoginScreenProps {
+    navigation: StackNavigationProp<RootStackParamList, 'ForgotPassword'>;
     route: RouteProp<RootStackParamList, 'Login'>;
 }
 
@@ -20,7 +23,7 @@ interface LoginFields {
     email: string;
 }
 
-export default function LoginScreen({ route }: LoginScreenProps): JSX.Element {
+export default function LoginScreen({ navigation, route }: LoginScreenProps): JSX.Element {
     const { setCustomer } = useCustomer();
     const { setComplianceWorkflow } = useComplianceWorkflow();
 
@@ -29,6 +32,8 @@ export default function LoginScreen({ route }: LoginScreenProps): JSX.Element {
     const initialValues: LoginFields = {
         email: ''
     };
+
+    const primary = useThemeColor('primary');
 
     const styles = StyleSheet.create({
         logo: {
@@ -43,6 +48,12 @@ export default function LoginScreen({ route }: LoginScreenProps): JSX.Element {
         inputContainer: {
             marginTop: 35,
             marginBottom: 30,
+        },
+        forgotAccount: {
+            textDecorationLine: 'underline',
+            textDecorationColor: primary,
+            color: primary,
+            marginTop: 20
         }
     });
 
@@ -83,6 +94,10 @@ export default function LoginScreen({ route }: LoginScreenProps): JSX.Element {
 
             await setCustomer(customer);
         }
+    };
+
+    const onPressForgotPassword = (): void => {
+        navigation.navigate('ForgotPassword');
     };
 
     return (
@@ -129,6 +144,9 @@ export default function LoginScreen({ route }: LoginScreenProps): JSX.Element {
                             disabled={!dirty || !isValid || isSubmitting}
                             onPress={(): void => handleSubmit()}
                         />
+                        <Pressable onPress={(): void => { onPressForgotPassword(); }} disabled={isSubmitting}>
+                            <Body textAlign='center' fontWeight='semibold' style={styles.forgotAccount}>Forgot password</Body>
+                        </Pressable>
                     </>
                 )}
             </Formik>

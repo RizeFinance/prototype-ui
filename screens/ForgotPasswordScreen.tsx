@@ -12,7 +12,7 @@ import { useAuth } from '../contexts/Auth';
 const logo = require('../assets/images/logo.png');
 
 interface ForgotPasswordScreenProps {
-    navigation: StackNavigationProp<RootStackParamList, 'PII'>;
+    navigation: StackNavigationProp<RootStackParamList, 'ForgotPassword'>;
 }
 
 interface ForgotPasswordFields {
