@@ -4,7 +4,7 @@ import AuthService from '../services/AuthService';
 export type AuthContextProps = {
     accessToken?: string;
     refreshToken?: string;
-    login: (userName: string, password: string) => Promise<void>;
+    login: (userName: string, password: string) => Promise<any>;
     register: (username: string, password: string) => Promise<any>;
 }
 
@@ -45,7 +45,7 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
         });
     }
 
-    login = async (userName: string, password: string): Promise<void> => {
+    login = async (userName: string, password: string): Promise<any> => {
         const { data } = await AuthService.authorize(userName, password);
         
         if (data && data.accessToken) {            
@@ -54,6 +54,8 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
                 refreshToken: data.refreshToken
             });
         }
+
+        return data;
     };
 
     register = async (username: string, password: string): Promise<any> => {

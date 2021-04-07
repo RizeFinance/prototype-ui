@@ -7,9 +7,8 @@ import { useAuth } from '../contexts/Auth';
 import { Button, Input, Screen } from '../components';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { useCustomer } from '../contexts/Customer';
-import RizeClient from '../utils/rizeClient';
 import { useThemeColor } from '../components/Themed';
-import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import CustomerService from '../services/CustomerService';
 import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -29,8 +28,6 @@ interface LoginFields {
 export default function LoginScreen({ navigation, route }: LoginScreenProps): JSX.Element {
     const auth = useAuth();
     const { setCustomer } = useCustomer();
-    
-    const rize = RizeClient.getInstance();
     const primary = useThemeColor('primary');
     
     const initialValues: LoginFields = {
@@ -45,13 +42,6 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
             marginTop: -30,
             marginBottom: -50
         },
-        emailInput: {
-            marginTop: 10,
-            marginBottom: 10,
-        },
-        passwordInput: {
-            marginTop: 10,
-        },
         message: {
             marginTop: 4,
         },
@@ -60,7 +50,7 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
             marginBottom: 30,
         },
         underline: {
-            marginTop: 10,
+            marginTop: 20,
             textDecorationLine: 'underline',
             textDecorationColor: primary
         }
@@ -84,20 +74,20 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
     };
 
     const onSubmit = async (values: LoginFields): Promise<void> => {
-        try {
-            await auth.login(values.email, values.password);
+        const authData = await auth.login(values.email, values.password);
 
-            const existingCustomers = await rize.customer.getList({
-                email: values.email,
-                include_initiated: true
-            });
-    
-            const customer = existingCustomers.data[0];
-            console.log('customer: ', customer);
-            await setCustomer(customer);
-        } catch (err) {
-            console.log(err);
-        }
+        const customerResponse = await CustomerService.getCustomer(authData.accessToken);
+
+        const customer = customerResponse.data;
+
+        const rizeCustomer = {
+            ...customer,
+            uid: customer.rize_uid,
+            external_uid: customer.uid
+        };
+        delete rizeCustomer.rize_uid;
+
+        await setCustomer(rizeCustomer);
     };
 
     const gotoSignupScreen = () => {
@@ -128,33 +118,33 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
                 onSubmit={onSubmit}
                 validate={validateForm}
             >
-                {({ handleChange, handleBlur, handleSubmit, values, errors, isValid, isSubmitting, dirty }) => (
+                {({ handleChange, handleBlur, handleSubmit, values, errors, isValid, isSubmitting, dirty, touched }) => (
                     <>
-                        <Input
-                            label='Email'
-                            containerStyle={styles.emailInput}
-                            autoCapitalize={'none'}
-                            keyboardType='email-address'
-                            textContentType='emailAddress'
-                            onChangeText={handleChange('email')}
-                            onBlur={handleBlur('email')}
-                            value={values.email}
-                            errorText={errors.email}
-                            editable={!isSubmitting}
-                            onSubmitEditing={(): void => handleSubmit()}
-                        />
-                        <Input
-                            label='Password'
-                            containerStyle={styles.passwordInput}
-                            textContentType='password'
-                            onChangeText={handleChange('password')}
-                            onBlur={handleBlur('password')}
-                            value={values.password}
-                            secureTextEntry
-                            errorText={errors.password}
-                            editable={!isSubmitting}
-                            onSubmitEditing={(): void => handleSubmit()}
-                        />
+                        <View style={styles.inputContainer}>
+                            <Input
+                                label='Email'
+                                autoCapitalize={'none'}
+                                keyboardType='email-address'
+                                textContentType='emailAddress'
+                                onChangeText={handleChange('email')}
+                                onBlur={handleBlur('email')}
+                                value={values.email}
+                                errorText={touched.email && errors.email}
+                                editable={!isSubmitting}
+                                onSubmitEditing={(): void => handleSubmit()}
+                            />
+                            <Input
+                                label='Password'
+                                textContentType='password'
+                                onChangeText={handleChange('password')}
+                                onBlur={handleBlur('password')}
+                                value={values.password}
+                                secureTextEntry
+                                errorText={touched.password && errors.password}
+                                editable={!isSubmitting}
+                                onSubmitEditing={(): void => handleSubmit()}
+                            />
+                        </View>
                         <Button
                             title='Login'
                             disabled={!dirty || !isValid || isSubmitting}
