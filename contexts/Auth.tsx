@@ -6,6 +6,7 @@ export type AuthContextProps = {
     refreshToken?: string;
     login: (userName: string, password: string) => Promise<any>;
     register: (username: string, password: string) => Promise<any>;
+    forgotPassword: (email: string) => Promise<any>;
 }
 
 export const AuthContext = React.createContext<AuthContextProps>({
@@ -13,6 +14,7 @@ export const AuthContext = React.createContext<AuthContextProps>({
     refreshToken: undefined,
     login: () => Promise.resolve(),
     register: () => Promise.resolve(null),
+    forgotPassword: () => Promise.resolve(null)
 });
 
 export type AuthProviderState = {
@@ -95,6 +97,16 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
         }
     }
 
+    forgotPassword = async (email: string): Promise<any> => {
+        try {
+            return await AuthService.forgotPassword(email);
+        } catch (err) {
+            return {
+                success: false
+            };
+        }
+    }
+
     render(): JSX.Element {
         const { accessToken, refreshToken } = this.state;
 
@@ -104,7 +116,8 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
                     accessToken: accessToken,
                     refreshToken: refreshToken,
                     login: this.login,
-                    register: this.register
+                    register: this.register,
+                    forgotPassword: this.forgotPassword
                 }}
             >
                 {this.props.children}

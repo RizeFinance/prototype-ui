@@ -1,8 +1,7 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Formik } from 'formik';
 import validator from 'validator';
-
 import { useAuth } from '../contexts/Auth';
 import { Button, Input, Screen } from '../components';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
@@ -12,7 +11,6 @@ import CustomerService from '../services/CustomerService';
 import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useState } from 'react';
 
 const logo = require('../assets/images/logo.png');
 
@@ -29,13 +27,14 @@ interface LoginFields {
 export default function LoginScreen({ navigation, route }: LoginScreenProps): JSX.Element {
     const auth = useAuth();
     const { setCustomer } = useCustomer();
-    const primary = useThemeColor('primary');
     const [commonError, setCommonError] = useState<string>('');
     
     const initialValues: LoginFields = {
         email: '',
         password: ''
     };
+
+    const primary = useThemeColor('primary');
 
     const styles = StyleSheet.create({
         logo: {
@@ -59,6 +58,12 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
             marginTop: 20,
             textDecorationLine: 'underline',
             textDecorationColor: primary
+        },
+        forgotAccount: {
+            textDecorationLine: 'underline',
+            textDecorationColor: primary,
+            color: primary,
+            marginTop: 20
         }
     });
 
@@ -104,6 +109,10 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
 
     const gotoSignupScreen = () => {
         navigation.navigate('Signup');
+    };
+
+    const onPressForgotPassword = (): void => {
+        navigation.navigate('ForgotPassword');
     };
 
     return (
@@ -169,6 +178,9 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
                             <Body textAlign='center' style={styles.underline}>
                                 I need to create an account
                             </Body>
+                        </Pressable>
+                        <Pressable onPress={(): void => { onPressForgotPassword(); }} disabled={isSubmitting}>
+                            <Body textAlign='center' fontWeight='semibold' style={styles.forgotAccount}>Forgot password</Body>
                         </Pressable>
                     </>
                 )}

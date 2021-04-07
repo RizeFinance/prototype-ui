@@ -8,6 +8,7 @@ export default {
                 screens: {
                     Login: 'login',
                     Signup: 'signup',
+                    ForgotPassword: 'forgot-password',
                     Home: 'home',
                     ProcessingApplication: 'processing-application',
                     ApplicationUnapproved: 'application-unapproved',

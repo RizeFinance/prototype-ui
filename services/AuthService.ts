@@ -18,7 +18,13 @@ const authorize = async (
     ).then((response) => response.data);
 };
 
+const forgotPassword = async (email: string): Promise<any> => {
+    return await api.post('/auth/forgot_password', { email })
+        .then((response) => response.data);
+};
+
 export default {
     authorize,
     register,
+    forgotPassword
 };
