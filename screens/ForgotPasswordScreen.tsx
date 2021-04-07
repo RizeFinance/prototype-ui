@@ -1,35 +1,29 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Button, Input, Screen } from '../components';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { Formik } from 'formik';
 import validator from 'validator';
-import { useThemeColor } from '../components/Themed';
-import { useCustomer } from '../contexts/Customer';
-import RizeClient from '../utils/rizeClient';
-import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
-import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useThemeColor } from '../components/Themed';
+import { useAuth } from '../contexts/Auth';
 
 const logo = require('../assets/images/logo.png');
 
-interface LoginScreenProps {
+interface ForgotPasswordScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'ForgotPassword'>;
-    route: RouteProp<RootStackParamList, 'Login'>;
 }
 
-interface LoginFields {
+interface ForgotPasswordFields {
     email: string;
 }
 
-export default function LoginScreen({ navigation, route }: LoginScreenProps): JSX.Element {
-    const { setCustomer } = useCustomer();
-    const { setComplianceWorkflow } = useComplianceWorkflow();
+export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScreenProps): JSX.Element {
+    const { forgotPassword } = useAuth();
+    const [message, setMesage] = useState<string>('');
 
-    const rize = RizeClient.getInstance();
-
-    const initialValues: LoginFields = {
+    const initialValues: ForgotPasswordFields = {
         email: ''
     };
 
@@ -49,7 +43,7 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
             marginTop: 35,
             marginBottom: 30,
         },
-        forgotAccount: {
+        alreadyHaveAccount: {
             textDecorationLine: 'underline',
             textDecorationColor: primary,
             color: primary,
@@ -57,7 +51,7 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
         }
     });
 
-    const validateForm = (values: LoginFields): any => {
+    const validateForm = (values: ForgotPasswordFields): any => {
         const errors: any = {};
 
         if (validator.isEmpty(values.email, { ignore_whitespace: true })) {
@@ -70,34 +64,19 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
         return errors;
     };
 
-    const createNewComplianceWorkflow = async (email: string): Promise<void> => {
-        const newComplianceWorkflow = await rize.complianceWorkflow.create(
-            new Date().getTime().toString(),
-            email
-        );
-        const customer = await rize.customer.get(newComplianceWorkflow.customer.uid);
-
-        await setComplianceWorkflow(newComplianceWorkflow);
-        await setCustomer(customer);
+    const onPressAlreadyHaveAccount = (): void => {
+        navigation.navigate('Login');
     };
 
-    const onSubmit = async (values: LoginFields): Promise<void> => {
-        const existingCustomers = await rize.customer.getList({
-            email: values.email,
-            include_initiated: true
-        });
-
-        if (existingCustomers.count === 0) {
-            await createNewComplianceWorkflow(values.email);
-        } else {
-            const customer = existingCustomers.data[0];
-
-            await setCustomer(customer);
+    const onSubmit = async (values: ForgotPasswordFields): Promise<void> => {
+        setMesage('');
+        const result = await forgotPassword(values.email);
+        if (result.success) {
+            setMesage('The password reset link has now been sent to your email address.');
         }
-    };
-
-    const onPressForgotPassword = (): void => {
-        navigation.navigate('ForgotPassword');
+        else {
+            setMesage('Failed to send reset link to your email address.');
+        }
     };
 
     return (
@@ -115,9 +94,9 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
                     style={styles.logo}
                 />
             </View>
-            <Heading3 textAlign='center'>Create Account</Heading3>
-            {!!route.params?.message &&
-                <BodySmall textAlign='center' style={styles.message}>{route.params.message}</BodySmall>
+            <Heading3 textAlign='center'>Forgot Password</Heading3>
+            {!!message &&
+                <BodySmall textAlign='center' style={styles.message}>{message}</BodySmall>
             }
             <Formik
                 initialValues={initialValues}
@@ -140,12 +119,12 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
                             onSubmitEditing={(): void => handleSubmit()}
                         />
                         <Button
-                            title='Submit'
+                            title='Request reset link'
                             disabled={!dirty || !isValid || isSubmitting}
                             onPress={(): void => handleSubmit()}
                         />
-                        <Pressable onPress={(): void => { onPressForgotPassword(); }} disabled={isSubmitting}>
-                            <Body textAlign='center' fontWeight='semibold' style={styles.forgotAccount}>Forgot password</Body>
+                        <Pressable onPress={(): void => { onPressAlreadyHaveAccount(); }} disabled={isSubmitting}>
+                            <Body textAlign='center' fontWeight='semibold' style={styles.alreadyHaveAccount}>Back to Login</Body>
                         </Pressable>
                     </>
                 )}
