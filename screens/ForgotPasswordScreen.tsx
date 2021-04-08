@@ -103,7 +103,7 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
                 onSubmit={onSubmit}
                 validate={validateForm}
             >
-                {({ handleChange, handleBlur, handleSubmit, values, errors, isValid, isSubmitting, dirty }) => (
+                {({ handleChange, handleBlur, handleSubmit, values, errors, isValid, isSubmitting, dirty, touched }) => (
                     <>
                         <Input
                             label='Email'
@@ -114,7 +114,7 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
                             onChangeText={handleChange('email')}
                             onBlur={handleBlur('email')}
                             value={values.email}
-                            errorText={errors.email}
+                            errorText={touched.email && errors.email}
                             editable={!isSubmitting}
                             onSubmitEditing={(): void => handleSubmit()}
                         />
