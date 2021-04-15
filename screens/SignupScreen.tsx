@@ -10,7 +10,7 @@ import { useThemeColor } from '../components/Themed';
 import { useAuth } from '../contexts/Auth';
 import { useCustomer } from '../contexts/Customer';
 import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
-import RizeClient from '../utils/rizeClient';
+import CustomerService from '../services/CustomerService';
 
 const logo = require('../assets/images/logo.png');
 
@@ -29,8 +29,6 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
     const { setCustomer } = useCustomer();
     const { setComplianceWorkflow } = useComplianceWorkflow();
     const [commonError, setCommonError] = useState<string>('');
-
-    const rize = RizeClient.getInstance();
 
     const initialValues: SignupFields = {
         email: '',
@@ -131,7 +129,8 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
                 navigation.navigate('Login', { message: 'A verification link has been sent to your email address. Please verify before you log in.' });
             } else {
                 await setComplianceWorkflow(result.data.workflow);
-                const customer = await rize.customer.get(result.data.workflow.customer.uid);
+
+                const customer = await CustomerService.getCustomer(result.data.accessToken);
 
                 await setCustomer(customer);
             }
