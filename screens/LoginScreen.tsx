@@ -94,18 +94,9 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
             return;
         }
 
-        const customerResponse = await CustomerService.getCustomer(authData.data.accessToken);
+        const customer = await CustomerService.getCustomer(authData.data.accessToken);
 
-        const customer = customerResponse.data;
-
-        const rizeCustomer = {
-            ...customer,
-            uid: customer.rize_uid,
-            external_uid: customer.uid
-        };
-        delete rizeCustomer.rize_uid;
-
-        await setCustomer(rizeCustomer);
+        await setCustomer(customer);
     };
 
     const gotoSignupScreen = () => {
