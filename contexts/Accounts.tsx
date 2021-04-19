@@ -39,28 +39,18 @@ export class AccountsProvider extends React.Component<AccountsProviderProps, Acc
         this.state = initialState;
     }
 
-    setStateAsync = async <K extends keyof AccountsProviderState>(
-        state: Pick<AccountsProviderState, K> | ((prevState: Readonly<AccountsProviderState>, props: Readonly<AccountsProviderProps>) => (Pick<AccountsProviderState, K> | AccountsProviderState | null)) | null
-    ): Promise<void> => {
-        return new Promise((resolve) => {
-            this.setState(state, () => { resolve(); });
-        });
-    }
-
     refetchAccounts = async (): Promise<SyntheticAccount[]> => {
-        await this.setStateAsync({ isLoading: true });
+        this.setState({ isLoading: true });
 
         try {
             const accountList = await AccountsService.getSyntheticAccounts(this.context.accessToken);
             const liabilityAccounts = accountList.data.filter(x => x.liability);
 
-            await this.setStateAsync({
-                liabilityAccounts
-            });
+            this.setState({ liabilityAccounts } );
 
             return liabilityAccounts;
         } finally {
-            await this.setState({ isLoading: true });
+            this.setState({ isLoading: true });
         }
     }
 
