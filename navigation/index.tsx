@@ -17,9 +17,10 @@ import ApplicationUnapprovedScreen from '../screens/ApplicationUnapprovedScreen'
 import PDFReaderScreen from '../screens/PDFReaderScreen';
 import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
-import HomeScreen from '../screens/HomeScreen';
+import AccountsScreen from '../screens/AccountsScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import { AuthProvider } from '../contexts/Auth';
+import { AccountsProvider } from '../contexts/Accounts';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
@@ -48,29 +49,31 @@ function MainStackScreen() {
                 </Stack.Navigator>
             ) : (
                 <ComplianceWorkflowProvider navigation={navigation}>
-                    <Stack.Navigator screenOptions={{ headerShown: false }}>
-                        {customer.status === 'initiated' ? (
-                            <>
-                                <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
-                                <Stack.Screen name="PatriotAct" component={PatriotActScreen} />
-                                <Stack.Screen name="PII" component={PIIScreen} />
-                                <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} />
-                                <Stack.Screen name="BankingDisclosures" component={BankingDisclosuresScreen} />
-                                <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
+                    <AccountsProvider>
+                        <Stack.Navigator screenOptions={{ headerShown: false }}>
+                            {customer.status === 'initiated' ? (
+                                <>
+                                    <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
+                                    <Stack.Screen name="PatriotAct" component={PatriotActScreen} />
+                                    <Stack.Screen name="PII" component={PIIScreen} />
+                                    <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} />
+                                    <Stack.Screen name="BankingDisclosures" component={BankingDisclosuresScreen} />
+                                    <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
+                                    <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />
+                                </>
+                            ) : (customer.status === 'queued' || customer.status === 'identity_verified') ? (
                                 <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />
-                            </>
-                        ) : (customer.status === 'queued' || customer.status === 'identity_verified') ? (
-                            <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />
-                        ) : (customer.status === 'manual_review' || customer.status === 'under_review' || customer.status === 'rejected') ? (
-                            <Stack.Screen
-                                name="ApplicationUnapproved"
-                                component={ApplicationUnapprovedScreen}
-                                initialParams={{ status: customer.status }}
-                            />
-                        ) : (
-                            <Stack.Screen name="Home" component={HomeScreen} />
-                        )}
-                    </Stack.Navigator>
+                            ) : (customer.status === 'manual_review' || customer.status === 'under_review' || customer.status === 'rejected') ? (
+                                <Stack.Screen
+                                    name="ApplicationUnapproved"
+                                    component={ApplicationUnapprovedScreen}
+                                    initialParams={{ status: customer.status }}
+                                />
+                            ) : (
+                                <Stack.Screen name="Accounts" component={AccountsScreen} />
+                            )}
+                        </Stack.Navigator>
+                    </AccountsProvider>
                 </ComplianceWorkflowProvider>
             )}
         </AuthProvider>

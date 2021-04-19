@@ -41,6 +41,6 @@ export type RootStackParamList = {
   ProcessingApplication: undefined;
   ApplicationUnapproved: ApplicationUnapprovedParams;
   PDFReader: PDFReaderParams;
-  Home: undefined;
+  Accounts: undefined;
   NotFound: undefined;
 };
