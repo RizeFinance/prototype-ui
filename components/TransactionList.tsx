@@ -8,6 +8,7 @@ import TransactionListItem from './TransactionListItem';
 
 export type TransactionListProps = {
     syntheticAccountUid?: string;
+    limitPerPage?: number;
 }
 
 const TransactionList = (props: TransactionListProps): JSX.Element => {
@@ -21,7 +22,12 @@ const TransactionList = (props: TransactionListProps): JSX.Element => {
     });
 
     const loadTransactions = async (): Promise<void> => {
-        const transactionList = await TransactionService.getTransactions(accessToken, props.syntheticAccountUid);
+        const transactionList = await TransactionService.getTransactions(
+            accessToken,
+            props.limitPerPage || 100,
+            0,
+            props.syntheticAccountUid
+        );
         setTransactions(transactionList.data);
     };
 

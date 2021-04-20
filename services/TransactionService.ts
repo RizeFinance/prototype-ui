@@ -2,8 +2,10 @@ import api from '../utils/api';
 import { RizeList, Transaction } from '../models';
 import querystring from 'query-string';
 
-const getTransactions = async (accessToken: string, syntheticAccountUid?: string): Promise<RizeList<Transaction>> => {
+const getTransactions = async (accessToken: string, limit = 100, offset = 0, syntheticAccountUid?: string): Promise<RizeList<Transaction>> => {
     const queryObj = {
+        limit: limit,
+        offset: offset,
         synthetic_account_uid: syntheticAccountUid,
     };
 
