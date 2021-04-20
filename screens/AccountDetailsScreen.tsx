@@ -30,6 +30,9 @@ export default function AccountsScreen({ navigation, route }: AccountsScreenProp
         column: {
             flex: 1,
         },
+        columnHeader: {
+            marginBottom: 4,
+        }
     });
 
     useEffect(() => {
@@ -57,7 +60,7 @@ export default function AccountsScreen({ navigation, route }: AccountsScreenProp
             </Heading3>
             <View style={styles.row}>
                 <View style={styles.column}>
-                    <Body fontWeight='bold'>
+                    <Body fontWeight='bold' style={styles.columnHeader}>
                         Available Balance
                     </Body>
                     <Heading4 fontWeight='semibold'>
@@ -65,7 +68,7 @@ export default function AccountsScreen({ navigation, route }: AccountsScreenProp
                     </Heading4>
                 </View>
                 <View style={styles.column}>
-                    <Body fontWeight='bold'>
+                    <Body fontWeight='bold' style={styles.columnHeader}>
                         Current Balance
                     </Body>
                     <Heading4 fontWeight='semibold'>
