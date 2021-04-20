@@ -46,6 +46,11 @@ export const fontStyles = StyleSheet.create({
         lineHeight: 24,
         fontFamily: 'OpenSans-Regular',
     },
+    bodyItalic: {
+        fontSize: 16,
+        lineHeight: 24,
+        fontFamily: 'OpenSans-Italic',
+    },
     bodySemibold: {
         fontFamily: 'OpenSans-SemiBold',
     },
@@ -124,9 +129,11 @@ export const Heading5: React.FC<Heading5Props> = ({style, fontWeight, ...props}:
     return Type(heading5Styles)({ style, ...props });
 };
 
-export type BodyProps = TypeProps & FontWeightProps;
+export type BodyProps = TypeProps & FontWeightProps & {
+    fontStyle?: 'regular' | 'italic';
+};
 
-export const Body: React.FC<BodyProps> = ({style, fontWeight, ...props}: BodyProps) => {
+export const Body: React.FC<BodyProps> = ({style, fontWeight, fontStyle, ...props}: BodyProps) => {
     const bodyStyles: StyleProp<TextStyle> = [fontStyles.body];
 
     switch (fontWeight) {
@@ -136,6 +143,11 @@ export const Body: React.FC<BodyProps> = ({style, fontWeight, ...props}: BodyPro
         case 'bold':
             bodyStyles.push(fontStyles.bodyBold);
             break;
+    }
+
+    switch (fontStyle) {
+        case 'italic':
+            bodyStyles.push(fontStyles.bodyItalic);
     }
 
     return Type(bodyStyles)({ style, ...props });
