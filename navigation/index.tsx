@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme, useNavigation } from '@react-navigation/native';
-import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
-import { ColorSchemeName, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import { createStackNavigator, StackNavigationOptions, StackNavigationProp } from '@react-navigation/stack';
+import { ColorSchemeName, KeyboardAvoidingView, Platform, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
 import { CustomerProvider, useCustomer } from '../contexts/Customer';
 import BankingDisclosuresScreen from '../screens/BankingDisclosuresScreen';
@@ -21,6 +21,9 @@ import AccountsScreen from '../screens/AccountsScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import { AuthProvider } from '../contexts/Auth';
 import { AccountsProvider } from '../contexts/Accounts';
+import { useThemeColor } from '../components/Themed';
+import TextLink from '../components/TextLink';
+import AccountDetailsScreen from '../screens/AccountDetailsScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
@@ -35,14 +38,49 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 const RootStack = createStackNavigator();
 const Stack = createStackNavigator<RootStackParamList>();
 
+function getMenuButton() {
+    return (
+        <TextLink>
+            Menu
+        </TextLink>
+    );
+}
+
 function MainStackScreen() {
     const { customer } = useCustomer();
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+    const background = useThemeColor('background');
+
+    const screenCardStyle: StyleProp<ViewStyle> = {
+        backgroundColor: background,
+    };
+
+    const screenOptions = {
+        withHeader: {
+            headerShown: true,
+            headerTitle: '',
+            headerRight: () => getMenuButton(),
+            headerLeftContainerStyle: {
+                paddingLeft: 32,
+            },
+            headerRightContainerStyle: {
+                paddingRight: 32,
+            },
+            headerStyle: {
+                shadowOpacity: 0,
+            },
+            cardStyle: screenCardStyle,
+        } as StackNavigationOptions,
+        withoutHeader: {
+            headerShown: false,
+            backgroundColor: background,
+        } as StackNavigationOptions
+    };
 
     return (
         <AuthProvider>
             {!customer ? (
-                <Stack.Navigator screenOptions={{ headerShown: false }}>
+                <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
                     <Stack.Screen name="Login" component={LoginScreen} />
                     <Stack.Screen name="Signup" component={SignupScreen} />
                     <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
@@ -50,29 +88,34 @@ function MainStackScreen() {
             ) : (
                 <ComplianceWorkflowProvider navigation={navigation}>
                     <AccountsProvider>
-                        <Stack.Navigator screenOptions={{ headerShown: false }}>
-                            {customer.status === 'initiated' ? (
-                                <>
-                                    <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
-                                    <Stack.Screen name="PatriotAct" component={PatriotActScreen} />
-                                    <Stack.Screen name="PII" component={PIIScreen} />
-                                    <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} />
-                                    <Stack.Screen name="BankingDisclosures" component={BankingDisclosuresScreen} />
-                                    <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
-                                    <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />
-                                </>
-                            ) : (customer.status === 'queued' || customer.status === 'identity_verified') ? (
+                        {customer.status === 'initiated' ? (
+                            <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+                                <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
+                                <Stack.Screen name="PatriotAct" component={PatriotActScreen} />
+                                <Stack.Screen name="PII" component={PIIScreen} />
+                                <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} />
+                                <Stack.Screen name="BankingDisclosures" component={BankingDisclosuresScreen} />
+                                <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
                                 <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />
-                            ) : (customer.status === 'manual_review' || customer.status === 'under_review' || customer.status === 'rejected') ? (
+                            </Stack.Navigator>
+                        ) : (customer.status === 'queued' || customer.status === 'identity_verified') ? (
+                            <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+                                <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />
+                            </Stack.Navigator>
+                        ) : (customer.status === 'manual_review' || customer.status === 'under_review' || customer.status === 'rejected') ? (
+                            <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
                                 <Stack.Screen
                                     name="ApplicationUnapproved"
                                     component={ApplicationUnapprovedScreen}
                                     initialParams={{ status: customer.status }}
                                 />
-                            ) : (
+                            </Stack.Navigator>
+                        ) : (
+                            <Stack.Navigator screenOptions={screenOptions.withHeader}>
                                 <Stack.Screen name="Accounts" component={AccountsScreen} />
-                            )}
-                        </Stack.Navigator>
+                                <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
+                            </Stack.Navigator>
+                        )}
                     </AccountsProvider>
                 </ComplianceWorkflowProvider>
             )}

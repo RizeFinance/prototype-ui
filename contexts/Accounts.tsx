@@ -50,7 +50,7 @@ export class AccountsProvider extends React.Component<AccountsProviderProps, Acc
 
             return liabilityAccounts;
         } finally {
-            this.setState({ isLoading: true });
+            this.setState({ isLoading: false });
         }
     }
 
