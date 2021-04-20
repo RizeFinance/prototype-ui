@@ -22,7 +22,7 @@ import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import { AuthProvider } from '../contexts/Auth';
 import { AccountsProvider } from '../contexts/Accounts';
 import { useThemeColor } from '../components/Themed';
-import TextLink from '../components/TextLink';
+import { TextLink } from '../components';
 import AccountDetailsScreen from '../screens/AccountDetailsScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {

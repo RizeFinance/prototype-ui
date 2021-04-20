@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Screen } from '../components';
+import { Screen, TextLink } from '../components';
 import { Body, Heading3, Heading4 } from '../components/Typography';
 import { RootStackParamList } from '../types';
 import { useAccounts } from '../contexts/Accounts';
 import { RouteProp } from '@react-navigation/core';
-import TextLink from '../components/TextLink';
 import utils from '../utils/utils';
 
 interface AccountsScreenProps {
