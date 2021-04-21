@@ -11,7 +11,7 @@ import { useCustomer } from '../contexts/Customer';
 
 interface ConfirmPIIScreenProps {
     route: RouteProp<RootStackParamList, 'ConfirmPII'>;
-    navigation: StackNavigationProp<RootStackParamList, 'PII'>;
+    navigation: StackNavigationProp<RootStackParamList, 'ConfirmPII'>;
 }
 
 export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreenProps): JSX.Element {

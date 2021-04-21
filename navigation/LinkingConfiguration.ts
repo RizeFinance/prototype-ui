@@ -9,7 +9,7 @@ export default {
                     Login: 'login',
                     Signup: 'signup',
                     ForgotPassword: 'forgot-password',
-                    Home: 'home',
+                    Accounts: 'accounts',
                     ProcessingApplication: 'processing-application',
                     ApplicationUnapproved: 'application-unapproved',
                     Disclosures: 'disclosures',

@@ -4,6 +4,7 @@ import { useThemeColor } from './Themed';
 
 export type ScreenProps = View['props'] & ScrollView['props'] & {
     useScrollView?: boolean;
+    withoutHeader?: boolean;
 }
 
 const Screen = (props: ScreenProps): JSX.Element => {
@@ -32,7 +33,8 @@ const Screen = (props: ScreenProps): JSX.Element => {
         content: {
             flex: 1,
             paddingHorizontal: 32,
-            paddingVertical: 50,
+            paddingBottom: 50,
+            paddingTop: props.withoutHeader ? 0 : 50,
         }
     });
 

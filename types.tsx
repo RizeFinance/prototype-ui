@@ -29,6 +29,10 @@ export type LoginParams = {
   message?: string;
 }
 
+export type AccountDetailsParams = {
+  accountUid: string;
+}
+
 export type RootStackParamList = {
   BankingDisclosures: undefined;
   Disclosures: undefined;
@@ -41,6 +45,7 @@ export type RootStackParamList = {
   ProcessingApplication: undefined;
   ApplicationUnapproved: ApplicationUnapprovedParams;
   PDFReader: PDFReaderParams;
-  Home: undefined;
+  Accounts: undefined;
+  AccountDetails: AccountDetailsParams;
   NotFound: undefined;
 };

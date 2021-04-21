@@ -4,3 +4,4 @@ export { default as DatePickerInput } from './DatePickerInput';
 export { default as Dropdown } from './Dropdown';
 export { default as Input } from './Input';
 export { default as Screen } from './Screen';
+export { default as TextLink } from './TextLink';
