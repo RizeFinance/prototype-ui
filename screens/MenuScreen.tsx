@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dimensions, Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { Screen, TextLink } from '../components';
 import { Heading4 } from '../components/Typography';
 
@@ -15,7 +15,7 @@ interface MenuScreenProps {
     route: RouteProp<RootStackParamList, 'Login'>;
 }
 
-export default function MenuScreen({ navigation, route }: MenuScreenProps): JSX.Element {    
+export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element {    
 
     const primary = useThemeColor('primary');
     
