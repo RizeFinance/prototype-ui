@@ -47,5 +47,6 @@ export type RootStackParamList = {
   PDFReader: PDFReaderParams;
   Accounts: undefined;
   AccountDetails: AccountDetailsParams;
+  ExternalAccount: undefined;
   NotFound: undefined;
 };

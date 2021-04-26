@@ -24,6 +24,7 @@ import { AccountsProvider } from '../contexts/Accounts';
 import { useThemeColor } from '../components/Themed';
 import { TextLink } from '../components';
 import AccountDetailsScreen from '../screens/AccountDetailsScreen';
+import ExternalAccountScreen from '../screens/ExternalAccountScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
@@ -59,6 +60,7 @@ function MainStackScreen() {
         withHeader: {
             headerShown: true,
             headerTitle: '',
+            headerLeft: () => <></>,
             headerRight: () => getMenuButton(),
             headerLeftContainerStyle: {
                 paddingLeft: 32,
@@ -114,6 +116,7 @@ function MainStackScreen() {
                             <Stack.Navigator screenOptions={screenOptions.withHeader}>
                                 <Stack.Screen name="Accounts" component={AccountsScreen} />
                                 <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
+                                <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
                             </Stack.Navigator>
                         )}
                     </AccountsProvider>
