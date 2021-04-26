@@ -45,7 +45,7 @@ export default function MenuScreen({ navigation, route }: MenuScreenProps): JSX.
     };
 
     const onPressLogout = (): void => {
-        console.log('Logout the app.');
+        console.log('Logout the app.');  // eslint-disable-line
     };
 
     return (
