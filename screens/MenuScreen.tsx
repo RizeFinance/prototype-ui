@@ -45,7 +45,7 @@ export default function MenuScreen({ navigation, route }: MenuScreenProps): JSX.
     };
 
     const onPressLogout = (): void => {
-        // TODO: Logout here
+        console.log('Logout the app.');
     };
 
     return (
