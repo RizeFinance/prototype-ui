@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavigationContainer, DefaultTheme, DarkTheme, useNavigation } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme, useNavigation, useRoute } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationOptions, StackNavigationProp } from '@react-navigation/stack';
 import { ColorSchemeName, KeyboardAvoidingView, Platform, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
@@ -22,8 +22,9 @@ import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import { AuthProvider } from '../contexts/Auth';
 import { AccountsProvider } from '../contexts/Accounts';
 import { useThemeColor } from '../components/Themed';
-import { TextLink } from '../components';
 import AccountDetailsScreen from '../screens/AccountDetailsScreen';
+import MenuScreen from '../screens/MenuScreen';
+import { TextLink } from '../components';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
@@ -38,13 +39,17 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 const RootStack = createStackNavigator();
 const Stack = createStackNavigator<RootStackParamList>();
 
-function getMenuButton() {
+
+const MenuButton = (): JSX.Element => {
+    const route = useRoute();
+    const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+    const isRouteNameMenu = (route.name === 'Menu');
     return (
-        <TextLink>
-            Menu
+        <TextLink onPress={(): void => { isRouteNameMenu ? navigation.goBack() : navigation.navigate('Menu'); }}>
+            { isRouteNameMenu ? 'X' : 'Menu' }
         </TextLink>
     );
-}
+};
 
 function MainStackScreen() {
     const { customer } = useCustomer();
@@ -59,7 +64,7 @@ function MainStackScreen() {
         withHeader: {
             headerShown: true,
             headerTitle: '',
-            headerRight: () => getMenuButton(),
+            headerRight: () => <MenuButton />,
             headerLeftContainerStyle: {
                 paddingLeft: 32,
             },
@@ -130,6 +135,17 @@ function RootNavigator() {
         },
     });
 
+    const menuScreenOptions = {
+        gestureDirection: 'horizontal-inverted',
+        headerShown: true,
+        headerLeft: null,
+        headerTitle: null,
+        headerRight: () => <MenuButton />,
+        headerRightContainerStyle: {
+            paddingRight: 32,
+        }
+    } as StackNavigationOptions;
+
     return (
         <CustomerProvider>
             <KeyboardAvoidingView
@@ -139,6 +155,7 @@ function RootNavigator() {
             >
                 <RootStack.Navigator screenOptions={{ headerShown: false }}>
                     <RootStack.Screen name="Main" component={MainStackScreen} />
+                    <RootStack.Screen name="Menu" component={MenuScreen} options={menuScreenOptions} />
                 </RootStack.Navigator>
             </KeyboardAvoidingView>
         </CustomerProvider>
