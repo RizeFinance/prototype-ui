@@ -5,6 +5,7 @@ import { Button, Input, Screen } from '../components';
 import { Body, Heading3 } from '../components/Typography';
 import { useAccounts } from '../contexts/Accounts';
 import { SyntheticAccount } from '../models';
+import * as Yup from 'yup';
 
 type CreateExternalAccountFields = {
     checkingNumber: string;
@@ -67,6 +68,16 @@ const ExternalAccountScreen = (): JSX.Element => {
             routingNumber: '',
         };
 
+        const externalAccountValidationSchema = Yup.object().shape({
+            checkingNumber: Yup.string().required('Checking Number is required.')
+                .min(9, 'Routing Number should have 9 characters.')
+                .max(9, 'Routing Number should have 9 numbers.')
+                .matches(/^\d+$/, 'Invalid Checking Number.'),
+            routingNumber: Yup.string().required('Routing Number is required.')
+                .min(8, 'Routing Number should have at least 8 numbers.')
+                .matches(/^\d+$/, 'Invalid Routing Number.'),
+        });
+
         // eslint-disable-next-line
         const onSubmit = async (values: CreateExternalAccountFields): Promise<void> => {
             // TODO: Implementation
@@ -77,6 +88,7 @@ const ExternalAccountScreen = (): JSX.Element => {
                 <Formik
                     initialValues={initialValues}
                     onSubmit={onSubmit}
+                    validationSchema={externalAccountValidationSchema}
                 >
                     {({ handleChange, handleBlur, handleSubmit, values, errors, isValid, isSubmitting, dirty, touched }) => (
                         <>
@@ -88,6 +100,8 @@ const ExternalAccountScreen = (): JSX.Element => {
                                     value={values.checkingNumber}
                                     errorText={!touched.checkingNumber ? '' : errors.checkingNumber}
                                     editable={!isSubmitting}
+                                    maxLength={9}
+                                    keyboardType='number-pad'
                                 />
                                 <Input
                                     label='Routing Number'
@@ -96,6 +110,7 @@ const ExternalAccountScreen = (): JSX.Element => {
                                     value={values.routingNumber}
                                     errorText={!touched.routingNumber ? '' : errors.routingNumber}
                                     editable={!isSubmitting}
+                                    keyboardType='number-pad'
                                 />
                             </View>
                             <Button
