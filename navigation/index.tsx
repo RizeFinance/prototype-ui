@@ -25,6 +25,7 @@ import { useThemeColor } from '../components/Themed';
 import AccountDetailsScreen from '../screens/AccountDetailsScreen';
 import MenuScreen from '../screens/MenuScreen';
 import { TextLink } from '../components';
+import { Body } from '../components/Typography';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
@@ -42,12 +43,16 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 const MenuButton = (): JSX.Element => {
     const route = useRoute();
+    const primary = useThemeColor('primary');
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const isRouteNameMenu = (route.name === 'Menu');
     return (
-        <TextLink onPress={(): void => { isRouteNameMenu ? navigation.goBack() : navigation.navigate('Menu'); }}>
-            { isRouteNameMenu ? 'X' : 'Menu' }
-        </TextLink>
+        <>
+            { isRouteNameMenu ? 
+                <Body fontWeight='bold' style={{ color: primary }} onPress={(): void => { navigation.goBack(); }}>X</Body> 
+                : <TextLink onPress={(): void => { navigation.navigate('Menu'); }}>Menu</TextLink>
+            }
+        </>
     );
 };
 
@@ -143,7 +148,10 @@ function RootNavigator() {
         headerRight: () => <MenuButton />,
         headerRightContainerStyle: {
             paddingRight: 32,
-        }
+        },
+        headerStyle: {
+            shadowOpacity: 0,
+        },
     } as StackNavigationOptions;
 
     return (
