@@ -37,11 +37,11 @@ export default function MenuScreen({ navigation, route }: MenuScreenProps): JSX.
     });
 
     const onPressAccounts = (): void => {
-        navigation.navigate('AccountDetails');
+        navigation.navigate('Accounts');
     };
 
     const onPressExternalAccounts = (): void => {
-        navigation.navigate('AccountDetails');
+        navigation.navigate('ExternalAccount');
     };
 
     const onPressLogout = (): void => {
