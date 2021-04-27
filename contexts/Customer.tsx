@@ -49,8 +49,8 @@ export class CustomerProvider extends React.Component<CustomerProviderProps, Cus
         await this.promisedSetState({ customer });
     }
 
-    resetState = async (): Promise<void> => {
-        await this.promisedSetState(initialState);
+    resetState = (): void => {
+        this.setState(initialState);
     }
 
     refreshCustomer = async (): Promise<Customer> => {

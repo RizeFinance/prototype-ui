@@ -45,10 +45,9 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
         navigation.navigate('ExternalAccount');
     };
 
-    const onPressLogout = async (): Promise<void> => {
+    const onPressLogout = (): void => {
         auth.logout();
         customer.resetState();
-        await customer.refreshCustomer();
         complianceWorkflow.resetState();
         navigation.goBack();
     };
