@@ -150,7 +150,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
                     fontWeight='semibold'
                     style={styles.connectStatusMessage}
                 >
-                    Account successfully connected.
+                    Transfer Successful.
                 </Body>
             )}
             {showFailedMessage && (
@@ -160,7 +160,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
                     fontWeight='semibold'
                     style={styles.connectStatusMessage}
                 >
-                    Account failed to connect.
+                    Transfer failed.
                 </Body>
             )}
             <Formik
