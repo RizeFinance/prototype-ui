@@ -26,7 +26,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
             alignSelf: 'center'
         },
         menuStyle: {
-            marginVertical: 12
+            marginVertical: 16
         },
     });
 
