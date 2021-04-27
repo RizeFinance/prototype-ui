@@ -6,14 +6,14 @@ export type CustomerContextProps = {
     customer?: Customer;
     setCustomer: (customer: Customer) => Promise<void>;
     refreshCustomer: () => Promise<Customer>;
-    resetCustomer: () => void;
+    resetState: () => void;
 }
 
 export const CustomerContext = React.createContext<CustomerContextProps>({
     customer: undefined,
     setCustomer: () => Promise.resolve(),
     refreshCustomer: () => Promise.resolve(null),
-    resetCustomer: () => null,
+    resetState: () => null,
 });
 
 export interface CustomerProviderProps {
@@ -49,7 +49,7 @@ export class CustomerProvider extends React.Component<CustomerProviderProps, Cus
         await this.promisedSetState({ customer });
     }
 
-    resetCustomer = async (): Promise<void> => {
+    resetState = async (): Promise<void> => {
         await this.promisedSetState(initialState);
     }
 
@@ -72,7 +72,7 @@ export class CustomerProvider extends React.Component<CustomerProviderProps, Cus
                     customer: customer,
                     setCustomer: this.setCustomer,
                     refreshCustomer: this.refreshCustomer,
-                    resetCustomer: this.resetCustomer
+                    resetState: this.resetState
                 }}
             >
                 {this.props.children}

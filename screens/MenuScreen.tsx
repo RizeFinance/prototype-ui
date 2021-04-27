@@ -47,9 +47,9 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
 
     const onPressLogout = async (): Promise<void> => {
         auth.logout();
-        await customer.resetCustomer();
+        customer.resetState();
         await customer.refreshCustomer();
-        complianceWorkflow.resetComplianceWorkflow();
+        complianceWorkflow.resetState();
         navigation.goBack();
     };
 
@@ -88,7 +88,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                 <TextLink
                     textAlign='center'
                     style={styles.menuStyle}
-                    onPress={(): void => onPressLogout()}
+                    onPress={(): Promise<void> => onPressLogout()}
                     fontType={Heading5}
                 >
                             LOG OUT
