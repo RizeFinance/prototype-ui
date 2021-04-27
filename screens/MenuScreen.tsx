@@ -8,6 +8,9 @@ import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useThemeColor } from '../components/Themed';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { useAuth } from '../contexts/Auth';
+import { useCustomer } from '../contexts/Customer';
 const logo = require('../assets/images/logo.png');
 
 interface MenuScreenProps {
@@ -16,9 +19,11 @@ interface MenuScreenProps {
 }
 
 export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element {    
-
+    const auth = useAuth();
+    const customer = useCustomer();
+    const complianceWorkflow = useComplianceWorkflow();
     const primary = useThemeColor('primary');
-    
+
     const styles = StyleSheet.create({
         logo: {
             height: 200,
@@ -45,7 +50,10 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
     };
 
     const onPressLogout = (): void => {
-        console.log('Logout the app.');  // eslint-disable-line
+        auth.logout();
+        customer.resetCustomer();
+        complianceWorkflow.resetComplianceWorkflow();
+        navigation.goBack();
     };
 
     return (
@@ -68,7 +76,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                     onPress={(): void => onPressAccounts()}
                     fontType={Heading4}
                 >
-                    Accounts
+                            Accounts
                 </TextLink>
                 <TextLink
                     textAlign='center'
@@ -76,7 +84,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                     onPress={(): void => onPressExternalAccounts()}
                     fontType={Heading4}
                 >
-                    External Account
+                            External Account
                 </TextLink>
             </ScrollView>
             <View style={[styles.menuContainer]}>
@@ -86,7 +94,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                     onPress={(): void => onPressLogout()}
                     fontType={Heading4}
                 >
-                    LOG OUT
+                            LOG OUT
                 </TextLink>
             </View>
         </Screen>

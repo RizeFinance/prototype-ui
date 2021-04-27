@@ -156,16 +156,18 @@ function RootNavigator() {
 
     return (
         <CustomerProvider>
-            <KeyboardAvoidingView
-                behavior='padding'
-                style={styles.keyboardAvoidingView}
-                keyboardVerticalOffset={Platform.OS === 'android' ? -200 : 0}
-            >
-                <RootStack.Navigator screenOptions={{ headerShown: false }}>
-                    <RootStack.Screen name="Main" component={MainStackScreen} />
-                    <RootStack.Screen name="Menu" component={MenuScreen} options={menuScreenOptions} />
-                </RootStack.Navigator>
-            </KeyboardAvoidingView>
+            <AuthProvider>
+                <KeyboardAvoidingView
+                    behavior='padding'
+                    style={styles.keyboardAvoidingView}
+                    keyboardVerticalOffset={Platform.OS === 'android' ? -200 : 0}
+                >
+                    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+                        <RootStack.Screen name="Main" component={MainStackScreen} />
+                        <RootStack.Screen name="Menu" component={MenuScreen} options={menuScreenOptions} />
+                    </RootStack.Navigator>
+                </KeyboardAvoidingView>
+            </AuthProvider>
         </CustomerProvider>
     );
 }
