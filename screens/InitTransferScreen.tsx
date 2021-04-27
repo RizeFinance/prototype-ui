@@ -10,6 +10,8 @@ import * as Yup from 'yup';
 import TransferService from '../services/TransferService';
 import { useAuth } from '../contexts/Auth';
 import utils from '../utils/utils';
+import { SyntheticAccount } from '../models';
+import Reference from 'yup/lib/Reference';
 
 interface InitTransferScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'InitTransfer'>;
@@ -20,6 +22,39 @@ type TransferFields = {
     toSyntheticAccountUid: string;
     amount: string;
 }
+
+declare module 'yup' {
+    interface StringSchema {
+        validSourceBalance(liabilityAccounts: SyntheticAccount[], message: string): StringSchema;
+    }
+    interface NumberSchema {
+        amountWithinSourceBalance(sourceSyntheticAccountUidRef: Reference<string>, liabilityAccounts: SyntheticAccount[], message: string): NumberSchema;
+    }
+}
+
+Yup.addMethod(Yup.string, 'validSourceBalance', function (liabilityAccounts: SyntheticAccount[], message: string) {
+    return this.test('validSourceBalance', message, function (value) {
+        const liabilityAccount = liabilityAccounts.find(x => x.uid === value);
+
+        if (liabilityAccount && parseFloat(liabilityAccount.net_usd_available_balance) <= 0) {
+            return false;
+        }
+
+        return true;
+    });
+});
+
+Yup.addMethod(Yup.number, 'amountWithinSourceBalance', function (sourceSyntheticAccountUidRef: Reference<string>, liabilityAccounts: SyntheticAccount[], message: string) {
+    return this.test('amountWithinSourceBalance', message, function (value) {
+        const liabilityAccount = liabilityAccounts.find(x => x.uid === this.resolve(sourceSyntheticAccountUidRef));
+
+        if (liabilityAccount && value > parseFloat(liabilityAccount.net_usd_available_balance)) {
+            return false;
+        }
+
+        return true;
+    });
+});
 
 export default function InitTransferScreen({ navigation }: InitTransferScreenProps): JSX.Element {
     const { accessToken } = useAuth();
@@ -59,12 +94,18 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
     };
 
     const transferValidationSchema = Yup.object().shape({
-        fromSyntheticAccountUid: Yup.string().required('Source account is required.'),
+        fromSyntheticAccountUid: Yup.string().required('Source account is required.')
+            .validSourceBalance(liabilityAccounts, 'Source account doesn\'t have enough balance.'),
         toSyntheticAccountUid: Yup.string().required('Destination account is required.')
             .not([Yup.ref('fromSyntheticAccountUid'), null], 'Source should not be the same as the destination.'),
         amount: Yup.number().required('Amount is required.')
             .typeError('Invalid amount.')
-            .moreThan(0, 'Amount should be greater than 0.'),
+            .moreThan(0, 'Amount should be greater than 0.')
+            .amountWithinSourceBalance(
+                Yup.ref<string>('fromSyntheticAccountUid'),
+                liabilityAccounts,
+                'Amount should not be greater than the source account balance.'
+            ),
     });
 
     const onSubmit = async (values: TransferFields, actions: FormikHelpers<TransferFields>): Promise<void> => {
