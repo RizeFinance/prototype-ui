@@ -7,6 +7,8 @@ import { Heading3 } from '../components/Typography';
 import { useAccounts } from '../contexts/Accounts';
 import { RootStackParamList } from '../types';
 import * as Yup from 'yup';
+import TransferService from '../services/TransferService';
+import { useAuth } from '../contexts/Auth';
 
 interface InitTransferScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'InitTransfer'>;
@@ -19,6 +21,7 @@ type TransferFields = {
 }
 
 export default function InitTransferScreen({ navigation }: InitTransferScreenProps): JSX.Element {
+    const { accessToken } = useAuth();
     const { refetchAccounts, liabilityAccounts, externalAccounts } = useAccounts();
     const syntheticAccounts = [...liabilityAccounts, ...externalAccounts]
         .map(x => ({
@@ -56,9 +59,13 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
             .moreThan(0, 'Amount should be greater than 0.'),
     });
 
-    // eslint-disable-next-line
     const onSubmit = async (values: TransferFields): Promise<void> => {
-        // TODO: Implementation
+        await TransferService.initiateTransfer(
+            accessToken,
+            values.fromSyntheticAccountUid,
+            values.toSyntheticAccountUid,
+            parseFloat(values.amount)
+        );
     };
 
     useEffect(() => {
