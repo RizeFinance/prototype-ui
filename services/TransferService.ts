@@ -5,7 +5,7 @@ const initiateTransfer = async (
     accessToken: string,
     sourceSyntheticAccountUid: string,
     destinationSyntheticAccountUid: string,
-    usdTransferAmount: number,
+    usdTransferAmount: string,
 ): Promise<Transfer> => {
     return await api.post('/transfers',
         {

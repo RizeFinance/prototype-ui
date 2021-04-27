@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Formik } from 'formik';
+import { Formik, FormikHelpers } from 'formik';
 import { View, StyleSheet } from 'react-native';
 import { Button, Dropdown, DropdownItem, Input, Screen } from '../components';
-import { Heading3 } from '../components/Typography';
+import { Body, Heading3 } from '../components/Typography';
 import { useAccounts } from '../contexts/Accounts';
 import { RootStackParamList } from '../types';
 import * as Yup from 'yup';
@@ -29,6 +29,9 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
             value: x.uid
         } as DropdownItem));
 
+    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+    const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
+
     const styles = StyleSheet.create({
         heading: {
             marginTop: 24,
@@ -42,6 +45,9 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
         },
         submitButton: {
             marginTop: 30,
+        },
+        connectStatusMessage: {
+            marginVertical: 8,
         },
     });
 
@@ -60,13 +66,26 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
             .moreThan(0, 'Amount should be greater than 0.'),
     });
 
-    const onSubmit = async (values: TransferFields): Promise<void> => {
-        await TransferService.initiateTransfer(
-            accessToken,
-            values.fromSyntheticAccountUid,
-            values.toSyntheticAccountUid,
-            parseFloat(values.amount)
-        );
+    const onSubmit = async (values: TransferFields, actions: FormikHelpers<TransferFields>): Promise<void> => {
+        setShowFailedMessage(false);
+        setShowSuccessMessage(false);
+
+        try {
+            await TransferService.initiateTransfer(
+                accessToken,
+                values.fromSyntheticAccountUid,
+                values.toSyntheticAccountUid,
+                values.amount,
+            );
+
+            setShowSuccessMessage(true);
+
+            actions.resetForm();
+            actions.setFieldTouched('fromSyntheticAccountUid', false);
+            actions.setFieldTouched('toSyntheticAccountUid', false);
+        } catch {
+            setShowFailedMessage(true);
+        }
     };
 
     useEffect(() => {
@@ -82,6 +101,26 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
             <Heading3 textAlign='center' style={styles.heading}>
                 Transfer
             </Heading3>
+            {showSuccessMessage && (
+                <Body
+                    color='success'
+                    textAlign='center'
+                    fontWeight='semibold'
+                    style={styles.connectStatusMessage}
+                >
+                    Account successfully connected.
+                </Body>
+            )}
+            {showFailedMessage && (
+                <Body
+                    color='error'
+                    textAlign='center'
+                    fontWeight='semibold'
+                    style={styles.connectStatusMessage}
+                >
+                    Account failed to connect.
+                </Body>
+            )}
             <Formik
                 initialValues={initialValues}
                 onSubmit={onSubmit}
