@@ -82,7 +82,7 @@ export default function InitTransferScreen(): JSX.Element {
                                 value={values.amount}
                                 errorText={!touched.amount ? '' : errors.amount}
                                 editable={!isSubmitting}
-                                keyboardType='number-pad'
+                                keyboardType='numeric'
                                 containerStyle={styles.inputs}
                             />
                         </View>
