@@ -6,7 +6,6 @@ import { Heading4, Heading5 } from '../components/Typography';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 import { useAuth } from '../contexts/Auth';
 import { useCustomer } from '../contexts/Customer';
 const logo = require('../assets/images/logo.png');
@@ -18,7 +17,6 @@ interface MenuScreenProps {
 export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element {    
     const auth = useAuth();
     const customer = useCustomer();
-    const complianceWorkflow = useComplianceWorkflow();
 
     const styles = StyleSheet.create({
         logo: {
@@ -48,7 +46,6 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
     const onPressLogout = (): void => {
         auth.logout();
         customer.resetState();
-        complianceWorkflow.resetState();
         navigation.goBack();
     };
 
@@ -69,7 +66,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                 <TextLink
                     textAlign='center'
                     style={styles.menuStyle}
-                    onPress={(): void => onPressAccounts()}
+                    onPress={onPressAccounts}
                     fontType={Heading4}
                 >
                             Accounts
@@ -77,7 +74,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                 <TextLink
                     textAlign='center'
                     style={styles.menuStyle}
-                    onPress={(): void => onPressExternalAccounts()}
+                    onPress={onPressExternalAccounts}
                     fontType={Heading4}
                 >
                             External Account
@@ -87,7 +84,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                 <TextLink
                     textAlign='center'
                     style={styles.menuStyle}
-                    onPress={(): void => onPressLogout()}
+                    onPress={onPressLogout}
                     fontType={Heading5}
                 >
                             LOG OUT

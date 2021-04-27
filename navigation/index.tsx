@@ -155,8 +155,8 @@ function RootNavigator() {
     } as StackNavigationOptions;
 
     return (
-        <CustomerProvider>
-            <AuthProvider>
+        <AuthProvider>
+            <CustomerProvider>
                 <KeyboardAvoidingView
                     behavior='padding'
                     style={styles.keyboardAvoidingView}
@@ -167,7 +167,7 @@ function RootNavigator() {
                         <RootStack.Screen name="Menu" component={MenuScreen} options={menuScreenOptions} />
                     </RootStack.Navigator>
                 </KeyboardAvoidingView>
-            </AuthProvider>
-        </CustomerProvider>
+            </CustomerProvider>
+        </AuthProvider>
     );
 }
