@@ -87,7 +87,7 @@ function MainStackScreen() {
     };
 
     return (
-        <AuthProvider>
+        <>
             {!customer ? (
                 <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
                     <Stack.Screen name="Login" component={LoginScreen} />
@@ -129,7 +129,7 @@ function MainStackScreen() {
                     </AccountsProvider>
                 </ComplianceWorkflowProvider>
             )}
-        </AuthProvider>
+        </>
     );
 }
 

@@ -87,7 +87,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                 <TextLink
                     textAlign='center'
                     style={styles.menuStyle}
-                    onPress={(): Promise<void> => onPressLogout()}
+                    onPress={(): void => onPressLogout()}
                     fontType={Heading5}
                 >
                             LOG OUT

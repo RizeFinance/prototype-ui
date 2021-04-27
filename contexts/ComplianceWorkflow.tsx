@@ -20,7 +20,6 @@ export type ComplianceWorkflowContextProps = {
     setDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
     setBankingDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
     loadBankingDisclosures: () => Promise<void>;
-    resetState: () => void;
 }
 
 export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowContextProps>({
@@ -31,7 +30,6 @@ export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowC
     setDisclosures: () => Promise.resolve(),
     setBankingDisclosures: () => Promise.resolve(),
     loadBankingDisclosures: () => Promise.resolve(),
-    resetState: () => null,
 });
 
 export interface ComplianceWorkflowProviderProps {
@@ -208,10 +206,6 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
         await this.promisedSetState({ bankingDisclosures });
     }
 
-    resetState = (): void => {
-        this.setState(initialState);
-    }
-
     render(): JSX.Element {
         const {
             complianceWorkflow,
@@ -228,8 +222,7 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
                     setComplianceWorkflow: this.setComplianceWorkflow,
                     setDisclosures: this.setDisclosures,
                     setBankingDisclosures: this.setBankingDisclosures,
-                    loadBankingDisclosures: this.loadBankingDisclosures,
-                    resetState: this.resetState
+                    loadBankingDisclosures: this.loadBankingDisclosures
                 }}
             >
                 {this.props.children}
