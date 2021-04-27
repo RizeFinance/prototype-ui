@@ -13,10 +13,7 @@ interface MenuScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'Menu'>;
 }
 
-export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element {    
-
-    const primary = useThemeColor('primary');
-    
+export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element {        
     const styles = StyleSheet.create({
         logo: {
             height: 200,
