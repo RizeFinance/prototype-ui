@@ -96,7 +96,7 @@ function MainStackScreen() {
     };
 
     return (
-        <AuthProvider>
+        <>
             {!customer ? (
                 <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
                     <Stack.Screen name="Login" component={LoginScreen} />
@@ -139,7 +139,7 @@ function MainStackScreen() {
                     </AccountsProvider>
                 </ComplianceWorkflowProvider>
             )}
-        </AuthProvider>
+        </>
     );
 }
 
@@ -165,17 +165,19 @@ function RootNavigator() {
     } as StackNavigationOptions;
 
     return (
-        <CustomerProvider>
-            <KeyboardAvoidingView
-                behavior='padding'
-                style={styles.keyboardAvoidingView}
-                keyboardVerticalOffset={Platform.OS === 'android' ? -200 : 0}
-            >
-                <RootStack.Navigator screenOptions={{ headerShown: false }}>
-                    <RootStack.Screen name="Main" component={MainStackScreen} />
-                    <RootStack.Screen name="Menu" component={MenuScreen} options={menuScreenOptions} />
-                </RootStack.Navigator>
-            </KeyboardAvoidingView>
-        </CustomerProvider>
+        <AuthProvider>
+            <CustomerProvider>
+                <KeyboardAvoidingView
+                    behavior='padding'
+                    style={styles.keyboardAvoidingView}
+                    keyboardVerticalOffset={Platform.OS === 'android' ? -200 : 0}
+                >
+                    <RootStack.Navigator screenOptions={{ headerShown: false }}>
+                        <RootStack.Screen name="Main" component={MainStackScreen} />
+                        <RootStack.Screen name="Menu" component={MenuScreen} options={menuScreenOptions} />
+                    </RootStack.Navigator>
+                </KeyboardAvoidingView>
+            </CustomerProvider>
+        </AuthProvider>
     );
 }
