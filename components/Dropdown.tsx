@@ -4,8 +4,10 @@ import RNPickerSelect, { Item } from 'react-native-picker-select';
 import { useThemeColor } from './Themed';
 import { Body, BodySmall, fontStyles } from './Typography';
 
+export type DropdownItem = Item;
+
 export type DropdownProps = {
-    items: Item[],
+    items: DropdownItem[],
     value?: string;
     label?: string;
     placeholder?: string;
