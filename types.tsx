@@ -48,5 +48,6 @@ export type RootStackParamList = {
   Accounts: undefined;
   AccountDetails: AccountDetailsParams;
   ExternalAccount: undefined;
+  InitTransfer: undefined;
   NotFound: undefined;
 };

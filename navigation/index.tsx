@@ -25,6 +25,7 @@ import { useThemeColor } from '../components/Themed';
 import { TextLink } from '../components';
 import AccountDetailsScreen from '../screens/AccountDetailsScreen';
 import ExternalAccountScreen from '../screens/ExternalAccountScreen';
+import InitTransferScreen from '../screens/InitTransferScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
@@ -117,6 +118,7 @@ function MainStackScreen() {
                                 <Stack.Screen name="Accounts" component={AccountsScreen} />
                                 <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
                                 <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
+                                <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
                             </Stack.Navigator>
                         )}
                     </AccountsProvider>

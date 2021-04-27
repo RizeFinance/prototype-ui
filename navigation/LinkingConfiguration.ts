@@ -17,6 +17,7 @@ export default {
                     PatriotAct: 'patriot-act',
                     PII: 'pii',
                     BankingDisclosures: 'banking-disclosures',
+                    InitTransfer: 'init-transfer',
                     NotFound: '*',
                 },
             }
