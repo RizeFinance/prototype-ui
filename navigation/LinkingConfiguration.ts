@@ -10,6 +10,7 @@ export default {
                     Signup: 'signup',
                     ForgotPassword: 'forgot-password',
                     Accounts: 'accounts',
+                    ExternalAccount: 'external-account',
                     ProcessingApplication: 'processing-application',
                     ApplicationUnapproved: 'application-unapproved',
                     Disclosures: 'disclosures',
