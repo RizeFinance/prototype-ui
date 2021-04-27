@@ -69,7 +69,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                     onPress={onPressAccounts}
                     fontType={Heading4}
                 >
-                            Accounts
+                    Accounts
                 </TextLink>
                 <TextLink
                     textAlign='center'
@@ -77,7 +77,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                     onPress={onPressExternalAccounts}
                     fontType={Heading4}
                 >
-                            External Account
+                    External Account
                 </TextLink>
             </ScrollView>
             <View style={[styles.menuContainer]}>
@@ -87,7 +87,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                     onPress={onPressLogout}
                     fontType={Heading5}
                 >
-                            LOG OUT
+                    LOG OUT
                 </TextLink>
             </View>
         </Screen>
