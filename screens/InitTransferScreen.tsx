@@ -1,8 +1,16 @@
+import React, { useEffect } from 'react';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik } from 'formik';
-import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, Dropdown, Input, Screen } from '../components';
+import { Button, Dropdown, DropdownItem, Input, Screen } from '../components';
 import { Heading3 } from '../components/Typography';
+import { useAccounts } from '../contexts/Accounts';
+import { RootStackParamList } from '../types';
+import * as Yup from 'yup';
+
+interface InitTransferScreenProps {
+    navigation: StackNavigationProp<RootStackParamList, 'InitTransfer'>;
+}
 
 type TransferFields = {
     fromSyntheticAccountUid: string;
@@ -10,7 +18,14 @@ type TransferFields = {
     amount: string;
 }
 
-export default function InitTransferScreen(): JSX.Element {
+export default function InitTransferScreen({ navigation }: InitTransferScreenProps): JSX.Element {
+    const { refetchAccounts, liabilityAccounts, externalAccounts } = useAccounts();
+    const syntheticAccounts = [...liabilityAccounts, ...externalAccounts]
+        .map(x => ({
+            label: x.name,
+            value: x.uid
+        } as DropdownItem));
+
     const styles = StyleSheet.create({
         heading: {
             marginTop: 24,
@@ -33,10 +48,26 @@ export default function InitTransferScreen(): JSX.Element {
         amount: '',
     };
 
+    const transferValidationSchema = Yup.object().shape({
+        fromSyntheticAccountUid: Yup.string().required('Source account is required.'),
+        toSyntheticAccountUid: Yup.string().required('Destination account is required.'),
+        amount: Yup.number().required('Amount is required.')
+            .typeError('Invalid amount.')
+            .moreThan(0, 'Amount should be greater than 0.'),
+    });
+
     // eslint-disable-next-line
     const onSubmit = async (values: TransferFields): Promise<void> => {
         // TODO: Implementation
     };
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', async () => {
+            await refetchAccounts();
+        });
+
+        return unsubscribe;
+    }, [navigation]);
 
     return (
         <Screen withoutHeader>
@@ -46,6 +77,7 @@ export default function InitTransferScreen(): JSX.Element {
             <Formik
                 initialValues={initialValues}
                 onSubmit={onSubmit}
+                validationSchema={transferValidationSchema}
             >
                 {({ handleChange, handleBlur, handleSubmit, setFieldValue, setFieldTouched, values, errors, isValid, isSubmitting, dirty, touched }) => (
                     <>
@@ -53,7 +85,7 @@ export default function InitTransferScreen(): JSX.Element {
                             <Dropdown
                                 label='From'
                                 placeholder='Select Account'
-                                items={[]}
+                                items={syntheticAccounts}
                                 value={values.fromSyntheticAccountUid}
                                 onChange={(value) => {
                                     setFieldValue('fromSyntheticAccountUid', value ?? '');
@@ -65,7 +97,7 @@ export default function InitTransferScreen(): JSX.Element {
                             <Dropdown
                                 label='To'
                                 placeholder='Select Account'
-                                items={[]}
+                                items={syntheticAccounts}
                                 value={values.toSyntheticAccountUid}
                                 onChange={(value) => {
                                     setFieldValue('toSyntheticAccountUid', value ?? '');
