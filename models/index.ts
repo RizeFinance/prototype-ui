@@ -1,3 +1,3 @@
 export { RizeList } from './Common';
-export { SyntheticAccount } from './SyntheticAccount';
+export { SyntheticAccount, SyntheticAccountType } from './SyntheticAccount';
 export { Transaction } from './Transaction';
