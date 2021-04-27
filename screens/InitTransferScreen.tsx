@@ -104,7 +104,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
             .amountWithinSourceBalance(
                 Yup.ref<string>('fromSyntheticAccountUid'),
                 liabilityAccounts,
-                'Amount should not be greater than the source account balance.'
+                'Amount should not be greater than the source account\'s balance.'
             ),
     });
 
