@@ -223,7 +223,6 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
                     setDisclosures: this.setDisclosures,
                     setBankingDisclosures: this.setBankingDisclosures,
                     loadBankingDisclosures: this.loadBankingDisclosures
-                    
                 }}
             >
                 {this.props.children}

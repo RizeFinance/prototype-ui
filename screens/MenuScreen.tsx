@@ -6,13 +6,18 @@ import { Heading4, Heading5 } from '../components/Typography';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useAuth } from '../contexts/Auth';
+import { useCustomer } from '../contexts/Customer';
 const logo = require('../assets/images/logo.png');
 
 interface MenuScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'Menu'>;
 }
 
-export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element {        
+export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element {    
+    const auth = useAuth();
+    const customer = useCustomer();
+
     const styles = StyleSheet.create({
         logo: {
             height: 200,
@@ -43,7 +48,9 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
     };
 
     const onPressLogout = (): void => {
-        console.log('Logout the app.');  // eslint-disable-line
+        auth.logout();
+        customer.resetState();
+        navigation.goBack();
     };
 
     return (
@@ -89,7 +96,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                 <TextLink
                     textAlign='center'
                     style={styles.menuStyle}
-                    onPress={(): void => onPressLogout()}
+                    onPress={onPressLogout}
                     fontType={Heading5}
                 >
                     LOG OUT
