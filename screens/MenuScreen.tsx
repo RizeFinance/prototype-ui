@@ -1,12 +1,10 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Screen, TextLink } from '../components';
-import { Heading4 } from '../components/Typography';
+import { Heading4, Heading5 } from '../components/Typography';
 
-import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useThemeColor } from '../components/Themed';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 import { useAuth } from '../contexts/Auth';
@@ -14,30 +12,28 @@ import { useCustomer } from '../contexts/Customer';
 const logo = require('../assets/images/logo.png');
 
 interface MenuScreenProps {
-    navigation: StackNavigationProp<RootStackParamList, 'Login'>;
-    route: RouteProp<RootStackParamList, 'Login'>;
+    navigation: StackNavigationProp<RootStackParamList, 'Menu'>;
 }
 
 export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element {    
     const auth = useAuth();
     const customer = useCustomer();
     const complianceWorkflow = useComplianceWorkflow();
-    const primary = useThemeColor('primary');
 
     const styles = StyleSheet.create({
         logo: {
             height: 200,
             width: 200,
-            marginTop: -75,
-            marginBottom: -25,
+            marginTop: -60,
+            marginBottom: -40,
+            marginRight: -16
         },
         menuContainer: {
             marginVertical: 16,
             alignSelf: 'center'
         },
         menuStyle: {
-            marginBottom: 8,
-            color: primary
+            marginVertical: 12
         },
     });
 
@@ -93,7 +89,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                     textAlign='center'
                     style={styles.menuStyle}
                     onPress={(): void => onPressLogout()}
-                    fontType={Heading4}
+                    fontType={Heading5}
                 >
                             LOG OUT
                 </TextLink>

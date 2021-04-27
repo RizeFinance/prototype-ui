@@ -36,7 +36,7 @@ export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowC
 
 export interface ComplianceWorkflowProviderProps {
     children?: JSX.Element;
-    navigation?: StackNavigationProp<RootStackParamList>;
+    navigation: StackNavigationProp<RootStackParamList>;
 }
 
 export type ComplianceWorkflowProviderState = {
