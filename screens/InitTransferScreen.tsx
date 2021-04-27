@@ -9,6 +9,7 @@ import { RootStackParamList } from '../types';
 import * as Yup from 'yup';
 import TransferService from '../services/TransferService';
 import { useAuth } from '../contexts/Auth';
+import utils from '../utils/utils';
 
 interface InitTransferScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'InitTransfer'>;
@@ -25,7 +26,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
     const { refetchAccounts, liabilityAccounts, externalAccounts } = useAccounts();
     const syntheticAccounts = [...liabilityAccounts, ...externalAccounts]
         .map(x => ({
-            label: x.name,
+            label: x.name + (x.synthetic_account_category === 'external' ? '' : ` (${utils.formatCurrency(x.net_usd_available_balance)})`),
             value: x.uid
         } as DropdownItem));
 
