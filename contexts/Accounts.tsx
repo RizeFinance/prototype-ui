@@ -6,6 +6,7 @@ import { AuthContext } from './Auth';
 export type AccountsContextProps = {
     isLoading: boolean;
     liabilityAccounts?: SyntheticAccount[];
+    externalAccounts?: SyntheticAccount[];
     refetchAccounts: () => Promise<SyntheticAccount[]>;
 }
 
@@ -17,12 +18,14 @@ export const AccountsContext = React.createContext<AccountsContextProps>({
 
 export type AccountsProviderState = {
     isLoading: boolean;
-    liabilityAccounts?: SyntheticAccount[],
+    liabilityAccounts?: SyntheticAccount[];
+    externalAccounts?: SyntheticAccount[];
 };
 
 const initialState = {
     isLoading: false,
     liabilityAccounts: [],
+    externalAccounts: [],
 };
 
 export interface AccountsProviderProps {
@@ -44,9 +47,11 @@ export class AccountsProvider extends React.Component<AccountsProviderProps, Acc
 
         try {
             const accountList = await AccountsService.getSyntheticAccounts(this.context.accessToken);
-            const liabilityAccounts = accountList.data.filter(x => x.liability);
+            const sortedAccounts = accountList.data.sort((a, b) => new Date(a.opened_at).getTime() - new Date(b.opened_at).getTime());
+            const liabilityAccounts = sortedAccounts.filter(x => x.liability);
+            const externalAccounts = sortedAccounts.filter(x => x.synthetic_account_category === 'external');
 
-            this.setState({ liabilityAccounts } );
+            this.setState({ liabilityAccounts, externalAccounts } );
 
             return liabilityAccounts;
         } finally {
@@ -55,13 +60,14 @@ export class AccountsProvider extends React.Component<AccountsProviderProps, Acc
     }
 
     render(): JSX.Element {
-        const { isLoading, liabilityAccounts } = this.state;
+        const { isLoading, liabilityAccounts, externalAccounts } = this.state;
 
         return (
             <AccountsContext.Provider
                 value={{
                     isLoading: isLoading,
                     liabilityAccounts: liabilityAccounts,
+                    externalAccounts: externalAccounts,
                     refetchAccounts: this.refetchAccounts,
                 }}
             >

@@ -28,7 +28,7 @@ const TransactionList = (props: TransactionListProps): JSX.Element => {
             0,
             props.syntheticAccountUid
         );
-        setTransactions(transactionList.data);
+        setTransactions(transactionList.data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
     };
 
     useEffect(() => {
