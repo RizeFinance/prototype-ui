@@ -22,8 +22,10 @@ import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import { AuthProvider } from '../contexts/Auth';
 import { AccountsProvider } from '../contexts/Accounts';
 import { useThemeColor } from '../components/Themed';
-import { TextLink } from '../components';
 import AccountDetailsScreen from '../screens/AccountDetailsScreen';
+import MenuScreen from '../screens/MenuScreen';
+import { TextLink } from '../components';
+import { Body } from '../components/Typography';
 import ExternalAccountScreen from '../screens/ExternalAccountScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
@@ -39,13 +41,18 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 const RootStack = createStackNavigator();
 const Stack = createStackNavigator<RootStackParamList>();
 
-function getMenuButton() {
-    return (
-        <TextLink>
-            Menu
-        </TextLink>
-    );
-}
+const CloseButton = (): JSX.Element => {
+    const primary = useThemeColor('primary');
+    const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+
+    return <Body fontWeight='bold' style={{ color: primary }} onPress={(): void => { navigation.goBack(); }}>X</Body>;
+};
+
+const MenuButton = (): JSX.Element => {
+    const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+
+    return <TextLink onPress={(): void => { navigation.navigate('Menu'); }}>Menu</TextLink>;
+};
 
 function MainStackScreen() {
     const { customer } = useCustomer();
@@ -61,7 +68,7 @@ function MainStackScreen() {
             headerShown: true,
             headerTitle: '',
             headerLeft: () => <></>,
-            headerRight: () => getMenuButton(),
+            headerRight: () => <MenuButton />,
             headerLeftContainerStyle: {
                 paddingLeft: 32,
             },
@@ -133,6 +140,20 @@ function RootNavigator() {
         },
     });
 
+    const menuScreenOptions = {
+        gestureDirection: 'horizontal-inverted',
+        headerShown: true,
+        headerLeft: null,
+        headerTitle: null,
+        headerRight: () => <CloseButton />,
+        headerRightContainerStyle: {
+            paddingRight: 32,
+        },
+        headerStyle: {
+            shadowOpacity: 0,
+        },
+    } as StackNavigationOptions;
+
     return (
         <CustomerProvider>
             <KeyboardAvoidingView
@@ -142,6 +163,7 @@ function RootNavigator() {
             >
                 <RootStack.Navigator screenOptions={{ headerShown: false }}>
                     <RootStack.Screen name="Main" component={MainStackScreen} />
+                    <RootStack.Screen name="Menu" component={MenuScreen} options={menuScreenOptions} />
                 </RootStack.Navigator>
             </KeyboardAvoidingView>
         </CustomerProvider>
