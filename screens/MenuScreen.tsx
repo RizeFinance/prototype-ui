@@ -5,7 +5,6 @@ import { Heading4, Heading5 } from '../components/Typography';
 
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useThemeColor } from '../components/Themed';
 import { ScrollView } from 'react-native-gesture-handler';
 const logo = require('../assets/images/logo.png');
 
