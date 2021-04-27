@@ -57,7 +57,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
     };
 
     return (
-        <Screen>
+        <Screen withoutHeader>
             <ScrollView 
                 style={{ flex: 1 }}
                 bounces={false}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavigationContainer, DefaultTheme, DarkTheme, useNavigation, useRoute } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme, useNavigation } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationOptions, StackNavigationProp } from '@react-navigation/stack';
 import { ColorSchemeName, KeyboardAvoidingView, Platform, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
@@ -40,20 +40,17 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 const RootStack = createStackNavigator();
 const Stack = createStackNavigator<RootStackParamList>();
 
-
-const MenuButton = (): JSX.Element => {
-    const route = useRoute();
+const CloseButton = (): JSX.Element => {
     const primary = useThemeColor('primary');
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-    const isRouteNameMenu = (route.name === 'Menu');
-    return (
-        <>
-            { isRouteNameMenu ? 
-                <Body fontWeight='bold' style={{ color: primary }} onPress={(): void => { navigation.goBack(); }}>X</Body> 
-                : <TextLink onPress={(): void => { navigation.navigate('Menu'); }}>Menu</TextLink>
-            }
-        </>
-    );
+
+    return <Body fontWeight='bold' style={{ color: primary }} onPress={(): void => { navigation.goBack(); }}>X</Body>;
+};
+
+const MenuButton = (): JSX.Element => {
+    const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+
+    return <TextLink onPress={(): void => { navigation.navigate('Menu'); }}>Menu</TextLink>;
 };
 
 function MainStackScreen() {
@@ -145,7 +142,7 @@ function RootNavigator() {
         headerShown: true,
         headerLeft: null,
         headerTitle: null,
-        headerRight: () => <MenuButton />,
+        headerRight: () => <CloseButton />,
         headerRightContainerStyle: {
             paddingRight: 32,
         },
