@@ -53,7 +53,8 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
 
     const transferValidationSchema = Yup.object().shape({
         fromSyntheticAccountUid: Yup.string().required('Source account is required.'),
-        toSyntheticAccountUid: Yup.string().required('Destination account is required.'),
+        toSyntheticAccountUid: Yup.string().required('Destination account is required.')
+            .not([Yup.ref('fromSyntheticAccountUid'), null], 'Source should not be the same as the destination.'),
         amount: Yup.number().required('Amount is required.')
             .typeError('Invalid amount.')
             .moreThan(0, 'Amount should be greater than 0.'),
