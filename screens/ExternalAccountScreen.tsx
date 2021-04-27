@@ -1,11 +1,13 @@
 import { Formik } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Input, Screen } from '../components';
 import { Body, Heading3 } from '../components/Typography';
 import { useAccounts } from '../contexts/Accounts';
 import { SyntheticAccount } from '../models';
 import * as Yup from 'yup';
+import { useAuth } from '../contexts/Auth';
+import AccountService from '../services/AccountService';
 
 type CreateExternalAccountFields = {
     checkingNumber: string;
@@ -13,7 +15,10 @@ type CreateExternalAccountFields = {
 }
 
 const ExternalAccountScreen = (): JSX.Element => {
-    const { externalAccounts } = useAccounts();
+    const { externalAccounts, poolUids, refetchAccounts } = useAccounts();
+    const { accessToken } = useAuth();
+    const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
+    const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
 
     const styles = StyleSheet.create({
         heading: {
@@ -37,6 +42,9 @@ const ExternalAccountScreen = (): JSX.Element => {
         },
         submitButton: {
             marginTop: 30,
+        },
+        connectStatusMessage: {
+            marginVertical: 8,
         },
     });
 
@@ -78,9 +86,29 @@ const ExternalAccountScreen = (): JSX.Element => {
                 .matches(/^\d+$/, 'Invalid Routing Number.'),
         });
 
-        // eslint-disable-next-line
         const onSubmit = async (values: CreateExternalAccountFields): Promise<void> => {
-            // TODO: Implementation
+            setShowFailedMessage(false);
+
+            try {
+                // Get the synthetic account type
+                const types = await AccountService.getSyntheticAccountTypes(accessToken);
+                const externalType = types.data.find(x => x.synthetic_account_category === 'external');
+
+                // Create the synthetic account
+                await AccountService.createSyntheticAccount(accessToken,
+                    externalType.uid,
+                    poolUids[0],
+                    'External Account',
+                    values.checkingNumber,
+                    values.routingNumber
+                );
+
+                await refetchAccounts();
+
+                setShowSuccessMessage(true);
+            } catch {
+                setShowFailedMessage(true);
+            }
         };
 
         return (
@@ -131,6 +159,26 @@ const ExternalAccountScreen = (): JSX.Element => {
             <Heading3 textAlign='center' style={styles.heading}>
                 External Account
             </Heading3>
+            {showSuccessMessage && (
+                <Body
+                    color='success'
+                    textAlign='center'
+                    fontWeight='semibold'
+                    style={styles.connectStatusMessage}
+                >
+                    Account successfully connected.
+                </Body>
+            )}
+            {showFailedMessage && (
+                <Body
+                    color='error'
+                    textAlign='center'
+                    fontWeight='semibold'
+                    style={styles.connectStatusMessage}
+                >
+                    Account failed to connect.
+                </Body>
+            )}
             {externalAccounts && externalAccounts.length > 0 && (
                 renderExternalAccountDetails(externalAccounts[0])
             )}

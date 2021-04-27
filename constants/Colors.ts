@@ -6,6 +6,7 @@ const defaultColors = {
     border: '#d4dbe1',
     background: 'white',
     gray: '#6e8090',
+    success: '#1bae9f',
 };
 
 export default {
