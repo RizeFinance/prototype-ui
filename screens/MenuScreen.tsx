@@ -26,7 +26,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
             alignSelf: 'center'
         },
         menuStyle: {
-            marginVertical: 12
+            marginVertical: 16
         },
     });
 
@@ -36,6 +36,10 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
 
     const onPressExternalAccounts = (): void => {
         navigation.navigate('ExternalAccount');
+    };
+
+    const onPressTransfer = (): void => {
+        navigation.navigate('InitTransfer');
     };
 
     const onPressLogout = (): void => {
@@ -59,7 +63,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                 <TextLink
                     textAlign='center'
                     style={styles.menuStyle}
-                    onPress={(): void => onPressAccounts()}
+                    onPress={onPressAccounts}
                     fontType={Heading4}
                 >
                     Accounts
@@ -67,10 +71,18 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                 <TextLink
                     textAlign='center'
                     style={styles.menuStyle}
-                    onPress={(): void => onPressExternalAccounts()}
+                    onPress={onPressExternalAccounts}
                     fontType={Heading4}
                 >
                     External Account
+                </TextLink>
+                <TextLink
+                    textAlign='center'
+                    style={styles.menuStyle}
+                    onPress={onPressTransfer}
+                    fontType={Heading4}
+                >
+                    Transfer
                 </TextLink>
             </ScrollView>
             <View style={[styles.menuContainer]}>
