@@ -2,30 +2,38 @@ import * as React from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme, useNavigation } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationOptions, StackNavigationProp } from '@react-navigation/stack';
 import { ColorSchemeName, KeyboardAvoidingView, Platform, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+
+import LinkingConfiguration from './LinkingConfiguration';
+import { RootStackParamList } from '../types';
+
+// Screens
+import {
+    AccountDetailsScreen,
+    AccountsScreen,
+    ApplicationUnapprovedScreen,
+    BankingDisclosuresScreen,
+    ConfirmPIIScreen,
+    DisclosuresScreen,
+    ExternalAccountScreen,
+    ForgotPasswordScreen,
+    InitTransferScreen,
+    LoginScreen,
+    PatriotActScreen,
+    PDFReaderScreen,
+    PIIScreen,
+    ProcessingApplicationScreen,
+    SignupScreen,
+} from '../screens';
+
+// Contexts
 import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
 import { CustomerProvider, useCustomer } from '../contexts/Customer';
-import BankingDisclosuresScreen from '../screens/BankingDisclosuresScreen';
-import DisclosuresScreen from '../screens/DisclosuresScreen';
-
-import LoginScreen from '../screens/LoginScreen';
-import SignupScreen from '../screens/SignupScreen';
-import PatriotActScreen from '../screens/PatriotActScreen';
-import PIIScreen from '../screens/PIIScreen';
-import ConfirmPIIScreen from '../screens/ConfirmPIIScreen';
-import ProcessingApplicationScreen from '../screens/ProcessingApplicationScreen';
-import ApplicationUnapprovedScreen from '../screens/ApplicationUnapprovedScreen';
-import PDFReaderScreen from '../screens/PDFReaderScreen';
-import { RootStackParamList } from '../types';
-import LinkingConfiguration from './LinkingConfiguration';
-import AccountsScreen from '../screens/AccountsScreen';
-import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import { AuthProvider } from '../contexts/Auth';
 import { AccountsProvider } from '../contexts/Accounts';
+
+// Components
 import { useThemeColor } from '../components/Themed';
 import { TextLink } from '../components';
-import AccountDetailsScreen from '../screens/AccountDetailsScreen';
-import ExternalAccountScreen from '../screens/ExternalAccountScreen';
-import InitTransferScreen from '../screens/InitTransferScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
