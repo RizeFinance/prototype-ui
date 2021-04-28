@@ -6,8 +6,9 @@ import { Button, Screen } from '../components';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 import { RootStackParamList } from '../types';
-import RizeClient from '../utils/rizeClient';
 import * as Network from 'expo-network';
+import { useAuth } from '../contexts/Auth';
+import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 
 interface PatriotActScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'PatriotAct'>;
@@ -15,7 +16,7 @@ interface PatriotActScreenProps {
 
 export default function PatriotActScreen({ navigation }: PatriotActScreenProps): JSX.Element {
     const { complianceWorkflow, setComplianceWorkflow } = useComplianceWorkflow();
-    const rize = RizeClient.getInstance();
+    const { accessToken } = useAuth();
 
     const styles = StyleSheet.create({
         heading: {
@@ -37,9 +38,8 @@ export default function PatriotActScreen({ navigation }: PatriotActScreenProps):
 
             if (patriotActDocument) {
                 const ipAddress = await Network.getIpAddressAsync();
-                const updatedComplianceWorkflow = await rize.complianceWorkflow.acknowledgeComplianceDocuments(
-                    complianceWorkflow.uid,
-                    complianceWorkflow.customer.uid,
+                const updatedComplianceWorkflow = await ComplianceWorkflowService.acknowledgeDocuments(
+                    accessToken,
                     {
                         accept: 'yes',
                         documentUid: patriotActDocument.uid,

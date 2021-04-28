@@ -9,11 +9,11 @@ import { Screen } from '../components';
 import { Heading3, BodySmall, Body } from '../components/Typography';
 import Button from '../components/Button';
 import { useThemeColor } from '../components/Themed';
-import RizeClient from '../utils/rizeClient';
-import { useCustomer } from '../contexts/Customer';
 import { ComplianceDocumentSelection, useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
+import { useAuth } from '../contexts/Auth';
+import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 
 interface DisclosuresScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'Disclosures'>;
@@ -27,10 +27,7 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
         setDisclosures
     } = useComplianceWorkflow();
 
-    const { customer } = useCustomer();
-
-    const rize = RizeClient.getInstance();
-
+    const { accessToken } = useAuth();
     const [allCheckBoxSelected, setAllCheckBoxSelected] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -71,9 +68,8 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
 
             if (unacceptedDocs.length > 0) {
                 const ipAddress = await Network.getIpAddressAsync();
-                const updatedComplianceWorkflow = await rize.complianceWorkflow.acknowledgeComplianceDocuments(
-                    complianceWorkflow.uid,
-                    customer.uid,
+                const updatedComplianceWorkflow = await ComplianceWorkflowService.acknowledgeDocuments(
+                    accessToken,
                     ...unacceptedDocs.map(doc => ({
                         accept: 'yes',
                         documentUid: doc.uid,
