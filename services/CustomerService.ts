@@ -1,12 +1,22 @@
+import { Customer } from '../models';
 import api from '../utils/api';
 
-const getCustomer = async (accessToken: string): Promise<any> => {
+const getCustomer = async (accessToken: string): Promise<Customer> => {
     return await api.get('/customer',
         { headers: { Authorization: `Bearer ${accessToken}` } }
     )
         .then((response) => response.data);
 };
 
+const verifyIdentity = async (accessToken: string): Promise<Customer> => {
+    return await api.put('/customer/identity_verification',
+        undefined,
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+    )
+        .then((response) => response.data);
+};
+
 export default {
-    getCustomer
+    getCustomer,
+    verifyIdentity,
 };
