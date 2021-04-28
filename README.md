@@ -2,7 +2,7 @@
 
 ## Prerequisites
 - NodeJS v12 and up
-    - Check nvm to manage multiple versions of node/npm on your local
+    - Check [nvm](https://github.com/creationix/nvm) to manage multiple versions of node/npm on your local
 - Expo CLI version 3.27.8
 - [Git](https://git-scm.com/)
 - [Watchman](https://facebook.github.io/watchman/docs/install#buildinstall) for macOS users
