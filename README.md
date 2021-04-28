@@ -3,7 +3,7 @@
 ## Prerequisites
 - NodeJS v12 and up
     - Check [nvm](https://github.com/creationix/nvm) to manage multiple versions of node/npm on your local
-- Expo CLI version 3.27.8
+- Expo CLI version `3.27.8`
 - [Git](https://git-scm.com/)
 - [Watchman](https://facebook.github.io/watchman/docs/install#buildinstall) for macOS users
 - [iOS Simulator (macOS only)](https://docs.expo.io/workflow/ios-simulator/)
@@ -22,7 +22,7 @@ This boilerplate requires specifically the `3.27.8` version of the Expo CLI in o
 
 ## Running the App
 1. Clone the [RizeFinance/compliance-demo-ui](https://github.com/RizeFinance/compliance-demo-ui) repository on your machine
-2. Run yarn to install the dependencies
+2. Run `yarn` to install the dependencies
 3. At the root of the project directory, create a .env file with the following contents:
     ```
     REACT_NATIVE_RIZE_PROGRAM_ID=
