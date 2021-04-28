@@ -29,7 +29,7 @@ import {
 // Contexts
 import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
 import { CustomerProvider, useCustomer } from '../contexts/Customer';
-import { AuthProvider } from '../contexts/Auth';
+import { AuthProvider, useAuth } from '../contexts/Auth';
 import { AccountsProvider } from '../contexts/Accounts';
 
 // Components
@@ -65,6 +65,7 @@ const MenuButton = (): JSX.Element => {
 
 function MainStackScreen() {
     const { customer } = useCustomer();
+    const auth = useAuth();
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const background = useThemeColor('background');
 
@@ -104,7 +105,7 @@ function MainStackScreen() {
                     <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
                 </Stack.Navigator>
             ) : (
-                <ComplianceWorkflowProvider navigation={navigation}>
+                <ComplianceWorkflowProvider navigation={navigation} auth={auth}>
                     <AccountsProvider>
                         {customer.status === 'initiated' ? (
                             <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
