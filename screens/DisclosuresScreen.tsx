@@ -70,11 +70,11 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
                 const ipAddress = await Network.getIpAddressAsync();
                 const updatedComplianceWorkflow = await ComplianceWorkflowService.acknowledgeDocuments(
                     accessToken,
-                    ...unacceptedDocs.map(doc => ({
+                    unacceptedDocs.map(doc => ({
                         accept: 'yes',
-                        documentUid: doc.uid,
-                        ipAddress: ipAddress,
-                        userName: complianceWorkflow.customer.email,
+                        document_uid: doc.uid,
+                        ip_address: ipAddress,
+                        user_name: complianceWorkflow.customer.email,
                     } as ComplianceDocumentAcknowledgementRequest))
                 );
 

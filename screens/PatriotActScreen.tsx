@@ -42,9 +42,9 @@ export default function PatriotActScreen({ navigation }: PatriotActScreenProps):
                     accessToken,
                     {
                         accept: 'yes',
-                        documentUid: patriotActDocument.uid,
-                        ipAddress: ipAddress,
-                        userName: complianceWorkflow.customer.email
+                        document_uid: patriotActDocument.uid,
+                        ip_address: ipAddress,
+                        user_name: complianceWorkflow.customer.email
                     }
                 );
 
@@ -64,7 +64,7 @@ export default function PatriotActScreen({ navigation }: PatriotActScreenProps):
             }
         }
     };
-    
+
     return (
         <Screen useScrollView>
             <Heading3 textAlign='center' style={styles.heading}>
