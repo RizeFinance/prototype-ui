@@ -6,7 +6,7 @@ import React, { useContext } from 'react';
 import { RootStackParamList } from '../types';
 import RizeClient from '../utils/rizeClient';
 import { CustomerContext } from './Customer';
-import { useAuth } from '../contexts/Auth';
+import { AuthContextProps, useAuth } from '../contexts/Auth';
 import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 
 export type ComplianceDocumentSelection = ComplianceDocument & {
@@ -37,6 +37,7 @@ export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowC
 export interface ComplianceWorkflowProviderProps {
     children?: JSX.Element;
     navigation: StackNavigationProp<RootStackParamList>;
+    auth: AuthContextProps;
 }
 
 export type ComplianceWorkflowProviderState = {
@@ -68,11 +69,10 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
 
     evaluateCurrentStep = async (): Promise<void> => {
         const customer = this.context.customer;
-        const { accessToken } = useAuth();
 
         if (customer?.status === 'initiated') {
             // Get the latest workflow of the customer
-            const latestWorkflow = await ComplianceWorkflowService.viewLatestWorkflow(accessToken);
+            const latestWorkflow = await ComplianceWorkflowService.viewLatestWorkflow(this.props.auth.accessToken);
 
             if (latestWorkflow.summary.status === 'expired') {
                 await this.renewComplianceWorkflow(latestWorkflow);
