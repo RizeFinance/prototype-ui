@@ -31,7 +31,7 @@ This boilerplate requires specifically the `3.27.8` version of the Expo CLI in o
     ```
     Place a working Rize Program ID and HMAC **(Note: These two will be removed in the future)**
     
-    Replace the value of REACT_NATIVE_API_BASE_URL with the base URL of the middleware API.
+    Replace the value of `REACT_NATIVE_API_BASE_URL` with the base URL of the middleware API.
 4. Run one of the following:
     - For iOS (Make sure you have XCode and iOS Simulator installed):
         ```
