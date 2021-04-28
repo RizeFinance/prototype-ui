@@ -6,7 +6,7 @@ import React, { useContext } from 'react';
 import { RootStackParamList } from '../types';
 import RizeClient from '../utils/rizeClient';
 import { CustomerContext } from './Customer';
-import { AuthContextProps, useAuth } from '../contexts/Auth';
+import { AuthContextProps } from '../contexts/Auth';
 import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 
 export type ComplianceDocumentSelection = ComplianceDocument & {
