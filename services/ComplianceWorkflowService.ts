@@ -1,3 +1,4 @@
+import { ComplianceDocumentAcknowledgementRequest } from '../models';
 import api from '../utils/api';
 
 const viewLatestWorkflow = async (accessToken: string): Promise<any> => {
@@ -9,7 +10,7 @@ const viewLatestWorkflow = async (accessToken: string): Promise<any> => {
 
 const acknowledgeDocuments = async (
     accessToken: string,
-    documents: any,
+    documents: ComplianceDocumentAcknowledgementRequest | ComplianceDocumentAcknowledgementRequest [],
 ): Promise<any> => {
     return await api.post('/compliance_workflows/batch_acknowledge_documents',
         { documents: Array.isArray(documents) ? documents : [documents] },
