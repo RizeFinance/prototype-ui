@@ -179,7 +179,7 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
 
     renewComplianceWorkflow = async (): Promise<void> => {
         const newComplianceWorkflow = await ComplianceWorkflowService.renewWorkflow(this.props.auth.accessToken);
-        const customer = await CustomerService.get(this.props.auth.accessToken);
+        const customer = await CustomerService.getCustomer(this.props.auth.accessToken);
 
         await this.setComplianceWorkflow(newComplianceWorkflow);
         await this.context.setCustomer(customer);
