@@ -8,6 +8,7 @@ import RizeClient from '../utils/rizeClient';
 import { CustomerContext } from './Customer';
 import { AuthContextProps } from '../contexts/Auth';
 import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
+import CustomerService from '../services/CustomerService';
 
 export type ComplianceDocumentSelection = ComplianceDocument & {
     selected?: boolean;
@@ -183,8 +184,7 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
             workflow.customer.email
         );
 
-        const customer = await this.rize.customer.get(newComplianceWorkflow.customer.uid);
-
+        const customer = await CustomerService.get(this.props.auth.accessToken);
         await this.setComplianceWorkflow(newComplianceWorkflow);
         await this.context.setCustomer(customer);
     };

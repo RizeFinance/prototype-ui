@@ -16,7 +16,16 @@ const verifyIdentity = async (accessToken: string): Promise<Customer> => {
         .then((response) => response.data);
 };
 
+const get = async (accessToken: string): Promise<any> => {
+    return await api.put('/customer/get',
+        undefined,
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+    )
+        .then((response) => response.data);
+};
+
 export default {
     getCustomer,
+    get,
     verifyIdentity,
 };

@@ -1,6 +1,8 @@
 import { Customer } from '@rizefinance/rize-js/types/lib/core/customer';
 import React, { useContext } from 'react';
+import CustomerService from '../services/CustomerService';
 import RizeClient from '../utils/rizeClient';
+import { AuthContextProps } from './Auth';
 
 export type CustomerContextProps = {
     customer?: Customer;
@@ -18,6 +20,7 @@ export const CustomerContext = React.createContext<CustomerContextProps>({
 
 export interface CustomerProviderProps {
     children?: JSX.Element;
+    auth: AuthContextProps;
 }
 
 export type CustomerProviderState = {
@@ -58,7 +61,7 @@ export class CustomerProvider extends React.Component<CustomerProviderProps, Cus
             return undefined;
         }
 
-        const customer = await this.rize.customer.get(this.state.customer.uid);
+        const customer = await CustomerService.get(this.props.auth.accessToken);
         await this.promisedSetState({ customer });
         return customer;
     }
