@@ -6,8 +6,9 @@ import { Screen, Button } from '../components';
 import { RootStackParamList } from '../types';
 import { Heading3, Body } from '../components/Typography';
 import { useThemeColor } from '../components/Themed';
-import RizeClient from '../utils/rizeClient';
 import { useCustomer } from '../contexts/Customer';
+import CustomerService from '../services/CustomerService';
+import { useAuth } from '../contexts/Auth';
 
 interface ConfirmPIIScreenProps {
     route: RouteProp<RootStackParamList, 'ConfirmPII'>;
@@ -17,9 +18,9 @@ interface ConfirmPIIScreenProps {
 export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreenProps): JSX.Element {
     const data = route.params.fieldValues;
     const { customer } = useCustomer();
+    const { accessToken } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-    const rize = RizeClient.getInstance();
     const gray = useThemeColor('gray');
     const primary = useThemeColor('primary');
     
@@ -40,23 +41,28 @@ export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreen
         setIsSubmitting(true);
 
         try {
-            const updatedCustomer = await rize.customer.update(customer.uid, customer.email, {
-                first_name: data.firstName,
-                middle_name: data.middleName,
-                last_name: data.lastName,
-                suffix: data.suffix,
-                phone: data.phone.replace(/\D/g,''),
-                ssn: data.ssn,
-                dob: data.dob,
-                address: {
-                    street1: data.address1,
-                    street2: data.address2,
-                    city: data.city,
-                    state: data.state,
-                    postal_code: data.zip,
-                },
-            });
-    
+            const updatedCustomer = await CustomerService.updateCustomer(
+                accessToken,
+                customer.uid,
+                customer.email, 
+                {
+                    first_name: data.firstName,
+                    middle_name: data.middleName,
+                    last_name: data.lastName,
+                    suffix: data.suffix,
+                    phone: data.phone.replace(/\D/g,''),
+                    ssn: data.ssn,
+                    dob: data.dob,
+                    address: {
+                        street1: data.address1,
+                        street2: data.address2,
+                        city: data.city,
+                        state: data.state,
+                        postal_code: data.zip,
+                    },
+                }
+            );
+
             if(updatedCustomer) {
                 navigation.navigate('BankingDisclosures');
             }
