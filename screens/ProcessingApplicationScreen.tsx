@@ -2,12 +2,13 @@ import React, { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { Screen } from '../components';
 import { Heading3, Heading4 } from '../components/Typography';
+import { useAuth } from '../contexts/Auth';
 import { useCustomer } from '../contexts/Customer';
-import RizeClient from '../utils/rizeClient';
+import CustomerService from '../services/CustomerService';
 
 export default function ProcessingApplicationScreen(): JSX.Element {
+    const { accessToken } = useAuth();
     const { customer, refreshCustomer } = useCustomer();
-    const rize = RizeClient.getInstance();
 
     let timeout = null;
 
@@ -30,7 +31,7 @@ export default function ProcessingApplicationScreen(): JSX.Element {
     useEffect(() => {
         const verificationCheck = async (): Promise<void> => {
             if (customer.status === 'initiated') {
-                await rize.customer.verifyIdentity(customer.uid);
+                await CustomerService.verifyIdentity(accessToken);
             }
     
             refreshCustomerPeriodically();
