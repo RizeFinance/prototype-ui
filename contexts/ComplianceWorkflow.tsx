@@ -75,7 +75,7 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
             const latestWorkflow = await ComplianceWorkflowService.viewLatestWorkflow(this.props.auth.accessToken);
 
             if (latestWorkflow.summary.status === 'expired') {
-                await this.renewComplianceWorkflow(latestWorkflow);
+                await this.renewComplianceWorkflow();
             } else {
                 await this.setComplianceWorkflow(latestWorkflow);
             }
@@ -176,13 +176,8 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
         }
     };
 
-    renewComplianceWorkflow = async (workflow: ComplianceWorkflow): Promise<void> => {
-        const newComplianceWorkflow = await this.rize.complianceWorkflow.renew(
-            workflow.customer.external_uid,
-            workflow.customer.uid,
-            workflow.customer.email
-        );
-
+    renewComplianceWorkflow = async (): Promise<void> => {
+        const newComplianceWorkflow = await ComplianceWorkflowService.renewWorkflow(this.props.auth.accessToken);
         const customer = await this.rize.customer.get(newComplianceWorkflow.customer.uid);
 
         await this.setComplianceWorkflow(newComplianceWorkflow);
