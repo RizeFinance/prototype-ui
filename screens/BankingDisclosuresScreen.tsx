@@ -6,10 +6,10 @@ import { useThemeColor } from '../components/Themed';
 import { useNavigation } from '@react-navigation/native';
 import cloneDeep from 'lodash/cloneDeep';
 import { ComplianceDocumentSelection, useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
-import { useCustomer } from '../contexts/Customer';
-import RizeClient from '../utils/rizeClient';
 import * as Network from 'expo-network';
 import { ComplianceDocumentAcknowledgementRequest } from '@rizefinance/rize-js/lib/core/compliance-workflow';
+import { useAuth } from '../contexts/Auth';
+import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 
 export default function BankingDisclosuresScreen(): JSX.Element {
 
@@ -22,17 +22,10 @@ export default function BankingDisclosuresScreen(): JSX.Element {
     } = useComplianceWorkflow();
 
     const navigation = useNavigation();
-
-    const { customer } = useCustomer();
-
+    const { accessToken } = useAuth();
     const [ checkboxSelected, setCheckboxSelected ] = useState<boolean>(false);
-
     const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
-
     const depositAgreement = bankingDisclosures.find(x => x.name === 'Deposit Agreement');
-
-    const rize = RizeClient.getInstance();
-    
     const primary = useThemeColor('primary');
 
     const styles = StyleSheet.create({
@@ -84,14 +77,13 @@ export default function BankingDisclosuresScreen(): JSX.Element {
 
             if (unacceptedDocs.length > 0) {
                 const ipAddress = await Network.getIpAddressAsync();
-                const updatedComplianceWorkflow = await rize.complianceWorkflow.acknowledgeComplianceDocuments(
-                    complianceWorkflow.uid,
-                    customer.uid,
-                    ...unacceptedDocs.map(doc => ({
+                const updatedComplianceWorkflow = await ComplianceWorkflowService.acknowledgeDocuments(
+                    accessToken,
+                    unacceptedDocs.map(doc => ({
                         accept: 'yes',
-                        documentUid: doc.uid,
-                        ipAddress: ipAddress,
-                        userName: complianceWorkflow.customer.email,
+                        document_uid: doc.uid,
+                        ip_address: ipAddress,
+                        user_name: complianceWorkflow.customer.email,
                     } as ComplianceDocumentAcknowledgementRequest))
                 );
 
