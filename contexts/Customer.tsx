@@ -61,7 +61,7 @@ export class CustomerProvider extends React.Component<CustomerProviderProps, Cus
             return undefined;
         }
 
-        const customer = await CustomerService.get(this.props.auth.accessToken);
+        const customer = await CustomerService.getCustomer(this.props.auth.accessToken);
         await this.promisedSetState({ customer });
         return customer;
     }
