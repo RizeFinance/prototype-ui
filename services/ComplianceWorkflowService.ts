@@ -19,7 +19,17 @@ const acknowledgeDocuments = async (
         .then((response) => response.data);
 };
 
+const renewWorkflow = async (
+    accessToken: string
+): Promise<any> => {
+    return await api.post('/compliance_workflows/renew', {},
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+    )
+        .then((response) => response.data);
+};
+
 export default {
     viewLatestWorkflow,
-    acknowledgeDocuments
+    acknowledgeDocuments,
+    renewWorkflow
 };
