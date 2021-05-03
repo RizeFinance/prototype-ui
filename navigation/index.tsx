@@ -29,7 +29,7 @@ import {
 // Contexts
 import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
 import { CustomerProvider, useCustomer } from '../contexts/Customer';
-import { AuthProvider, useAuth } from '../contexts/Auth';
+import { AuthConsumer, AuthProvider, useAuth } from '../contexts/Auth';
 import { AccountsProvider } from '../contexts/Accounts';
 
 // Components
@@ -167,18 +167,22 @@ function RootNavigator() {
 
     return (
         <AuthProvider>
-            <CustomerProvider>
-                <KeyboardAvoidingView
-                    behavior='padding'
-                    style={styles.keyboardAvoidingView}
-                    keyboardVerticalOffset={Platform.OS === 'android' ? -200 : 0}
-                >
-                    <RootStack.Navigator screenOptions={{ headerShown: false }}>
-                        <RootStack.Screen name="Main" component={MainStackScreen} />
-                        <RootStack.Screen name="Menu" component={MenuScreen} options={menuScreenOptions} />
-                    </RootStack.Navigator>
-                </KeyboardAvoidingView>
-            </CustomerProvider>
+            <AuthConsumer>
+                {(auth) => (
+                    <CustomerProvider auth={auth}>
+                        <KeyboardAvoidingView
+                            behavior='padding'
+                            style={styles.keyboardAvoidingView}
+                            keyboardVerticalOffset={Platform.OS === 'android' ? -200 : 0}
+                        >
+                            <RootStack.Navigator screenOptions={{ headerShown: false }}>
+                                <RootStack.Screen name="Main" component={MainStackScreen} />
+                                <RootStack.Screen name="Menu" component={MenuScreen} options={menuScreenOptions} />
+                            </RootStack.Navigator>
+                        </KeyboardAvoidingView>
+                    </CustomerProvider>
+                )}
+            </AuthConsumer>
         </AuthProvider>
     );
 }

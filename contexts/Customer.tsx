@@ -1,5 +1,5 @@
-import { Customer } from '@rizefinance/rize-js/types/lib/core/customer';
 import React, { useContext } from 'react';
+import { Customer } from '../models';
 import CustomerService from '../services/CustomerService';
 import RizeClient from '../utils/rizeClient';
 import { AuthContextProps } from './Auth';
