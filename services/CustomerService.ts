@@ -18,13 +18,11 @@ const verifyIdentity = async (accessToken: string): Promise<Customer> => {
 
 const updateCustomer = async (
     accessToken: string,
-    customerUid: string,
     customerEmail: string,
     customerDetails: CustomerDetails,
 ): Promise<Customer> => {
     return await api.put('/customer',
         {
-            customerUid,
             email: customerEmail,
             details: customerDetails,
         },

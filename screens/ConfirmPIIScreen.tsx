@@ -41,9 +41,8 @@ export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreen
         setIsSubmitting(true);
 
         try {
-            const updatedCustomer = await CustomerService.updateCustomer(
+            await CustomerService.updateCustomer(
                 accessToken,
-                customer.uid,
                 customer.email, 
                 {
                     first_name: data.firstName,
@@ -63,9 +62,7 @@ export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreen
                 }
             );
 
-            if(updatedCustomer) {
-                navigation.navigate('BankingDisclosures');
-            }
+            navigation.navigate('BankingDisclosures');
         } finally {
             setIsSubmitting(false);
         }
