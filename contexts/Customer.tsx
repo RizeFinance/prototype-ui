@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { Customer } from '../models';
 import CustomerService from '../services/CustomerService';
-import RizeClient from '../utils/rizeClient';
 import { AuthContextProps } from './Auth';
 
 export type CustomerContextProps = {
@@ -37,8 +36,6 @@ export class CustomerProvider extends React.Component<CustomerProviderProps, Cus
 
         this.state = initialState;
     }
-
-    rize = RizeClient.getInstance();
 
     promisedSetState = async <K extends keyof CustomerProviderState>(
         state: Pick<CustomerProviderState, K> | ((prevState: Readonly<CustomerProviderState>, props: Readonly<CustomerProviderProps>) => (Pick<CustomerProviderState, K> | CustomerProviderState | null)) | null

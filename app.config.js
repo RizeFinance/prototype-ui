@@ -49,10 +49,6 @@ export default {
         ],
     },
     extra: {
-        rize: {
-            programId: process.env.REACT_NATIVE_RIZE_PROGRAM_ID,
-            hmac: process.env.REACT_NATIVE_RIZE_HMAC,
-        },
         api: {
             baseUrl: process.env.REACT_NATIVE_API_BASE_URL,
         }
