@@ -86,7 +86,7 @@ export default function PatriotActScreen({ navigation }: PatriotActScreenProps):
                 <Body>&nbsp;</Body>
 
                 <Body>
-                    To help the government fight the funding of terrorism and mony laundering activities,
+                    To help the government fight the funding of terrorism and money laundering activities,
                     Federal law requires all financial institutions to obtain, verify, and record information
                     that identifies each person who opens an account.
                 </Body>
