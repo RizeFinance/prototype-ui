@@ -25,7 +25,7 @@ export default function BankingDisclosuresScreen(): JSX.Element {
     const { accessToken } = useAuth();
     const [ checkboxSelected, setCheckboxSelected ] = useState<boolean>(false);
     const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
-    const depositAgreement = bankingDisclosures.find(x => x.name === 'Deposit Agreement');
+    const depositAgreement = bankingDisclosures.find(x => x.name === 'Deposit Agreement and Disclosures');
     const primary = useThemeColor('primary');
 
     const styles = StyleSheet.create({
@@ -46,10 +46,10 @@ export default function BankingDisclosuresScreen(): JSX.Element {
     });
 
     useEffect(() => {
-        if (bankingDisclosures.length === 0) {
+        if (complianceWorkflow && bankingDisclosures.length === 0) {
             loadBankingDisclosures();
         }
-    }, []);
+    }, [complianceWorkflow]);
 
     useEffect(() => {
         const hasUnselectedBox = bankingDisclosures.find(doc => !doc.selected);
@@ -68,13 +68,11 @@ export default function BankingDisclosuresScreen(): JSX.Element {
         });
     };
 
-
     const handleSubmit = async (): Promise<void> => {
         setIsSubmitting(true);
 
         try {
-            const unacceptedDocs = bankingDisclosures.filter(x => !x.alreadyAccepted);
-
+            const unacceptedDocs = complianceWorkflow.current_step_documents_pending
             if (unacceptedDocs.length > 0) {
                 const ipAddress = await Network.getIpAddressAsync();
                 const updatedComplianceWorkflow = await ComplianceWorkflowService.acknowledgeDocuments(
@@ -121,7 +119,7 @@ export default function BankingDisclosuresScreen(): JSX.Element {
             <Body>&nbsp;</Body>
 
             <View style={styles.checkboxesContainer}>
-                {depositAgreement && generateCheckBox(depositAgreement,bankingDisclosures.indexOf(depositAgreement))}
+                {depositAgreement && generateCheckBox(depositAgreement, bankingDisclosures.indexOf(depositAgreement))}
             </View>
 
             <View style={styles.footer}>
