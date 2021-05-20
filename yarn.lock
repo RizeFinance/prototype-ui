@@ -2069,14 +2069,16 @@
     color "^3.1.3"
     react-native-iphone-x-helper "^1.3.0"
 
-"@rizefinance/rize-js@^0.0.1":
-  version "0.0.1"
-  resolved "https://npm.pkg.github.com/download/@rizefinance/rize-js/0.0.1/a99f70c7f9b33df2d9138d8c1b9a00ba2fa1469463710714cb69e66a9b9f5c12#30d064140d6ce4efe8adabac684b15dfa366a5f0"
-  integrity sha512-p72vE4V1CVym/HcXiJ0ZVlpfLkvQ7a2AyfHa6KaFUTXOXnhAksZQ8fkYFCq665IzFAGB4nhK0qHiz6YmUGLu0g==
+"@rizefinance/rize-js@^0.0.5":
+  version "0.0.5"
+  resolved "https://npm.pkg.github.com/download/@rizefinance/rize-js/0.0.5/be8f2661d131de99a87c1b0ae47d01ffd4ff30d2a909dbe68bbff190e81891c6#5d431cedc648e57b38d0207aa190647ad3cbb698"
+  integrity sha512-8PLh59L5yrOYSwZc80ZSz4WwaY3ISwKIE4YADDWcuIl2Tzk63GOZubNSmCU+0neU2OfcLvGdsJhVb81pZM9ZSg==
   dependencies:
     axios "^0.21.1"
     jsrsasign "^10.1.11"
+    lodash "^4.17.21"
     query-string "^6.14.0"
+    stompit "^1.0.0"
     validator "^13.5.2"
 
 "@sinonjs/commons@^1.7.0":
@@ -7749,7 +7751,7 @@ q@^1.1.2:
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
   integrity sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=
 
-qs@^6.5.0:
+qs@^6.5.0, qs@~6.9.1:
   version "6.9.6"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.6.tgz#26ed3c8243a431b2924aca84cc90471f35d5a0ee"
   integrity sha512-TIRk4aqYLNoJUbd+g2lEdz5kLWIuTMRagAXxl78Q0RiVjAOugHmeKNGdd3cwo/ktpf9aL9epCfFqWDEKysUlLQ==
@@ -8713,6 +8715,13 @@ stealthy-require@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/stealthy-require/-/stealthy-require-1.1.1.tgz#35b09875b4ff49f26a777e509b3090a3226bf24b"
   integrity sha1-NbCYdbT/SfJqd35QmzCQoyJr8ks=
+
+stompit@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/stompit/-/stompit-1.0.0.tgz#2fd3aaae9c8dd6bc9cc0a83ca359205992748f5b"
+  integrity sha512-He+ZV41LyCs4WNpMT9WFAuhQ6cUNhzfa+PsRlf7qxGIfMhDCUncnD9V7Cwvo8tzvpnwVyRB2BDG3R7I2Gbv4Ww==
+  dependencies:
+    qs "~6.9.1"
 
 stream-buffers@~2.2.0:
   version "2.2.0"
