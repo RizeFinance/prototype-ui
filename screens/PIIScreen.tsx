@@ -251,7 +251,6 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                                 onChangeText={(e) => {
                                     let value = e.replace(/\D/g,'');
                                     value = phoneFormatter.apply(value);
-                                    console.log(value)
                                     setFieldValue('phone', value);
                                 }}
                                 multiline={true}
