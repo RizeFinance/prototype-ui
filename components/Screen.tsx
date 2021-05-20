@@ -25,6 +25,10 @@ const Screen = (props: ScreenProps): JSX.Element => {
         container: {
             flex: 1,
             backgroundColor: background,
+            maxWidth: 500,
+            width: '100%',
+            marginRight: 'auto',
+            marginLeft: 'auto',
         },
         safeAreaView: {
             flex: 1,

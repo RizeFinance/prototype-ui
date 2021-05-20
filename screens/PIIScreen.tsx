@@ -1,6 +1,6 @@
 import { Formik, useFormikContext } from 'formik';
 import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Platform } from 'react-native';
 import { Button, DatePickerInput, Dropdown, Input, Screen } from '../components';
 import { Heading3 } from '../components/Typography';
 import states from '../constants/States';
@@ -32,7 +32,7 @@ function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
         const unsubscribe = navigation.addListener('focus', async () => {
             const updatedCustomer = await refreshCustomer();
 
-            if (updatedCustomer && updatedCustomer.details.first_name) {
+            if (updatedCustomer && updatedCustomer?.details?.first_name) {
                 const details = updatedCustomer.details;
 
                 setFieldValue('firstName', details.first_name ?? '');
@@ -172,16 +172,28 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                         </View>
 
                         <View style={styles.formGroup}>
-                            <DatePickerInput
-                                label='Date of Birth'
-                                placeholder='Month/Date/Year'
-                                errorText={!touched.dob as boolean ? '' : errors.dob as string}
-                                value={values.dob}
-                                onChange={(date: Date) => {
-                                    setFieldValue('dob', date);
-                                    setFieldTouched('dob', true, false);
-                                }}
-                            />
+                            {Platform.OS === 'web' ? (
+                                <Input
+                                    label='Date of Birth'
+                                    placeholder='Month/Date/Year'
+                                    onChangeText={handleChange('dob')}
+                                    onBlur={handleBlur('dob')}
+                                    value={values.dob}
+                                    errorText={!touched.dob as boolean ? '' : errors.dob as string}
+                                    editable={!isSubmitting}
+                                />
+                            ) : (
+                                <DatePickerInput
+                                    label='Date of Birth'
+                                    placeholder='Month/Date/Year'
+                                    errorText={!touched.dob as boolean ? '' : errors.dob as string}
+                                    value={values.dob}
+                                    onChange={(date: Date) => {
+                                        setFieldValue('dob', date);
+                                        setFieldTouched('dob', true, false);
+                                    }}
+                                />
+                            )}
                         </View>
 
                         <View style={styles.formGroup}>
@@ -210,19 +222,16 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                                 errorText={!touched.city ? '' : errors.city}
                                 editable={!isSubmitting}
                             />
-                            <Dropdown
+                            <Input
                                 placeholder='State'
-                                items={states.map(x => ({
-                                    label: x.name,
-                                    value: x.code
-                                }))}
+                                onChangeText={handleChange('state')}
+                                onBlur={handleBlur('state')}
                                 value={values.state}
-                                onChange={(value) => {
-                                    setFieldValue('state', value ?? '');
-                                    setFieldTouched('state', true, false);
-                                }}
                                 errorText={!touched.state ? '' : errors.state}
+                                editable={!isSubmitting}
                             />
+
+                            
                             <Input
                                 placeholder='Zip Code'
                                 onChangeText={handleChange('zip')}
@@ -239,24 +248,12 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                             <Input
                                 label='Phone Number'
                                 placeholder='(xxx) xxx-xxxx'
-                                onTextInput={(e) => {
-                                    if (e.nativeEvent.text) {
-                                        let value = `${e.nativeEvent.previousText}${e.nativeEvent.text}`;
-                                        value = value.replace(/\D/g,'');
-                                        value = phoneFormatter.apply(value);
-
-                                        setFieldValue('phone', value);
-                                    } else {
-                                        const value = utils.replaceAt(
-                                            e.nativeEvent.previousText,
-                                            e.nativeEvent.range.start,
-                                            e.nativeEvent.range.end,
-                                            ''
-                                        );
-                            
-                                        setFieldValue('phone', value);
-                                    }
+                                onChangeText={(e) => {
+                                    let value = e.replace(/\D/g,'');
+                                    value = phoneFormatter.apply(value);
+                                    setFieldValue('phone', value);
                                 }}
+                                multiline={true}
                                 onBlur={handleBlur('phone')}
                                 value={values.phone}
                                 errorText={!touched.phone ? '' : errors.phone}
@@ -270,24 +267,12 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                             <Input
                                 label='Social Security Number'
                                 placeholder='xxx-xx-xxxx'
-                                onTextInput={(e) => {
-                                    if (e.nativeEvent.text) {
-                                        let value = `${e.nativeEvent.previousText}${e.nativeEvent.text}`;
-                                        value = value.replace(/[^A-Za-z0-9]+/g,'');
-                                        value = ssnFormatter.apply(value);
-
-                                        setFieldValue('ssn', value);
-                                    } else {
-                                        const value = utils.replaceAt(
-                                            e.nativeEvent.previousText,
-                                            e.nativeEvent.range.start,
-                                            e.nativeEvent.range.end,
-                                            ''
-                                        );
-                            
-                                        setFieldValue('ssn', value);
-                                    }
+                                onChangeText={(e) => {
+                                    let value = e.replace(/[^A-Za-z0-9]+/g,'');
+                                    value = ssnFormatter.apply(value);
+                                    setFieldValue('ssn', value);
                                 }}
+                                multiline={true}
                                 onBlur={handleBlur('ssn')}
                                 value={values.ssn}
                                 errorText={!touched.ssn ? '' : errors.ssn}
