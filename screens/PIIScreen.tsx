@@ -32,7 +32,7 @@ function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
         const unsubscribe = navigation.addListener('focus', async () => {
             const updatedCustomer = await refreshCustomer();
 
-            if (updatedCustomer && updatedCustomer.details.first_name) {
+            if (updatedCustomer && updatedCustomer?.details?.first_name) {
                 const details = updatedCustomer.details;
 
                 setFieldValue('firstName', details.first_name ?? '');
