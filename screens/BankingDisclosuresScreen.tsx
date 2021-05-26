@@ -72,7 +72,7 @@ export default function BankingDisclosuresScreen(): JSX.Element {
         setIsSubmitting(true);
 
         try {
-            const unacceptedDocs = complianceWorkflow.current_step_documents_pending
+            const unacceptedDocs = complianceWorkflow.current_step_documents_pending;
             if (unacceptedDocs.length > 0) {
                 const ipAddress = await Network.getIpAddressAsync();
                 const updatedComplianceWorkflow = await ComplianceWorkflowService.acknowledgeDocuments(

@@ -108,16 +108,16 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
     }
 
     loadBankingDisclosures = async (): Promise<void> => {
-        if (this.state.complianceWorkflow === undefined) return
+        if (this.state.complianceWorkflow === undefined) return;
         const {
             all_documents: all,
             accepted_documents: accepted,
             current_step_documents_pending: pending
         } = await this.state.complianceWorkflow;
 
-        const acceptedBankingDisclosures = accepted.filter(x => x.name === "Deposit Agreement and Disclosures");
-        const pendingBankingDisclosures = pending.filter(x => x.name === "Deposit Agreement and Disclosures");
-        const allDisclosures = all.filter(x =>     x.name === "Deposit Agreement and Disclosures").map(x => {
+        const acceptedBankingDisclosures = accepted.filter(x => x.name === 'Deposit Agreement and Disclosures');
+        const pendingBankingDisclosures = pending.filter(x => x.name === 'Deposit Agreement and Disclosures');
+        const allDisclosures = all.filter(x =>     x.name === 'Deposit Agreement and Disclosures').map(x => {
             const acceptedBankingDisc = acceptedBankingDisclosures.find(acc => acc.name === x.name);
             const pendingBankingDisc = pendingBankingDisclosures.find(acc => acc.name === x.name);
             

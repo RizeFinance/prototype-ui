@@ -94,6 +94,11 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
             return;
         }
 
+        if(authData.data.require_new_password) {
+            navigation.navigate('SetPassword');
+            return;
+        }
+
         const customer = await CustomerService.getCustomer(authData.data.accessToken);
 
         await setCustomer(customer);
@@ -166,11 +171,6 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
                             disabled={!dirty || !isValid || isSubmitting}
                             onPress={(): void => handleSubmit()}
                         />
-                        <Pressable onPress={(): void => gotoSignupScreen()}>
-                            <Body textAlign='center' fontWeight='semibold' style={styles.underline}>
-                                I need to create an account
-                            </Body>
-                        </Pressable>
                         <Pressable onPress={(): void => { onPressForgotPassword(); }} disabled={isSubmitting}>
                             <Body textAlign='center' fontWeight='semibold' style={styles.forgotAccount}>Forgot password</Body>
                         </Pressable>

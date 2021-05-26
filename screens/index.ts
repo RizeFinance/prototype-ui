@@ -13,4 +13,6 @@ export { default as PatriotActScreen } from './PatriotActScreen';
 export { default as PDFReaderScreen } from './PDFReaderScreen';
 export { default as PIIScreen } from './PIIScreen';
 export { default as ProcessingApplicationScreen } from './ProcessingApplicationScreen';
+export { default as SetPasswordScreen } from './SetPasswordScreen';
 export { default as SignupScreen } from './SignupScreen';
+export { default as DebitCardScreen } from './DebitCardScreen';
