@@ -23,8 +23,15 @@ const forgotPassword = async (email: string): Promise<any> => {
         .then((response) => response.data);
 };
 
+const setPassword = async (username: string, oldPassword: string, newPassword: string): Promise<any> => {
+    return await api.post('/auth/set_password', { username, old_password: oldPassword, new_password: newPassword })
+        .then((response) => response.data);
+};
+
+
 export default {
     authorize,
     register,
-    forgotPassword
+    forgotPassword,
+    setPassword
 };

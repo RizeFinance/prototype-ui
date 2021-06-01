@@ -23,7 +23,8 @@ import {
     PDFReaderScreen,
     PIIScreen,
     ProcessingApplicationScreen,
-    SignupScreen,
+    SetPasswordScreen,
+    DebitCardScreen,
 } from '../screens';
 
 // Contexts
@@ -101,8 +102,8 @@ function MainStackScreen() {
             {!customer ? (
                 <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
                     <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="Signup" component={SignupScreen} />
                     <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+                    <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
                 </Stack.Navigator>
             ) : (
                 <ComplianceWorkflowProvider navigation={navigation} auth={auth}>
@@ -135,6 +136,7 @@ function MainStackScreen() {
                                 <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
                                 <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
                                 <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
+                                <Stack.Screen name="DebitCard" component={DebitCardScreen} />
                             </Stack.Navigator>
                         )}
                     </AccountsProvider>

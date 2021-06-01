@@ -4,29 +4,35 @@ import AuthService from '../services/AuthService';
 export type AuthContextProps = {
     accessToken?: string;
     refreshToken?: string;
+    userName?: string;
     login: (userName: string, password: string) => Promise<any>;
     logout: () => void;
     register: (username: string, password: string) => Promise<any>;
     forgotPassword: (email: string) => Promise<any>;
+    setPassword: (username: string, oldPassword: string, newPassword: string) => Promise<any>;
 }
 
 export const AuthContext = React.createContext<AuthContextProps>({
     accessToken: undefined,
     refreshToken: undefined,
+    userName: undefined,
     login: () => Promise.resolve(),
     logout: () => null,
     register: () => Promise.resolve(null),
-    forgotPassword: () => Promise.resolve(null)
+    forgotPassword: () => Promise.resolve(null),
+    setPassword: () => Promise.resolve(null)
 });
 
 export type AuthProviderState = {
     accessToken?: string;
     refreshToken?: string
+    userName?: string
 };
 
 const initialState = {
     accessToken: undefined,
-    refreshToken: undefined
+    refreshToken: undefined,
+    userName: undefined,
 };
 
 export interface AuthProviderProps {
@@ -53,6 +59,8 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
     }
 
     login = async (userName: string, password: string): Promise<any> => {
+        this.setState({ userName });
+        
         try {
             const { data } = await AuthService.authorize(userName, password);
             if (data && data.accessToken) {            
@@ -112,17 +120,38 @@ export class AuthProvider extends React.Component<AuthProviderProps, AuthProvide
         }
     }
 
+    setPassword = async (username: string, oldPassword: string, newPassword: string): Promise<any> => {
+        try {
+            const result = await AuthService.setPassword(username, oldPassword, newPassword);
+
+            if (result.success && result.data.accessToken) {            
+                await this.promisedSetState({
+                    accessToken: result.data.accessToken,
+                    refreshToken: result.data.refreshToken
+                });
+            }
+
+            return result;
+        } catch (err) {
+            return {
+                success: false
+            };
+        }
+    }
+
     render(): JSX.Element {
-        const { accessToken, refreshToken } = this.state;
+        const { accessToken, refreshToken, userName } = this.state;
 
         return (
             <AuthContext.Provider
                 value={{
                     accessToken: accessToken,
                     refreshToken: refreshToken,
+                    userName: userName,
                     login: this.login,
                     register: this.register,
                     forgotPassword: this.forgotPassword,
+                    setPassword: this.setPassword,
                     logout: this.logout
                 }}
             >
