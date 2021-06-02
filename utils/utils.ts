@@ -15,7 +15,14 @@ const formatCurrency = (num: number | string): string => {
     return '$' + floatNum.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 };
 
+const formatDate = (date: string): string => {
+    const setDate  = new Date(date);
+    
+    return setDate.toLocaleDateString('en-US');
+};
+
 export default {
     replaceAt,
     formatCurrency,
+    formatDate
 };

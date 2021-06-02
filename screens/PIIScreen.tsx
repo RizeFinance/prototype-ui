@@ -1,12 +1,10 @@
 import { Formik, useFormikContext } from 'formik';
 import React, { useEffect } from 'react';
 import { StyleSheet, View, Platform } from 'react-native';
-import { Button, DatePickerInput, Dropdown, Input, Screen } from '../components';
+import { Button, DatePickerInput, Input, Screen } from '../components';
 import { Heading3 } from '../components/Typography';
-import states from '../constants/States';
 import * as Yup from 'yup';
 import StringMask from 'string-mask';
-import utils from '../utils/utils';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { PIIFields, RootStackParamList } from '../types';
 import moment from 'moment';

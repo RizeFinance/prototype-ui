@@ -51,6 +51,9 @@ export default {
     extra: {
         api: {
             baseUrl: process.env.REACT_NATIVE_API_BASE_URL,
+        },
+        application: {
+            allowSignup: process.env.ALLOW_SIGNUP,
         }
     },
 };
