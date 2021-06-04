@@ -4,6 +4,9 @@ export type Config = {
     api: {
         baseUrl: string;
     };
+    application: {
+      allowSignup: string;
+    }
 }
 
 export default {

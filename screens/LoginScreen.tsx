@@ -11,6 +11,7 @@ import CustomerService from '../services/CustomerService';
 import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
+import config from '../config/config';
 
 const logo = require('../assets/images/logo.png');
 
@@ -34,6 +35,7 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
         password: ''
     };
 
+    const allowSignup = config.application.allowSignup === 'true';
     const primary = useThemeColor('primary');
 
     const styles = StyleSheet.create({
@@ -171,6 +173,14 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
                             disabled={!dirty || !isValid || isSubmitting}
                             onPress={(): void => handleSubmit()}
                         />
+
+                        { allowSignup && 
+                            <Pressable onPress={(): void => gotoSignupScreen()}>
+                                <Body textAlign='center' fontWeight='semibold' style={styles.underline}>
+                                    I need to create an account
+                                </Body>
+                            </Pressable>
+                        }
                         <Pressable onPress={(): void => { onPressForgotPassword(); }} disabled={isSubmitting}>
                             <Body textAlign='center' fontWeight='semibold' style={styles.forgotAccount}>Forgot password</Body>
                         </Pressable>
