@@ -48,9 +48,9 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     }, []);
 
     useEffect(() => {
-        if (!isLoading && !debitCards.length) {
-            setLoadingNewCard(true);
+        if (!isLoading && debitCards.length === 0) {
             refreshDebitCardPeriodically();
+            setLoadingNewCard(true);
         }
     }, [debitCards, isLoading]);
 
@@ -161,7 +161,8 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     const refreshDebitCardPeriodically = async (): Promise<void> => {
         const { data: debitCards }  = await refetchDebitCards();
 
-        if (some(debitCards, { ready_to_use: true })) {
+        const readyCards = debitCards.filter(c => !!c.card_last_four_digit && !c.closed_at)
+        if (!isEmpty(readyCards)) {
             setLoadingNewCard(false);
             return;
         }
@@ -205,7 +206,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
               </View>
             }
 
-            { activeCard && associatedAccount && 
+            { !isLoadingNewCard && activeCard && associatedAccount && 
               <View style={styles.container}>
                   <View style={styles.row}>
                       <View style={styles.column}>
