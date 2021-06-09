@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Screen } from '../components';
 import { Body, Heading3, Heading4 } from '../components/Typography';
@@ -24,6 +24,9 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
         heading: {
             marginTop: 24,
             marginBottom: 24,
+        },
+        loading: {
+            marginTop: 25,
         },
         accountInfo: {
             marginVertical: 16,
@@ -74,12 +77,19 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
             <Heading3 textAlign='center' style={styles.heading}>
                 Accounts
             </Heading3>
-            {liabilityAccounts && liabilityAccounts.length > 0 && (
+            {liabilityAccounts?.length > 0 ? (
                 <>
                     {liabilityAccounts.map((account, idx) => (
                         <AccountInfo key={idx} account={account} />
                     ))}
                 </>
+            ): (
+                <View style={styles.loading}>
+                    <ActivityIndicator size='large' />
+                    <Heading3 textAlign='center' style={styles.loading}>
+                    We&apos;re processing your accounts.
+                    </Heading3>
+                </View>
             )}
         </Screen>
     );
