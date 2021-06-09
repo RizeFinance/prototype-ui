@@ -26,10 +26,10 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
 
     const { liabilityAccounts, refetchAccounts } = useAccounts();
 
-    const displayStatus = ['normal', 'queued'];
+    const displayStatus = ['normal', 'queued', 'shipped'];
     const activeCard = debitCards.find(x => displayStatus.includes(x.status) && isNil(x.closed_at));
     const associatedAccount = liabilityAccounts.find(x => x.uid === activeCard?.synthetic_account_uid);
-    const isCardActive = activeCard?.status === 'normal';
+    const isCardActive = ['normal', 'shipped'].includes(activeCard?.status);
 
     const [isLoadingNewCard, setLoadingNewCard] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
@@ -46,6 +46,13 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
         refetchDebitCards();
         refetchAccounts();
     }, []);
+
+    useEffect(() => {
+        if (!isLoading && !debitCards.length) {
+            setLoadingNewCard(true);
+            refreshDebitCardPeriodically();
+        }
+    }, [debitCards, isLoading]);
 
     useEffect(() => {
         activeCard && setIsLocked(!!activeCard?.locked_at);
@@ -76,7 +83,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
             marginBottom: 25,
         },
         loading_heading: {
-          marginTop: 25,
+            marginTop: 25,
         },
         success: {
             color: '#2ecc71',
@@ -108,7 +115,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
             marginRight: 10,
         },
         input: {
-          marginBottom: 15,
+            marginBottom: 15,
         },
         reissueContainer: {
             borderTopColor: 'black',
@@ -132,7 +139,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
         setAlert({ text, success });
 
         if (reissueReason !== 'damaged') {
-            setLoadingNewCard(true)
+            setLoadingNewCard(true);
             refreshDebitCardPeriodically();
         }
     };
@@ -155,8 +162,8 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
         const { data: debitCards }  = await refetchDebitCards();
 
         if (some(debitCards, { ready_to_use: true })) {
-          setLoadingNewCard(false)
-          return;
+            setLoadingNewCard(false);
+            return;
         }
 
         setTimeout(() => {
