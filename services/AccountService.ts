@@ -37,7 +37,7 @@ const createSyntheticAccount = async (
 };
 
 const getLinkToken = async (accessToken: string): Promise<string> => {
-    return await api.get('/synthetic_accounts/connect/create',
+    return await api.get('/synthetic_accounts/auth/get_token',
         { headers: { Authorization: `Bearer ${accessToken}` } }
     )
         .then((response) => response.data.link_token);
