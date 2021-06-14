@@ -7,7 +7,7 @@ const replaceAt = (text: string, startIndex: number, endIndex: number, replaceme
 };
 
 const formatCurrency = (num: number | string): string => {
-    if (num === undefined) {
+    if (num === undefined || num === null ) {
         return '$0';
     }
     

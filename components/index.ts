@@ -8,3 +8,4 @@ export { default as Screen } from './Screen';
 export { default as TextLink } from './TextLink';
 export { default as TransactionList } from './TransactionList';
 export { default as TransactionListItem } from './TransactionListItem';
+export { default as PlaidLink } from './PlaidLink';
