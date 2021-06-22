@@ -9,7 +9,9 @@ export type AccountsContextProps = {
     liabilityAccounts?: SyntheticAccount[];
     externalAccounts?: SyntheticAccount[];
     poolUids?: string[];
+    linkToken?: string;
     refetchAccounts: () => Promise<SyntheticAccount[]>;
+    fetchLinkToken: () => Promise<string>;
 }
 
 export const AccountsContext = React.createContext<AccountsContextProps>({
@@ -18,6 +20,7 @@ export const AccountsContext = React.createContext<AccountsContextProps>({
     externalAccounts: [],
     poolUids: [],
     refetchAccounts: () => Promise.resolve([]),
+    fetchLinkToken: () => Promise.resolve(),
 });
 
 export type AccountsProviderState = {
@@ -25,6 +28,7 @@ export type AccountsProviderState = {
     liabilityAccounts?: SyntheticAccount[];
     externalAccounts?: SyntheticAccount[];
     poolUids?: string[];
+    linkToken?: string;
 };
 
 const initialState = {
@@ -32,6 +36,7 @@ const initialState = {
     liabilityAccounts: [],
     externalAccounts: [],
     poolUids: [],
+    linkToken: null,
 };
 
 export interface AccountsProviderProps {
@@ -56,19 +61,33 @@ export class AccountsProvider extends React.Component<AccountsProviderProps, Acc
             const nonArchivedAccounts = accountList.data.filter(x => x.status !== 'archived');
             const sortedAccounts = nonArchivedAccounts.sort((a, b) => new Date(a.opened_at).getTime() - new Date(b.opened_at).getTime());
             const liabilityAccounts = sortedAccounts.filter(x => x.liability);
-            const externalAccounts = sortedAccounts.filter(x => x.synthetic_account_category === 'external');
+            const externalAccounts = sortedAccounts.filter(x => ['external', 'plaid_external'].includes(x.synthetic_account_category));
             const poolUids = _.uniq(sortedAccounts.map(x => x.pool_uid));
 
             this.setState({ liabilityAccounts, externalAccounts, poolUids } );
 
-            return liabilityAccounts;
+            return accountList;
+        } finally {
+            this.setState({ isLoading: false });
+        }
+    }
+
+    fetchLinkToken = async (): string => {
+        this.setState({ isLoading: true });
+
+        try {
+            const linkToken = await AccountsService.getLinkToken(this.context.accessToken);
+
+            this.setState({ linkToken } );
+
+            return linkToken;
         } finally {
             this.setState({ isLoading: false });
         }
     }
 
     render(): JSX.Element {
-        const { isLoading, liabilityAccounts, externalAccounts, poolUids } = this.state;
+        const { isLoading, liabilityAccounts, externalAccounts, poolUids, linkToken } = this.state;
 
         return (
             <AccountsContext.Provider
@@ -77,7 +96,9 @@ export class AccountsProvider extends React.Component<AccountsProviderProps, Acc
                     liabilityAccounts: liabilityAccounts,
                     externalAccounts: externalAccounts,
                     poolUids: poolUids,
+                    linkToken: linkToken,
                     refetchAccounts: this.refetchAccounts,
+                    fetchLinkToken: this.fetchLinkToken,
                 }}
             >
                 {this.props.children}

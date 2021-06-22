@@ -20,24 +20,32 @@ const createSyntheticAccount = async (
     syntheticAccountTypeUid: string,
     poolUid: string,
     name: string,
-    accountNumber?: string,
-    routingNumber?: string
+    accountId: string,
+    publicToken: string,
 ): Promise<SyntheticAccount> => {
     return await api.post('/synthetic_accounts',
         {
             synthetic_account_type_uid: syntheticAccountTypeUid,
             pool_uid: poolUid,
             name: name,
-            account_number: accountNumber,
-            routing_number: routingNumber,
+            account_id: accountId,
+            public_token: publicToken
         },
         { headers: { Authorization: `Bearer ${accessToken}` } }
     )
         .then((response) => response.data);
 };
 
+const getLinkToken = async (accessToken: string): Promise<string> => {
+    return await api.get('/synthetic_accounts/auth/get_token',
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+    )
+        .then((response) => response.data.link_token);
+};
+
 export default {
     getSyntheticAccounts,
     createSyntheticAccount,
-    getSyntheticAccountTypes
+    getSyntheticAccountTypes,
+    getLinkToken
 };

@@ -1,24 +1,29 @@
-import { Formik } from 'formik';
-import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Button, Input, Screen } from '../components';
-import { Body, Heading3 } from '../components/Typography';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
+import { Screen } from '../components';
+import { Body, Heading3, Heading5 } from '../components/Typography';
 import { useAccounts } from '../contexts/Accounts';
 import { SyntheticAccount } from '../models';
-import * as Yup from 'yup';
+import PlaidLink from '../components/PlaidLink';
 import { useAuth } from '../contexts/Auth';
 import AccountService from '../services/AccountService';
-
-type CreateExternalAccountFields = {
-    checkingNumber: string;
-    routingNumber: string;
-}
+import { capitalize, isEmpty } from 'lodash';
 
 const ExternalAccountScreen = (): JSX.Element => {
-    const { externalAccounts, poolUids, refetchAccounts } = useAccounts();
+    const { externalAccounts, poolUids, refetchAccounts, linkToken, fetchLinkToken } = useAccounts();
     const { accessToken } = useAuth();
     const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
     const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [publicToken, setPublicToken] = useState<string>(null);
+    const [selectableAccounts, setSelectableAccounts] = useState<[]>([]);
+
+    useEffect(() => {
+        (async () => {
+            await refetchAccounts(); 
+            await fetchLinkToken(); 
+        })();
+    }, []);
 
     const styles = StyleSheet.create({
         heading: {
@@ -46,15 +51,31 @@ const ExternalAccountScreen = (): JSX.Element => {
         connectStatusMessage: {
             marginVertical: 8,
         },
+        accountContainer: {
+            marginTop: 10,
+            padding: 20,
+            backgroundColor: 'gray',
+            borderRadius: 4,
+        },
+        accountName: {
+            color: 'white',
+        },
+        loading: {
+            marginTop: 55,
+        },
+
     });
 
     const renderExternalAccountDetails = (externalAccount: SyntheticAccount): JSX.Element => {
         return (
             <View style={styles.detailsSection}>
+                <Heading5 textAlign='center' style={styles.heading}>
+                    {externalAccount.name}
+                </Heading5>
                 <View style={styles.row}>
                     <View style={styles.col}>
                         <Body fontWeight='semibold'>Checking Number</Body>
-                        <Body>{externalAccount.account_number}</Body>
+                        <Body>**** **** **** {externalAccount.account_number_last_four}</Body>
                     </View>
                     <View style={styles.col}>
                         <Body fontWeight='semibold'>Routing Number</Body>
@@ -71,88 +92,107 @@ const ExternalAccountScreen = (): JSX.Element => {
     };
 
     const renderCreateExternalAccountForm = (): JSX.Element => {
-        const initialValues: CreateExternalAccountFields = {
-            checkingNumber: '',
-            routingNumber: '',
-        };
-
-        const externalAccountValidationSchema = Yup.object().shape({
-            checkingNumber: Yup.string().required('Checking Number is required.')
-                .min(9, 'Routing Number should have 9 characters.')
-                .max(9, 'Routing Number should have 9 numbers.')
-                .matches(/^\d+$/, 'Invalid Checking Number.'),
-            routingNumber: Yup.string().required('Routing Number is required.')
-                .min(8, 'Routing Number should have at least 8 numbers.')
-                .matches(/^\d+$/, 'Invalid Routing Number.'),
-        });
-
-        const onSubmit = async (values: CreateExternalAccountFields): Promise<void> => {
+        const onCreateAccount = async (account): Promise<void> => {
             setShowFailedMessage(false);
+            setIsLoading(true);
 
             try {
                 // Get the synthetic account type
                 const types = await AccountService.getSyntheticAccountTypes(accessToken);
-                const externalType = types.data.find(x => x.synthetic_account_category === 'external');
+                const externalType = types.data.find(x => x.synthetic_account_category === 'plaid_external');
 
                 // Create the synthetic account
-                await AccountService.createSyntheticAccount(accessToken,
+                await AccountService.createSyntheticAccount(
+                    accessToken,
                     externalType.uid,
                     poolUids[0],
-                    'External Account',
-                    values.checkingNumber,
-                    values.routingNumber
+                    account.name,
+                    account.id,
+                    publicToken
                 );
 
-                await refetchAccounts();
-
+                refreshAccountsPeriodically();
                 setShowSuccessMessage(true);
             } catch {
                 setShowFailedMessage(true);
+                setIsLoading(false);
             }
         };
 
+        const refreshAccountsPeriodically = async (): Promise<void> => {
+            const { data: accounts } = await refetchAccounts();
+
+            const readyAccounts = accounts.filter(account => 
+                account.synthetic_account_category === 'plaid_external' && !!account.routing_number);
+            if (!isEmpty(readyAccounts)) {
+                setIsLoading(false);
+                return;
+            }
+
+            setTimeout(() => {
+                refreshAccountsPeriodically();
+            }, 5000);
+        };
+
+        const onHandleSuccess = (publicToken, metadata) => {
+            setPublicToken(publicToken);
+            if (metadata.accounts.length > 1) {
+                setSelectableAccounts(metadata.accounts);
+            } else {
+                onCreateAccount(metadata.accounts[0]);
+            }
+        };
+
+        if (selectableAccounts?.length > 1) {
+            return (
+                <>
+                    <Heading5 textAlign='center' style={styles.heading}>
+                        Select an Account
+                    </Heading5>
+                    {selectableAccounts.map((account, index) => (
+                        <View key={index} style={styles.accountContainer}>
+                            <Pressable onPress={(): void => { onCreateAccount(account); }}>
+                                <Body style={styles.accountName}>
+                                    {account.name}: {capitalize(account.subtype)}
+                                </Body>
+                            </Pressable>
+                        </View>
+                    ))}
+                </>
+
+            );
+        }
+
         return (
             <>
-                <Formik
-                    initialValues={initialValues}
-                    onSubmit={onSubmit}
-                    validationSchema={externalAccountValidationSchema}
-                >
-                    {({ handleChange, handleBlur, handleSubmit, values, errors, isValid, isSubmitting, dirty, touched }) => (
-                        <>
-                            <View style={styles.formGroup}>
-                                <Input
-                                    label='Checking Number'
-                                    onChangeText={handleChange('checkingNumber')}
-                                    onBlur={handleBlur('checkingNumber')}
-                                    value={values.checkingNumber}
-                                    errorText={!touched.checkingNumber ? '' : errors.checkingNumber}
-                                    editable={!isSubmitting}
-                                    maxLength={9}
-                                    keyboardType='number-pad'
-                                />
-                                <Input
-                                    label='Routing Number'
-                                    onChangeText={handleChange('routingNumber')}
-                                    onBlur={handleBlur('routingNumber')}
-                                    value={values.routingNumber}
-                                    errorText={!touched.routingNumber ? '' : errors.routingNumber}
-                                    editable={!isSubmitting}
-                                    keyboardType='number-pad'
-                                />
-                            </View>
-                            <Button
-                                title='Connect Account'
-                                disabled={!dirty || !isValid || isSubmitting}
-                                onPress={(): void => handleSubmit()}
-                                style={styles.submitButton}
-                            />
-                        </>
-                    )}
-                </Formik>
+                { linkToken ? (
+                    <PlaidLink
+                        linkToken={linkToken}
+                        onSuccess={onHandleSuccess}
+                    />
+                ):(
+                    <View style={styles.loading}>
+                        <ActivityIndicator size='large' />
+                        <Heading3 textAlign='center' style={styles.loading}>
+                            We&apos;re retrieving your accounts.
+                        </Heading3>
+                    </View>
+                )}
+                  
             </>
         );
     };
+
+    if (isLoading) {
+        return (
+            <View style={styles.loading}>
+                <ActivityIndicator size='large' />
+                <Heading3 textAlign='center' style={styles.loading}>
+                    We&apos;re processing your account.
+                </Heading3>
+            </View>
+        );
+    }
 
     return (
         <Screen withoutHeader>
