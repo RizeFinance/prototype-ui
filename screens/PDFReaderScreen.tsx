@@ -1,4 +1,5 @@
 import React  from 'react';
+import { Platform} from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
@@ -24,7 +25,12 @@ const PDFReaderScreen = ({ route }: PDFReaderScreenProps): JSX.Element => {
 
     return (
         <Screen>
-            <WebView style={{ flex: 1 }} source={{ uri: uri }} />
+            { Platform.OS === 'web' ? (
+                <iframe src={uri} style={{ flex: 1 }}/>
+            ) : (
+                <WebView style={{ flex: 1 }} source={{ uri: uri }} /> 
+            )}
+           
             <Button
                 title='Back'
                 onPress={onPressBack}
