@@ -6,7 +6,7 @@ import { Heading3, Heading5, Body } from '../components/Typography';
 import TextLink from '../components/TextLink';
 import { useDebitCards } from '../contexts/DebitCards';
 import { useAccounts } from '../contexts/Accounts';
-import { isEmpty, capitalize, isNil } from 'lodash';
+import { isEmpty, capitalize, isNil, startCase, toLower } from 'lodash';
 import utils from '../utils/utils';
 
 interface DebitCardScreenProps {
@@ -26,10 +26,10 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
 
     const { liabilityAccounts, refetchAccounts } = useAccounts();
 
-    const displayStatus = ['normal', 'queued', 'shipped'];
+    const displayStatus = ['normal', 'queued', 'shipped', 'printing_physical_card', 'card_replacement_shipped', 'usable_without_pin'];
     const activeCard = debitCards.find(x => displayStatus.includes(x.status) && isNil(x.closed_at));
     const associatedAccount = liabilityAccounts.find(x => x.uid === activeCard?.synthetic_account_uid);
-    const isCardActive = ['normal', 'shipped'].includes(activeCard?.status);
+    const isCardActive = ['normal', 'shipped', 'printing_physical_card', 'card_replacement_shipped', 'usable_without_pin'].includes(activeCard?.status);
 
     const [isLoadingNewCard, setLoadingNewCard] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
@@ -46,13 +46,6 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
         refetchDebitCards();
         refetchAccounts();
     }, []);
-
-    useEffect(() => {
-        if (!isLoading && debitCards.length === 0) {
-            refreshDebitCardPeriodically();
-            setLoadingNewCard(true);
-        }
-    }, [debitCards, isLoading]);
 
     useEffect(() => {
         activeCard && setIsLocked(!!activeCard?.locked_at);
@@ -245,7 +238,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
                         Status
                           </Body>
                           <Heading5>
-                              {capitalize(activeCard.status)}
+                              {capitalize(startCase(toLower(activeCard.status)))}
                           </Heading5>
                       </View>
                   </View>
