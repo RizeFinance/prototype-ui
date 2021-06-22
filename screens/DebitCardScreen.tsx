@@ -161,7 +161,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     const refreshDebitCardPeriodically = async (): Promise<void> => {
         const { data: debitCards }  = await refetchDebitCards();
 
-        const readyCards = debitCards.filter(c => !!c.card_last_four_digit && !c.closed_at)
+        const readyCards = debitCards.filter(c => !!c.card_last_four_digit && !c.closed_at);
         if (!isEmpty(readyCards)) {
             setLoadingNewCard(false);
             return;
