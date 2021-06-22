@@ -48,13 +48,6 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     }, []);
 
     useEffect(() => {
-        if (!isLoading && debitCards.length === 0) {
-            refreshDebitCardPeriodically();
-            setLoadingNewCard(true);
-        }
-    }, [debitCards, isLoading]);
-
-    useEffect(() => {
         activeCard && setIsLocked(!!activeCard?.locked_at);
     }, [activeCard]);
 
