@@ -35,7 +35,6 @@
     "expo-web-browser": "~8.6.0",
     "formik": "^2.2.6",
     "lodash": "^4.17.21",
-    "modal-react-native-web": "^0.2.0",
     "moment": "^2.29.1",
     "query-string": "^7.0.0",
     "react": "16.13.1",

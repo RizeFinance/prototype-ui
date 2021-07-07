@@ -46,6 +46,7 @@ export interface ComplianceWorkflowProviderProps {
 
 export type ComplianceWorkflowProviderState = {
     complianceWorkflow?: ComplianceWorkflow;
+    agreements: ComplianceDocumentSelection[];
     disclosures: ComplianceDocumentSelection[];
     bankingDisclosures: ComplianceDocumentSelection[];
 }
@@ -93,7 +94,6 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
 
         try {
             const { accepted_documents: agreements } = await ComplianceWorkflowService.viewLatestWorkflow(this.props.auth.accessToken);
-            console.log(agreements)
             this.setState({ agreements });
             return { data: agreements };
         } catch (err) {

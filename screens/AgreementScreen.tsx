@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/native';
 import Screen from '../components/Screen';
-import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { useComplianceWorkflow, ComplianceDocumentSelection } from '../contexts/ComplianceWorkflow';
 import { RootStackParamList } from '../types';
 import TextLink from '../components/TextLink';
 import { Heading3, Heading4, Body } from '../components/Typography';
+import { isEmpty } from 'lodash';
 import utils from '../utils/utils';
 
 interface AgreementScreenProps {
@@ -13,7 +14,7 @@ interface AgreementScreenProps {
 }
 
 interface AgreementInfoProps {
-    agreement: any;
+    agreement: ComplianceDocumentSelection;
 }
 
 export default function AgreementScreen({ navigation }: AgreementScreenProps): JSX.Element {
@@ -41,7 +42,7 @@ export default function AgreementScreen({ navigation }: AgreementScreenProps): J
         }
     });
 
-    const onPressAgreementName = async (agreement: any): void => {
+    const onPressAgreementName = async (agreement: ComplianceDocumentSelection) => {
         window.open(agreement.compliance_document_url, "_blank");
     };
 
@@ -51,10 +52,10 @@ export default function AgreementScreen({ navigation }: AgreementScreenProps): J
                 <TextLink
                     textAlign='center'
                     style={styles.agreementName}
-                    onPress={(): void => onPressAgreementName(agreement)}
+                    onPress={() => onPressAgreementName(agreement)}
                     fontType={Heading4}
                 >
-                  { agreement.name}
+                  {agreement.name}
                 </TextLink>
                 <Body fontWeight='semibold' textAlign='center'>
                     Acknowledged {utils.formatDate(agreement.accepted_at)}
@@ -67,16 +68,16 @@ export default function AgreementScreen({ navigation }: AgreementScreenProps): J
     return (
         <Screen>
           <Heading3 textAlign='center' style={styles.heading}>
-            Statements
+            Agreements
           </Heading3>
 
-          { agreements.length &&
+          { !isEmpty(agreements) && (
             <View style={styles.container}>
                 { agreements.map((agreement, i) => (
                   <AgreementInfo key={i} agreement={agreement} />
                 ))}
             </View>
-          }
+          )}
         </Screen>
     );
 };

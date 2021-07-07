@@ -19,10 +19,8 @@ const ExternalAccountScreen = (): JSX.Element => {
     const [selectableAccounts, setSelectableAccounts] = useState<[]>([]);
 
     useEffect(() => {
-        (async () => {
-            await refetchAccounts(); 
-            await fetchLinkToken(); 
-        })();
+        refetchAccounts(); 
+        fetchLinkToken(); 
     }, []);
 
     const styles = StyleSheet.create({
