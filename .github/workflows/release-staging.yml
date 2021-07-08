@@ -1,0 +1,42 @@
+name: Deploy Release
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy_staging:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install Yarn
+        run: npm install -g yarn 
+
+      - name: Install Node.js dependencies
+        run: yarn install
+
+      - name: Create Build
+        run: yarn build:web
+        env:
+          REACT_NATIVE_API_BASE_URL: https://prototype-staging.rizefs.com
+          ALLOW_SIGNUP: true
+          SENTRY_DSN: https://c705c0b521f7456dabe5d9e4cd24f64d@o56811.ingest.sentry.io/5855434
+          RIZE_ENV: staging
+
+      - name: Deploy to Netlify
+        uses: netlify/actions/cli@master
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.STAGING_NETLIFY_SITE_ID }}
+        with:
+          args: deploy --dir=web-build/ --prod
+          secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
