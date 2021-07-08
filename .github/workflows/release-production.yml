@@ -22,6 +22,8 @@ jobs:
 
       - name: Install Node.js dependencies
         run: yarn install
+        env:
+          GITHUB_PACKAGE_AUTH_TOKEN: ${{ secrets.PACKAGE_AUTH_TOKEN }}
 
       - name: Create Build
         run: yarn build:web
