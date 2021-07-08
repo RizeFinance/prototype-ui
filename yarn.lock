@@ -2181,10 +2181,10 @@
     color "^3.1.3"
     react-native-iphone-x-helper "^1.3.0"
 
-"@rizefinance/rize-js@^0.0.5":
-  version "0.0.5"
-  resolved "https://npm.pkg.github.com/download/@rizefinance/rize-js/0.0.5/be8f2661d131de99a87c1b0ae47d01ffd4ff30d2a909dbe68bbff190e81891c6#5d431cedc648e57b38d0207aa190647ad3cbb698"
-  integrity sha512-8PLh59L5yrOYSwZc80ZSz4WwaY3ISwKIE4YADDWcuIl2Tzk63GOZubNSmCU+0neU2OfcLvGdsJhVb81pZM9ZSg==
+"@rizefinance/rize-js@^0.0.6":
+  version "0.0.6"
+  resolved "https://npm.pkg.github.com/download/@rizefinance/rize-js/0.0.6/3745c331733e8d95b5cd1359cc62fff0958b99b37915644e21bd7566484735e6#ebbe6a65fa06b4558c0ba05e4496af2ffb1c6f9f"
+  integrity sha512-EWr4hMhDfHecw4iKL62wD2UaVf6aTpyxSpRBHmlx9dgpEWEqWVI2JD7fO9bMOfObuW2XuaEp2ljA0SBWA9KoqQ==
   dependencies:
     axios "^0.21.1"
     jsrsasign "^10.1.11"
