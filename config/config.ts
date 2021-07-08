@@ -5,7 +5,9 @@ export type Config = {
         baseUrl: string;
     };
     application: {
-      allowSignup: string;
+      allowSignup: string; 
+      sentryDsn: string;
+      rizeEnv: string;
     }
 }
 

@@ -9,6 +9,7 @@ export default {
     icon: './assets/images/icon.png',
     scheme: 'myapp',
     userInterfaceStyle: 'automatic',
+    plugins: ['sentry-expo'],
     splash: {
         image: './assets/images/splash.png',
         resizeMode: 'contain',
@@ -54,6 +55,8 @@ export default {
         },
         application: {
             allowSignup: process.env.ALLOW_SIGNUP,
+            sentryDsn: process.env.SENTRY_DSN,
+            rizeEnv: process.env.RIZE_ENV,
         }
     },
 };
