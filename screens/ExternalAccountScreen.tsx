@@ -7,6 +7,7 @@ import { SyntheticAccount } from '../models';
 import PlaidLink from '../components/PlaidLink';
 import { useAuth } from '../contexts/Auth';
 import AccountService from '../services/AccountService';
+import { useThemeColor } from '../components/Themed';
 import { capitalize, isEmpty } from 'lodash';
 
 const ExternalAccountScreen = (): JSX.Element => {
@@ -17,6 +18,8 @@ const ExternalAccountScreen = (): JSX.Element => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [publicToken, setPublicToken] = useState<string>(null);
     const [selectableAccounts, setSelectableAccounts] = useState<[]>([]);
+
+    const primary = useThemeColor('primary');
 
     useEffect(() => {
         refetchAccounts(); 
@@ -52,11 +55,12 @@ const ExternalAccountScreen = (): JSX.Element => {
         accountContainer: {
             marginTop: 10,
             padding: 20,
-            backgroundColor: 'gray',
+            backgroundColor: primary,
             borderRadius: 4,
         },
         accountName: {
             color: 'white',
+            fontWeight: 'bold',
         },
         loading: {
             marginTop: 55,
@@ -111,9 +115,10 @@ const ExternalAccountScreen = (): JSX.Element => {
 
                 refreshAccountsPeriodically();
                 setShowSuccessMessage(true);
-            } catch {
+            } catch (err) {
                 setShowFailedMessage(true);
                 setIsLoading(false);
+                throw err;
             }
         };
 
@@ -134,14 +139,10 @@ const ExternalAccountScreen = (): JSX.Element => {
 
         const onHandleSuccess = (publicToken, metadata) => {
             setPublicToken(publicToken);
-            if (metadata.accounts.length > 1) {
-                setSelectableAccounts(metadata.accounts);
-            } else {
-                onCreateAccount(metadata.accounts[0]);
-            }
+            setSelectableAccounts(metadata.accounts);
         };
 
-        if (selectableAccounts?.length > 1) {
+        if (selectableAccounts?.length >= 1) {
             return (
                 <>
                     <Heading5 textAlign='center' style={styles.heading}>
