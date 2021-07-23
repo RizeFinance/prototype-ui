@@ -185,7 +185,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
               <View style={styles.container}>
                   <ActivityIndicator size='large' />
                   <Heading3 textAlign='center' style={styles.loading_heading}>
-                    We&apos;re processing your debit card.
+                    We are generating you new debit card information
                   </Heading3>
               </View>
             }
