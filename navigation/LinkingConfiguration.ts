@@ -19,6 +19,8 @@ export default {
                     PatriotAct: 'patriot-act',
                     PII: 'pii',
                     DebitCard: 'debit-card',
+                    Statements: 'statements',
+                    Agreements: 'agreements',
                     BankingDisclosures: 'banking-disclosures',
                     InitTransfer: 'init-transfer',
                     NotFound: '*',

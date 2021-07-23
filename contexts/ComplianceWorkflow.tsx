@@ -16,22 +16,26 @@ export type ComplianceDocumentSelection = ComplianceDocument & {
 
 export type ComplianceWorkflowContextProps = {
     complianceWorkflow?: ComplianceWorkflow;
+    agreements: ComplianceDocumentSelection[];
     disclosures: ComplianceDocumentSelection[];
     bankingDisclosures: ComplianceDocumentSelection[];
     setComplianceWorkflow: (complianceWorkflow: ComplianceWorkflow) => Promise<void>;
     setDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
     setBankingDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
-    loadBankingDisclosures: () => Promise<void>;
+    loadAgreements: () => Promise<void>;
+
 }
 
 export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowContextProps>({
     complianceWorkflow: undefined,
+    agreements: [],
     disclosures: [],
     bankingDisclosures: [],
     setComplianceWorkflow: () => Promise.resolve(),
     setDisclosures: () => Promise.resolve(),
     setBankingDisclosures: () => Promise.resolve(),
     loadBankingDisclosures: () => Promise.resolve(),
+    loadAgreements: () => Promise.resolve(),
 });
 
 export interface ComplianceWorkflowProviderProps {
@@ -42,12 +46,14 @@ export interface ComplianceWorkflowProviderProps {
 
 export type ComplianceWorkflowProviderState = {
     complianceWorkflow?: ComplianceWorkflow;
+    agreements: ComplianceDocumentSelection[];
     disclosures: ComplianceDocumentSelection[];
     bankingDisclosures: ComplianceDocumentSelection[];
 }
 
 const initialState = {
     complianceWorkflow: undefined,
+    agreements: [],
     disclosures: [],
     bankingDisclosures: []
 };
@@ -80,6 +86,18 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
             }
 
             await this.redirectToCurrentStep(latestWorkflow, customer);
+        }
+    }
+
+    loadAgreements = async (): Promise<void> => {
+        const customer = this.context.customer;
+
+        try {
+            const { accepted_documents: agreements } = await ComplianceWorkflowService.viewLatestWorkflow(this.props.auth.accessToken);
+            this.setState({ agreements });
+            return { data: agreements };
+        } catch (err) {
+            return { data: err };
         }
     }
 
@@ -208,6 +226,7 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
         const {
             complianceWorkflow,
             disclosures,
+            agreements,
             bankingDisclosures,
         } = this.state;
 
@@ -216,11 +235,14 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
                 value={{
                     complianceWorkflow: complianceWorkflow,
                     disclosures: disclosures,
+                    agreements: agreements,
                     bankingDisclosures: bankingDisclosures,
+                    evaluateCurrentStep: this.evaluateCurrentStep,
                     setComplianceWorkflow: this.setComplianceWorkflow,
                     setDisclosures: this.setDisclosures,
                     setBankingDisclosures: this.setBankingDisclosures,
-                    loadBankingDisclosures: this.loadBankingDisclosures
+                    loadBankingDisclosures: this.loadBankingDisclosures,
+                    loadAgreements: this.loadAgreements,
                 }}
             >
                 {this.props.children}

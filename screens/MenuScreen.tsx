@@ -51,6 +51,14 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
         navigation.navigate('DebitCard');
     };
 
+    const onPressStatments = (): void => {
+        navigation.navigate('Statements');
+    };
+
+    const onPressAgreements = (): void => {
+        navigation.navigate('Agreements');
+    };
+
     const onPressLogout = (): void => {
         auth.logout();
         customer.resetState();
@@ -102,6 +110,22 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
                     fontType={Heading4}
                 >
                     Debit Card
+                </TextLink>
+                <TextLink
+                    textAlign='center'
+                    style={styles.menuStyle}
+                    onPress={onPressStatments}
+                    fontType={Heading4}
+                >
+                    Statements
+                </TextLink>
+                <TextLink
+                    textAlign='center'
+                    style={styles.menuStyle}
+                    onPress={onPressAgreements}
+                    fontType={Heading4}
+                >
+                    Agreements
                 </TextLink>
             </ScrollView>
             <View style={[styles.menuContainer]}>
