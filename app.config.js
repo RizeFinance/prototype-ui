@@ -57,6 +57,7 @@ export default {
             allowSignup: process.env.ALLOW_SIGNUP,
             sentryDsn: process.env.SENTRY_DSN,
             rizeEnv: process.env.RIZE_ENV,
+            defaultProductUid: process.env.DEFAULT_PRODUCT_UID
         }
     },
 };

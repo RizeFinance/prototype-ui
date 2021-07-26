@@ -8,9 +8,9 @@ const getCustomer = async (accessToken: string): Promise<Customer> => {
         .then((response) => response.data);
 };
 
-const verifyIdentity = async (accessToken: string): Promise<Customer> => {
-    return await api.put('/customer/identity_verification',
-        undefined,
+const createCustomerProduct = async (accessToken: string, product_uid: string): Promise<Customer> => {
+    return await api.post('/customer/customer_products',
+        { product_uid },
         { headers: { Authorization: `Bearer ${accessToken}` } }
     )
         .then((response) => response.data);
@@ -36,5 +36,5 @@ const updateCustomer = async (
 export default {
     getCustomer,
     updateCustomer,
-    verifyIdentity,
+    createCustomerProduct
 };
