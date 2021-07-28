@@ -5,6 +5,7 @@ import { Heading3, Heading4 } from '../components/Typography';
 import { useAuth } from '../contexts/Auth';
 import { useCustomer } from '../contexts/Customer';
 import CustomerService from '../services/CustomerService';
+import config from '../config/config';
 
 export default function ProcessingApplicationScreen(): JSX.Element {
     const { accessToken } = useAuth();
@@ -31,7 +32,7 @@ export default function ProcessingApplicationScreen(): JSX.Element {
     useEffect(() => {
         const verificationCheck = async (): Promise<void> => {
             if (customer.status === 'initiated') {
-                await CustomerService.verifyIdentity(accessToken);
+                await CustomerService.createCustomerProduct(accessToken, config.application.defaultProductUid);
             }
     
             refreshCustomerPeriodically();

@@ -8,6 +8,7 @@ export type Config = {
       allowSignup: string; 
       sentryDsn: string;
       rizeEnv: string;
+      defaultProductUid: string;
     }
 }
 
