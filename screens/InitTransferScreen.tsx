@@ -61,10 +61,11 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
     const { refetchAccounts, liabilityAccounts, externalAccounts } = useAccounts();
     const syntheticAccounts = [...liabilityAccounts, ...externalAccounts]
         .map(x => ({
-            label: x.name + (x.synthetic_account_category === 'external' ? '' : ` (${utils.formatCurrency(x.net_usd_available_balance)})`),
+            label: x.name + (['plaid_external', 'external'].includes(x.synthetic_account_category) ? '' : ` (${utils.formatCurrency(x.net_usd_available_balance)})`),
             value: x.uid
         } as DropdownItem));
 
+    
     const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
     const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
 
@@ -108,6 +109,18 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
             ),
     });
 
+    useEffect(() => {
+        refetchAccounts();
+    }, []);
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', async () => {
+            await refetchAccounts();
+        });
+
+        return unsubscribe;
+    }, [navigation]);
+
     const onSubmit = async (values: TransferFields, actions: FormikHelpers<TransferFields>): Promise<void> => {
         setShowFailedMessage(false);
         setShowSuccessMessage(false);
@@ -121,22 +134,13 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
             );
 
             setShowSuccessMessage(true);
-
             actions.resetForm();
-            actions.setFieldTouched('fromSyntheticAccountUid', false);
-            actions.setFieldTouched('toSyntheticAccountUid', false);
         } catch {
             setShowFailedMessage(true);
+        } finally {
+            refetchAccounts();
         }
     };
-
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', async () => {
-            await refetchAccounts();
-        });
-
-        return unsubscribe;
-    }, [navigation]);
 
     return (
         <Screen withoutHeader>
@@ -177,8 +181,10 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
                                 items={syntheticAccounts}
                                 value={values.fromSyntheticAccountUid}
                                 onChange={(value) => {
-                                    setFieldValue('fromSyntheticAccountUid', value ?? '');
-                                    setFieldTouched('fromSyntheticAccountUid', true, false);
+                                    if (value) {
+                                        setFieldValue('fromSyntheticAccountUid', value);
+                                        setFieldTouched('fromSyntheticAccountUid', true, false);
+                                    }
                                 }}
                                 errorText={!touched.fromSyntheticAccountUid ? '' : errors.fromSyntheticAccountUid}
                                 containerStyle={styles.inputs}
@@ -189,8 +195,10 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
                                 items={syntheticAccounts}
                                 value={values.toSyntheticAccountUid}
                                 onChange={(value) => {
-                                    setFieldValue('toSyntheticAccountUid', value ?? '');
-                                    setFieldTouched('toSyntheticAccountUid', true, false);
+                                    if (value) {
+                                        setFieldValue('toSyntheticAccountUid', value);
+                                        setFieldTouched('toSyntheticAccountUid', true, false);
+                                    }
                                 }}
                                 errorText={!touched.toSyntheticAccountUid ? '' : errors.toSyntheticAccountUid}
                                 containerStyle={styles.inputs}

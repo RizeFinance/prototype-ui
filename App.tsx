@@ -10,10 +10,10 @@ import Navigation from './navigation';
 import * as Sentry from 'sentry-expo';
 
 Sentry.init({
-  dsn: config.application.sentryDsn,
-  environment: config.application.rizeEnv,
-  enableInExpoDevelopment: true,
-  debug: config.application.rizeEnv === "development" ? true : false, 
+    dsn: config.application.sentryDsn,
+    environment: config.application.rizeEnv,
+    enableInExpoDevelopment: true,
+    debug: config.application.rizeEnv === 'development' ? true : false, 
 });
 
 export default function App(): any {

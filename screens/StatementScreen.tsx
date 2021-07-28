@@ -1,37 +1,29 @@
 import React, { useEffect, useState }  from 'react';
-import { StyleSheet, Platform, View, ActivityIndicator } from 'react-native';
-import Modal from 'modal-react-native-web';
-import { StackNavigationProp } from '@react-navigation/stack';
-import Button from '../components/Button';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import Screen from '../components/Screen';
-import { Heading3, Heading4,  Body } from '../components/Typography';
-import { RootStackParamList } from '../types';
+import { Heading3, Heading4 } from '../components/Typography';
 import { useDocuments } from '../contexts/Documents';
 import { Document } from '../models';
 import TextLink from '../components/TextLink';
 import { isEmpty } from 'lodash';
 import utils from '../utils/utils';
 
-interface StatementScreenProps {
-  navigation: StackNavigationProp<RootStackParamList, 'Statements'>;
-}
-
 interface DocumentInfoProps {
     document: Document;
 }
 
-export default function StatementScreen({ navigation }: StatementScreenProps): JSX.Element {
+export default function StatementScreen(): JSX.Element {
     const {
-      isLoading,
-      getDocuments,
-      viewDocument,
-      documents
+        isLoading,
+        getDocuments,
+        viewDocument,
+        documents
     } = useDocuments();
 
     const [isDownloading, setDownloading] = useState<boolean>(false);
 
     useEffect(() => {
-      getDocuments();
+        getDocuments();
     }, []);
 
     const styles = StyleSheet.create({
@@ -42,20 +34,20 @@ export default function StatementScreen({ navigation }: StatementScreenProps): J
             marginTop: 25,
         },
         documentInfo: {
-          marginVertical: 16,
+            marginVertical: 16,
         },
         documentName: {
-          marginBottom: 8,
+            marginBottom: 8,
         }
     });
 
     const onPressDocumentName = async (document: Document) => {
-        setDownloading(true)
+        setDownloading(true);
 
-        const viewableDocument = await viewDocument(document.uid)
-        window.open("data:application/octet-stream;base64," + viewableDocument.base_64);
+        const viewableDocument = await viewDocument(document.uid);
+        window.open('data:application/octet-stream;base64,' + viewableDocument.base_64);
         
-        setDownloading(false)
+        setDownloading(false);
     };
 
     const DocumentInfo = ({ document }: DocumentInfoProps): JSX.Element => {
@@ -75,35 +67,35 @@ export default function StatementScreen({ navigation }: StatementScreenProps): J
 
     return (
         <Screen>
-          <Heading3 textAlign='center' style={styles.heading}>
+            <Heading3 textAlign='center' style={styles.heading}>
             Statements
-          </Heading3>
+            </Heading3>
 
-          { isLoading && (
-              <View style={styles.container}>
-                  <ActivityIndicator size='large' />
-                  <Heading3 textAlign='center' style={styles.container}>
+            { isLoading && (
+                <View style={styles.container}>
+                    <ActivityIndicator size='large' />
+                    <Heading3 textAlign='center' style={styles.container}>
                     We&apos;re loading your statements.
-                  </Heading3>
-              </View>
-          )}
+                    </Heading3>
+                </View>
+            )}
 
-          { isDownloading && (
-              <View style={styles.container}>
-                  <ActivityIndicator size='large' />
-                  <Heading3 textAlign='center' style={styles.container}>
+            { isDownloading && (
+                <View style={styles.container}>
+                    <ActivityIndicator size='large' />
+                    <Heading3 textAlign='center' style={styles.container}>
                     Downloading...
-                  </Heading3>
-              </View>
-          )}
+                    </Heading3>
+                </View>
+            )}
 
-          { !isDownloading && !isEmpty(documents) && (
-            <View style={styles.container}>
-                { documents.map((document, i) => (
-                  <DocumentInfo key={i} document={document} />
-                ))}
-            </View>
-          )}
+            { !isDownloading && !isEmpty(documents) && (
+                <View style={styles.container}>
+                    { documents.map((document, i) => (
+                        <DocumentInfo key={i} document={document} />
+                    ))}
+                </View>
+            )}
         </Screen>
     );
-};
+}

@@ -18,7 +18,7 @@ export const DocumentsContext = React.createContext<DocumentsContextProps>({
     isLoading: false,
     documents: [],
     getDocuments: () => Promise.resolve([]),
-    viewDocument: (uid: string) => Promise.resolve(),
+    viewDocument: () => Promise.resolve(),
 });
 
 export type DocumentProviderState = {
@@ -60,7 +60,7 @@ export class DocumentsProvider extends React.Component<DocumentsProviderProps, D
     }
 
     viewDocument = async (uid: string): Promise<ViewableDoc> => {
-        const response = await DocumentService.viewDocument(this.context.accessToken, uid)
+        const response = await DocumentService.viewDocument(this.context.accessToken, uid);
         return response;
     }
 

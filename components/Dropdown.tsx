@@ -106,7 +106,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
                 style={{
                     inputIOS: actualInputStyle,
                     inputAndroid: actualInputStyle,
-                    inputWeb: actualInputStyle,
+                    inputWeb: defaultStyles.input,
                 }}
                 placeholder={{
                     label: placeholder ?? '',

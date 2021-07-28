@@ -1,30 +1,24 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View, ActivityIndicator } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/native';
+import { StyleSheet, View } from 'react-native';
 import Screen from '../components/Screen';
 import { useComplianceWorkflow, ComplianceDocumentSelection } from '../contexts/ComplianceWorkflow';
-import { RootStackParamList } from '../types';
 import TextLink from '../components/TextLink';
 import { Heading3, Heading4, Body } from '../components/Typography';
 import { isEmpty } from 'lodash';
 import utils from '../utils/utils';
 
-interface AgreementScreenProps {
-    navigation: StackNavigationProp<RootStackParamList, 'Agreements'>;
-}
-
 interface AgreementInfoProps {
     agreement: ComplianceDocumentSelection;
 }
 
-export default function AgreementScreen({ navigation }: AgreementScreenProps): JSX.Element {
+export default function AgreementScreen(): JSX.Element {
     const {
-      agreements,
-      loadAgreements
+        agreements,
+        loadAgreements
     } = useComplianceWorkflow();
 
     useEffect(() => {
-      loadAgreements();
+        loadAgreements();
     }, []);
 
     const styles = StyleSheet.create({
@@ -35,15 +29,15 @@ export default function AgreementScreen({ navigation }: AgreementScreenProps): J
             marginTop: 25,
         },
         agreementInfo: {
-          marginVertical: 16,
+            marginVertical: 16,
         },
         agreementName: {
-          marginBottom: 8,
+            marginBottom: 8,
         }
     });
 
     const onPressAgreementName = async (agreement: ComplianceDocumentSelection) => {
-        window.open(agreement.compliance_document_url, "_blank");
+        window.open(agreement.compliance_document_url, '_blank');
     };
 
     const AgreementInfo = ({ agreement }: AgreementInfoProps): JSX.Element => {
@@ -55,7 +49,7 @@ export default function AgreementScreen({ navigation }: AgreementScreenProps): J
                     onPress={() => onPressAgreementName(agreement)}
                     fontType={Heading4}
                 >
-                  {agreement.name}
+                    {agreement.name}
                 </TextLink>
                 <Body fontWeight='semibold' textAlign='center'>
                     Acknowledged {utils.formatDate(agreement.accepted_at)}
@@ -67,17 +61,17 @@ export default function AgreementScreen({ navigation }: AgreementScreenProps): J
 
     return (
         <Screen>
-          <Heading3 textAlign='center' style={styles.heading}>
+            <Heading3 textAlign='center' style={styles.heading}>
             Agreements
-          </Heading3>
+            </Heading3>
 
-          { !isEmpty(agreements) && (
-            <View style={styles.container}>
-                { agreements.map((agreement, i) => (
-                  <AgreementInfo key={i} agreement={agreement} />
-                ))}
-            </View>
-          )}
+            { !isEmpty(agreements) && (
+                <View style={styles.container}>
+                    { agreements.map((agreement, i) => (
+                        <AgreementInfo key={i} agreement={agreement} />
+                    ))}
+                </View>
+            )}
         </Screen>
     );
-};
+}

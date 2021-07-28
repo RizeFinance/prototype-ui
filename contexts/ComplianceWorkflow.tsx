@@ -90,8 +90,6 @@ export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkfl
     }
 
     loadAgreements = async (): Promise<void> => {
-        const customer = this.context.customer;
-
         try {
             const { accepted_documents: agreements } = await ComplianceWorkflowService.viewLatestWorkflow(this.props.auth.accessToken);
             this.setState({ agreements });
