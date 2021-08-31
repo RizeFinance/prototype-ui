@@ -27,7 +27,8 @@ import {
     SetPasswordScreen,
     DebitCardScreen,
     StatementScreen,
-    AgreementScreen
+  AgreementScreen,
+  LockedScreen,
 } from '../screens';
 
 // Contexts
@@ -138,7 +139,14 @@ function MainStackScreen() {
                                             initialParams={{ status: customer.status }}
                                         />
                                     </Stack.Navigator>
-                                ) : (
+                ) : customer.locked_at ? (
+                  <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+                    <Stack.Screen
+                      name="LockedScreen"
+                      component={LockedScreen}
+                    />
+                  </Stack.Navigator>
+                ) : (
                                     <Stack.Navigator screenOptions={screenOptions.withHeader}>
                                         <Stack.Screen name="Accounts" component={AccountsScreen} />
                                         <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />

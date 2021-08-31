@@ -51,4 +51,5 @@ export type RootStackParamList = {
   InitTransfer: undefined;
   Menu: undefined;
   NotFound: undefined;
+  LockedScreen: undefined;
 };
