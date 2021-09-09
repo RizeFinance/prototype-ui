@@ -24,8 +24,6 @@ jobs:
       - name: Install Node.js dependencies
         run: yarn install
         env:
-          # Specify custom .npmrc because actions/setup-node@v1 doesn't
-          # correctly set registry-url and token at Windows platform
           NPM_CONFIG_USERCONFIG: .npmrc.ci
           NODE_AUTH_TOKEN: ${{ secrets.MASTER_PACKAGE_KEY }}
 
@@ -36,6 +34,8 @@ jobs:
           ALLOW_SIGNUP: true
           SENTRY_DSN: https://c705c0b521f7456dabe5d9e4cd24f64d@o56811.ingest.sentry.io/5855434
           RIZE_ENV: staging
+          DEFAULT_PRODUCT_UID: XN2e84KTjTeYkDns
+          BROKERAGE_PRODUCT_UID: ETVG5Vzr9jBV9fQD
 
       - name: Deploy to Netlify
         uses: netlify/actions/cli@master
@@ -44,4 +44,3 @@ jobs:
           NETLIFY_SITE_ID: ${{ secrets.STAGING_NETLIFY_SITE_ID }}
         with:
           args: deploy --dir=web-build/ --prod
-          secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
