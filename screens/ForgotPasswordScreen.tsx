@@ -94,7 +94,7 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
                     style={styles.logo}
                 />
             </View>
-            <Heading3 textAlign='center'>Forgot Password</Heading3>
+            <Heading3 textAlign='center'>Forgot Password?</Heading3>
             {!!message &&
                 <BodySmall textAlign='center' style={styles.message}>{message}</BodySmall>
             }
