@@ -18,19 +18,16 @@ jobs:
         with:
           node-version: 14
 
-      - name: Create a .npmrc file for the github private repository
-        uses: ferluisxd/create-npmrc@3
-        with:
-          org_name: '@rizefinance'
-          auth_token: ${{ secrets.MASTER_PACKAGE_KEY }}
-        env:
-          AUTH_TOKEN: ${{ secrets.MASTER_PACKAGE_KEY }}
-
       - name: Install Yarn
         run: npm install -g yarn 
 
       - name: Install Node.js dependencies
         run: yarn install
+        env:
+          # Specify custom .npmrc because actions/setup-node@v1 doesn't
+          # correctly set registry-url and token at Windows platform
+          NPM_CONFIG_USERCONFIG: .npmrc.ci
+          NODE_AUTH_TOKEN: ${{ secrets.MASTER_PACKAGE_KEY }}
 
       - name: Create Build
         run: yarn build:web
