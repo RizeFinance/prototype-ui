@@ -19,11 +19,12 @@ jobs:
           node-version: 14
 
       - name: Create a .npmrc file for the github private repository
-        uses: FerLuisxd/create-npmrc@3
+        uses: ferluisxd/create-npmrc@3
         with:
-          org_name: rizefinance  
+          org_name: '@rizefinance'
+          auth_token: ${{ secrets.MASTER_PACKAGE_KEY }}
         env:
-          AUTH_TOKEN: ${{ secrets.PACKAGE_AUTH_TOKEN }}
+          AUTH_TOKEN: ${{ secrets.MASTER_PACKAGE_KEY }}
 
       - name: Install Yarn
         run: npm install -g yarn 
