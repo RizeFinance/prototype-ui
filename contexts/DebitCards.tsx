@@ -11,6 +11,7 @@ export type DebitCardsContextProps = {
     unlockDebitCard: (uid: string) => Promise<DebitCard[]>;
     reissueDebitCard: (uid: string, reason: string) => Promise<DebitCard[]>;
     createDebitCard: (pool_uid: string) => Promise<DebitCard[]>;
+    activateDebitCard: (uid: string, cardLastFourDigits: string, cvv: string, expiryDate: string) => Promise<DebitCard[]>;
 }
 
 export const DebitCardsContext = React.createContext<DebitCardsContextProps>({
@@ -21,6 +22,7 @@ export const DebitCardsContext = React.createContext<DebitCardsContextProps>({
     unlockDebitCard: () => Promise.resolve([]),
     reissueDebitCard: () => Promise.resolve([]),
     createDebitCard: () => Promise.resolve([]),
+    activateDebitCard: () => Promise.resolve([]),
 });
 
 export type DebitCardProviderState = {
@@ -101,6 +103,20 @@ export class DebitCardsProvider extends React.Component<DebitCardsProviderProps,
         }
     }
 
+    activateDebitCard = async (uid: string, cardLastFourDigits: string, cvv: string, expiryDate: string): Promise<DebitCard[]> => {
+        this.setState({ isLoading: true });
+
+        try {
+            await DebitCardService.activateDebitCard(this.context.accessToken, uid, cardLastFourDigits, cvv, expiryDate);
+            const response = await this.refetchDebitCards();
+            return response;
+        } catch (err) {
+            return { success: false, error: err };
+        } finally {
+            this.setState({ isLoading: false });
+        }
+    }
+
     render(): JSX.Element {
         const { isLoading, debitCards } = this.state;
 
@@ -115,6 +131,7 @@ export class DebitCardsProvider extends React.Component<DebitCardsProviderProps,
                     unlockDebitCard: this.unlockDebitCard,
                     reissueDebitCard: this.reissueDebitCard,
                     createDebitCard: this.createDebitCard,
+                    activateDebitCard: this.activateDebitCard,
                 }}
             >
                 {this.props.children}

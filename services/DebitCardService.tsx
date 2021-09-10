@@ -40,11 +40,23 @@ const createDebitCard = async (accessToken: string, pool_uid: string): Promise<D
         .then((response) => response.data);
 };
 
+const activateDebitCard = async (accessToken: string, debitCardUid: string, cardLastFourDigits: string, cvv: string, expiryDate: string): Promise<DebitCard> => {
+    return await api.put(`/debit_cards/${debitCardUid}/activate`,
+        { 
+            card_last_four_digits: cardLastFourDigits,
+            cvv: cvv,
+            expiry_date: expiryDate
+        },
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+    )
+        .then((response) => response.data);
+};
 
 export default {
     getDebitCards,
     lockDebitCard,
     unlockDebitCard,
     reissueDebitCard,
-    createDebitCard
+    createDebitCard,
+    activateDebitCard
 };
