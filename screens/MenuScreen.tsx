@@ -7,7 +7,6 @@ import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useAuth } from '../contexts/Auth';
-import { useCustomer } from '../contexts/Customer';
 const logo = require('../assets/images/logo.png');
 
 interface MenuScreenProps {
@@ -15,8 +14,7 @@ interface MenuScreenProps {
 }
 
 export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element {    
-    const auth = useAuth();
-    const customer = useCustomer();
+    const {customer, ...auth} = useAuth();
 
     const styles = StyleSheet.create({
         logo: {
@@ -61,7 +59,6 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
 
     const onPressLogout = (): void => {
         auth.logout();
-        customer.resetState();
         navigation.goBack();
     };
 

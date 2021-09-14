@@ -8,7 +8,7 @@ import StringMask from 'string-mask';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { PIIFields, RootStackParamList } from '../types';
 import moment from 'moment';
-import { useCustomer } from '../contexts/Customer';
+import { useAuth } from '../contexts/Auth';
 
 interface PIIScreenProps {
     navigation: StackNavigationProp<RootStackParamList, 'PII'>;
@@ -22,7 +22,7 @@ const phoneFormatter = new StringMask('(000) 000-0000');
 const ssnFormatter = new StringMask('AAA-AA-AAAA');
 
 function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
-    const { refreshCustomer } = useCustomer();
+    const { refreshCustomer } = useAuth();
 
     const { setFieldValue } = useFormikContext<PIIScreenFields>();
 

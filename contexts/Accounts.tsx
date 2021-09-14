@@ -4,13 +4,21 @@ import AccountsService from '../services/AccountService';
 import { AuthContext } from './Auth';
 import _ from 'lodash';
 
+interface IAccountAPIResponse {
+    total_count: string;
+    limit: string;
+    offset: string;
+    data: SyntheticAccount[]
+    
+}
+
 export type AccountsContextProps = {
     isLoading: boolean;
     liabilityAccounts?: SyntheticAccount[];
     externalAccounts?: SyntheticAccount[];
     poolUids?: string[];
     linkToken?: string;
-    refetchAccounts: () => Promise<SyntheticAccount[]>;
+    refetchAccounts: () => Promise<IAccountAPIResponse>;
     fetchLinkToken: () => Promise<string>;
 }
 

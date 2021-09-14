@@ -6,7 +6,6 @@ import { Formik } from 'formik';
 import validator from 'validator';
 import { RootStackParamList } from '../types';
 import CustomerService from '../services/CustomerService';
-import { useCustomer } from '../contexts/Customer';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useThemeColor } from '../components/Themed';
 import { useAuth } from '../contexts/Auth';
@@ -24,8 +23,8 @@ interface SetPasswordFields {
 }
 
 export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps): JSX.Element {
-    const auth = useAuth();
-    const { setCustomer } = useCustomer();
+    const {setCustomer, ...auth} = useAuth();
+
     const [message, setMesage] = useState<string>('');
 
     const initialValues: SetPasswordFields = {

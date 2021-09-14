@@ -33,22 +33,21 @@ import {
 
 // Contexts
 import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
-import { DebitCardsProvider } from '../contexts/DebitCards';
-import { DocumentsProvider } from '../contexts/Documents';
-import { CustomerProvider, useCustomer } from '../contexts/Customer';
-import { AuthConsumer, AuthProvider, useAuth } from '../contexts/Auth';
-import { AccountsProvider } from '../contexts/Accounts';
+import { useAuth } from '../contexts/Auth';
 
 // Components
 import { useThemeColor } from '../components/Themed';
 import { Body } from '../components/Typography';
 import { TextLink } from '../components';
 
+
+
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
     return (
         <NavigationContainer
             linking={LinkingConfiguration}
-            theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+            >
             <RootNavigator />
         </NavigationContainer>
     );
@@ -70,9 +69,9 @@ const MenuButton = (): JSX.Element => {
     return <TextLink onPress={(): void => { navigation.navigate('Menu'); }}>Menu</TextLink>;
 };
 
+
 function MainStackScreen() {
-    const { customer } = useCustomer();
-    const auth = useAuth();
+    const {customer, ...auth} = useAuth();
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
     const background = useThemeColor('background');
 
@@ -104,65 +103,86 @@ function MainStackScreen() {
     };
 
     return (
-        <>
-            {!customer ? (
-                <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
-                    <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="Signup" component={SignupScreen} />
-                    <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-                    <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
-                </Stack.Navigator>
+      <>
+        {!customer ? (
+          <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Signup" component={SignupScreen} />
+            <Stack.Screen
+              name="ForgotPassword"
+              component={ForgotPasswordScreen}
+            />
+            <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
+          </Stack.Navigator>
+        ) : (
+          <ComplianceWorkflowProvider navigation={navigation} auth={auth}>
+            {customer.status === 'initiated' ? (
+              <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+                <Stack.Screen
+                  name="Disclosures"
+                  component={DisclosuresScreen}
+                />
+                <Stack.Screen name="PatriotAct" component={PatriotActScreen} />
+                <Stack.Screen name="PII" component={PIIScreen} />
+                <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} />
+                <Stack.Screen
+                  name="BankingDisclosures"
+                  component={BankingDisclosuresScreen}
+                />
+                <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
+                <Stack.Screen
+                  name="ProcessingApplication"
+                  component={ProcessingApplicationScreen}
+                />
+              </Stack.Navigator>
+            ) : customer.status === 'queued' ||
+              customer.status === 'identity_verified' ? (
+              <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+                <Stack.Screen
+                  name="ProcessingApplication"
+                  component={ProcessingApplicationScreen}
+                />
+              </Stack.Navigator>
+            ) : customer.status === 'manual_review' ||
+              customer.status === 'under_review' ||
+              customer.status === 'rejected' ? (
+              <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+                <Stack.Screen
+                  name="ApplicationUnapproved"
+                  component={ApplicationUnapprovedScreen}
+                  initialParams={{ status: customer.status }}
+                />
+              </Stack.Navigator>
+            ) : ( customer.locked_at ? (
+              <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+                <Stack.Screen
+                  name="LockedScreen"
+                  component={LockedScreen}
+                />
+              </Stack.Navigator>
             ) : (
-                <ComplianceWorkflowProvider navigation={navigation} auth={auth}>
-                    <AccountsProvider>
-                        <DebitCardsProvider>
-                            <DocumentsProvider>
-                                {customer.status === 'initiated' ? (
-                                    <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
-                                        <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
-                                        <Stack.Screen name="PatriotAct" component={PatriotActScreen} />
-                                        <Stack.Screen name="PII" component={PIIScreen} />
-                                        <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} />
-                                        <Stack.Screen name="BankingDisclosures" component={BankingDisclosuresScreen} />
-                                        <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
-                                        <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />
-                                    </Stack.Navigator>
-                                ) : (customer.status === 'queued' || customer.status === 'identity_verified') ? (
-                                    <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
-                                        <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />
-                                    </Stack.Navigator>
-                                ) : (customer.status === 'manual_review' || customer.status === 'under_review' || customer.status === 'rejected') ? (
-                                    <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
-                                        <Stack.Screen
-                                            name="ApplicationUnapproved"
-                                            component={ApplicationUnapprovedScreen}
-                                            initialParams={{ status: customer.status }}
-                                        />
-                                    </Stack.Navigator>
-                ) : customer.locked_at ? (
-                  <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
-                    <Stack.Screen
-                      name="LockedScreen"
-                      component={LockedScreen}
-                    />
-                  </Stack.Navigator>
-                ) : (
-                                    <Stack.Navigator screenOptions={screenOptions.withHeader}>
-                                        <Stack.Screen name="Accounts" component={AccountsScreen} />
-                                        <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
-                                        <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
-                                        <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
-                                        <Stack.Screen name="DebitCard" component={DebitCardScreen} />
-                                        <Stack.Screen name="Statements" component={StatementScreen} />
-                                        <Stack.Screen name="Agreements" component={AgreementScreen} />
-                                    </Stack.Navigator>
-                                )}
-                            </DocumentsProvider>
-                        </DebitCardsProvider>
-                    </AccountsProvider>
-                </ComplianceWorkflowProvider>
-            )}
-        </>
+              <Stack.Navigator screenOptions={screenOptions.withHeader}>
+                <Stack.Screen name="Accounts" component={AccountsScreen} />
+                <Stack.Screen
+                  name="AccountDetails"
+                  component={AccountDetailsScreen}
+                />
+                <Stack.Screen
+                  name="ExternalAccount"
+                  component={ExternalAccountScreen}
+                />
+                <Stack.Screen
+                  name="InitTransfer"
+                  component={InitTransferScreen}
+                />
+                <Stack.Screen name="DebitCard" component={DebitCardScreen} />
+                <Stack.Screen name="Statements" component={StatementScreen} />
+                <Stack.Screen name="Agreements" component={AgreementScreen} />
+              </Stack.Navigator>
+              ))}
+          </ComplianceWorkflowProvider>
+        )}
+      </>
     );
 }
 
@@ -188,23 +208,20 @@ function RootNavigator() {
     } as StackNavigationOptions;
 
     return (
-        <AuthProvider>
-            <AuthConsumer>
-                {(auth) => (
-                    <CustomerProvider auth={auth}>
-                        <KeyboardAvoidingView
-                            behavior='padding'
-                            style={styles.keyboardAvoidingView}
-                            keyboardVerticalOffset={Platform.OS === 'android' ? -200 : 0}
-                        >
-                            <RootStack.Navigator screenOptions={{ headerShown: false }}>
-                                <RootStack.Screen name="Main" component={MainStackScreen} />
-                                <RootStack.Screen name="Menu" component={MenuScreen} options={menuScreenOptions} />
-                            </RootStack.Navigator>
-                        </KeyboardAvoidingView>
-                    </CustomerProvider>
-                )}
-            </AuthConsumer>
-        </AuthProvider>
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={styles.keyboardAvoidingView}
+        keyboardVerticalOffset={Platform.OS === 'android' ? -200 : 0}
+      >
+        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+          <RootStack.Screen name="Main" component={MainStackScreen} />
+          <RootStack.Screen
+            name="Menu"
+            component={MenuScreen}
+            options={menuScreenOptions}
+          />
+        </RootStack.Navigator>
+      </KeyboardAvoidingView>
     );
+                  
 }

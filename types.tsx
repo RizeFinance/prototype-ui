@@ -52,4 +52,9 @@ export type RootStackParamList = {
   Menu: undefined;
   NotFound: undefined;
   LockedScreen: undefined;
+  SetPassword: undefined;
+  DebitCard: undefined;
+  Statements: undefined;
+  Agreements: undefined;
+  Main: any;
 };

@@ -31,15 +31,20 @@ const TextLink = (props: TextLinkProps): JSX.Element => {
         pressable: {
             flexDirection: 'row',
             justifyContent: justifyContent,
+            cursor: 'pointer'
         },
         underline: {
             borderColor: primary,
             flex: 1,
             borderBottomWidth: 2,
             opacity: 0.5,
+            cursor: 'pointer'
+
         },
         editButton: {
             color: primary,
+            cursor: 'pointer'
+
         }
     });
 

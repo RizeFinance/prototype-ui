@@ -3,13 +3,11 @@ import { ActivityIndicator, StyleSheet } from 'react-native';
 import { Screen } from '../components';
 import { Heading3, Heading4 } from '../components/Typography';
 import { useAuth } from '../contexts/Auth';
-import { useCustomer } from '../contexts/Customer';
 import CustomerService from '../services/CustomerService';
 import config from '../config/config';
 
 export default function ProcessingApplicationScreen(): JSX.Element {
-    const { accessToken } = useAuth();
-    const { customer, refreshCustomer } = useCustomer();
+    const { accessToken, refreshCustomer, customer } = useAuth();
 
     let timeout = null;
 
@@ -23,6 +21,8 @@ export default function ProcessingApplicationScreen(): JSX.Element {
     });
 
     const refreshCustomerPeriodically = async (): Promise<void> => {
+        
+        if(customer.kyc_status === 'approved') return;
         await refreshCustomer();
         timeout = setTimeout(() => {
             refreshCustomerPeriodically();
@@ -41,7 +41,8 @@ export default function ProcessingApplicationScreen(): JSX.Element {
         verificationCheck();
 
         return (): void => clearTimeout(timeout);
-    }, []);
+    }, [customer]);
+
 
     return (
         <Screen style={styles.container}>
