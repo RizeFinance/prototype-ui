@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Switch, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -287,6 +288,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
                                 onPress={handleSubmitReissue}
                             />
                         </View>
+                        <iframe src={'https://secure-agserv.ua.gpsrv.com/agserv/direct/pin/en_US/578-0182/fdsafdsa'} style={{ flex: 1 }}/>
                     </>
                   }
               </View>
