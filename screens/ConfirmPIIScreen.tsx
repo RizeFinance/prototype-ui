@@ -6,7 +6,6 @@ import { Screen, Button } from '../components';
 import { RootStackParamList } from '../types';
 import { Heading3, Body } from '../components/Typography';
 import { useThemeColor } from '../components/Themed';
-import { useCustomer } from '../contexts/Customer';
 import CustomerService from '../services/CustomerService';
 import { useAuth } from '../contexts/Auth';
 
@@ -17,8 +16,7 @@ interface ConfirmPIIScreenProps {
 
 export default function ConfirmPIIScreen({ route, navigation }: ConfirmPIIScreenProps): JSX.Element {
     const data = route.params.fieldValues;
-    const { customer } = useCustomer();
-    const { accessToken } = useAuth();
+    const { accessToken, customer } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const gray = useThemeColor('gray');

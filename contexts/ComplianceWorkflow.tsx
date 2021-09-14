@@ -4,7 +4,7 @@ import { Customer } from '@rizefinance/rize-js/types/lib/core/customer';
 import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 import React, { useContext } from 'react';
 import { RootStackParamList } from '../types';
-import { CustomerContext } from './Customer';
+import { AuthContext } from './Auth';
 import { AuthContextProps } from '../contexts/Auth';
 import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 import CustomerService from '../services/CustomerService';
@@ -59,8 +59,8 @@ const initialState = {
 };
 
 export class ComplianceWorkflowProvider extends React.Component<ComplianceWorkflowProviderProps, ComplianceWorkflowProviderState> {
-    static contextType = CustomerContext;
-    context: React.ContextType<typeof CustomerContext>;
+    static contextType = AuthContext;
+    context: React.ContextType<typeof AuthContext>;
 
     constructor(props: ComplianceWorkflowProviderProps) {
         super(props);

@@ -8,7 +8,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import { useThemeColor } from '../components/Themed';
 import { useAuth } from '../contexts/Auth';
-import { useCustomer } from '../contexts/Customer';
 import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 import CustomerService from '../services/CustomerService';
 
@@ -25,8 +24,9 @@ interface SignupFields {
 }
 
 export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Element {
-    const { register } = useAuth();
-    const { setCustomer } = useCustomer();
+    const { register, setCustomer } = useAuth();
+  
+    
     const { setComplianceWorkflow } = useComplianceWorkflow();
     const [commonError, setCommonError] = useState<string>('');
 

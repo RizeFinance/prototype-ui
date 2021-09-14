@@ -6,6 +6,7 @@ import config from './config/config';
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
+import {ApplicationProviders} from './contexts'
 
 import * as Sentry from 'sentry-expo';
 
@@ -24,10 +25,12 @@ export default function App(): any {
         return null;
     } else {
         return (
+          <ApplicationProviders>
             <SafeAreaProvider>
-                <Navigation colorScheme={colorScheme} />
-                <StatusBar />
+              <Navigation colorScheme={colorScheme} />
+              <StatusBar />
             </SafeAreaProvider>
+          </ApplicationProviders>
         );
     }
 }

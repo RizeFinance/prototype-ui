@@ -104,14 +104,15 @@ const ExternalAccountScreen = (): JSX.Element => {
                 const externalType = types.data.find(x => x.synthetic_account_category === 'plaid_external');
 
                 // Create the synthetic account
-                await AccountService.createSyntheticAccount(
+                await AccountService.createSyntheticAccount({
                     accessToken,
-                    externalType.uid,
-                    poolUids[0],
-                    account.name,
-                    account.id,
+                    syntheticAccountTypeUid: externalType.uid,
+                    poolUid: poolUids[0],
+                    name: account.name,
+                    accountId: account.id,
                     publicToken
-                );
+                }
+            );
 
                 refreshAccountsPeriodically();
                 setShowSuccessMessage(true);

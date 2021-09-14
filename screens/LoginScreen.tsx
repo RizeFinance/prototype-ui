@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Formik } from 'formik';
 import validator from 'validator';
 import { useAuth } from '../contexts/Auth';
 import { Button, Input, Screen } from '../components';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
-import { useCustomer } from '../contexts/Customer';
 import { useThemeColor } from '../components/Themed';
 import CustomerService from '../services/CustomerService';
 import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import config from '../config/config';
+import {removeValue} from '../utils/asyncStorage'
 
 const logo = require('../assets/images/logo.png');
 
@@ -25,9 +25,10 @@ interface LoginFields {
     password: string;
 }
 
+
 export default function LoginScreen({ navigation, route }: LoginScreenProps): JSX.Element {
-    const auth = useAuth();
-    const { setCustomer } = useCustomer();
+    const {setCustomer, ...auth} = useAuth();
+
     const [commonError, setCommonError] = useState<string>('');
     
     const initialValues: LoginFields = {
@@ -87,7 +88,24 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
         return errors;
     };
 
-    const onSubmit = async (values: LoginFields): Promise<void> => {
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      if (auth.accessToken !== '') {
+        try {
+          const customer = await CustomerService.getCustomer(auth.accessToken);
+          setCustomer(customer);
+
+        } catch(e) {
+            removeValue({storageKey: '@tokens'})
+        }
+
+      }
+    };
+    fetchCustomer();
+  }, [auth]);
+
+  const onSubmit = async (values: LoginFields): Promise<void> => {
+      
         setCommonError('');
         const authData = await auth.login(values.email, values.password);
         
@@ -100,10 +118,6 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
             navigation.navigate('SetPassword');
             return;
         }
-
-        const customer = await CustomerService.getCustomer(authData.data.accessToken);
-
-        await setCustomer(customer);
     };
 
     const gotoSignupScreen = () => {

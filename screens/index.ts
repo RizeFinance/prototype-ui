@@ -1,5 +1,5 @@
 export { default as AccountDetailsScreen } from './AccountDetailsScreen';
-export { default as AccountsScreen } from './AccountsScreen';
+export { default as AccountsScreen } from './AccountsScreen/AccountsScreen';
 export { default as ApplicationUnapprovedScreen } from './ApplicationUnapprovedScreen';
 export { default as BankingDisclosuresScreen } from './BankingDisclosuresScreen';
 export { default as ConfirmPIIScreen } from './ConfirmPIIScreen';

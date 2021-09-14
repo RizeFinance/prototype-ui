@@ -15,25 +15,36 @@ const getSyntheticAccountTypes = async (accessToken: string): Promise<RizeList<S
         .then((response) => response.data);
 };
 
-const createSyntheticAccount = async (
-    accessToken: string,
-    syntheticAccountTypeUid: string,
-    poolUid: string,
-    name: string,
-    accountId: string,
-    publicToken: string,
-): Promise<SyntheticAccount> => {
-    return await api.post('/synthetic_accounts',
-        {
-            synthetic_account_type_uid: syntheticAccountTypeUid,
-            pool_uid: poolUid,
-            name: name,
-            account_id: accountId,
-            public_token: publicToken
-        },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+interface CreateAccount {
+  syntheticAccountTypeUid: string;
+  poolUid?: string;
+  name: string;
+  accountId?: string;
+  accessToken: string;
+  publicToken?: string;
+}
+
+const createSyntheticAccount = async ({
+  syntheticAccountTypeUid,
+  poolUid,
+  name,
+  accountId,
+  accessToken,
+  publicToken,
+}: CreateAccount): Promise<SyntheticAccount> => {
+  return await api
+    .post(
+      '/synthetic_accounts',
+      {
+        synthetic_account_type_uid: syntheticAccountTypeUid,
+        pool_uid: poolUid,
+        name: name,
+        account_id: accountId,
+        public_token: publicToken,
+      },
+      { headers: { Authorization: `Bearer ${accessToken}` } },
     )
-        .then((response) => response.data);
+    .then(response => response.data);
 };
 
 const getLinkToken = async (accessToken: string): Promise<string> => {

@@ -5,7 +5,8 @@ const getCustomer = async (accessToken: string): Promise<Customer> => {
     return await api.get('/customer',
         { headers: { Authorization: `Bearer ${accessToken}` } }
     )
-        .then((response) => response.data);
+        .then((response) => response.data)
+        .catch(error => {})
 };
 
 const createCustomerProduct = async (accessToken: string, product_uid: string): Promise<Customer> => {
