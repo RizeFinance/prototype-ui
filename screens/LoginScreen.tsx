@@ -91,14 +91,13 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
   useEffect(() => {
     const fetchCustomer = async () => {
       if (auth.accessToken !== '') {
-        try {
-          const customer = await CustomerService.getCustomer(auth.accessToken);
-          setCustomer(customer);
-
-        } catch(e) {
+        
+        const customer = await CustomerService.getCustomer(auth.accessToken);
+        if (customer) {
+            setCustomer(customer);
+        } else {
             removeValue({storageKey: '@tokens'})
         }
-
       }
     };
     fetchCustomer();
