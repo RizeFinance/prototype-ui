@@ -9,7 +9,7 @@ interface IStoreData {
   };
 }
 
-const storeData = async ({ storageKey, data }: IStoreData) => {
+const storeData = async ({ storageKey, data }: IStoreData): Promise<void | string> => {
   const json = JSON.stringify(data);
   try {
     await AsyncStorage.setItem(storageKey, json);
@@ -20,7 +20,7 @@ const storeData = async ({ storageKey, data }: IStoreData) => {
 
 type IStorageKey = Omit<IStoreData, 'data'>;
 
-const getData = async ({ storageKey }: IStorageKey) => {
+const getData = async ({ storageKey }: IStorageKey): Promise<void | string> => {
   try {
     const json = await AsyncStorage.getItem(storageKey);
     return json !== null ? JSON.parse(json) : null;
@@ -29,7 +29,7 @@ const getData = async ({ storageKey }: IStorageKey) => {
   }
 };
 
-const removeValue = async ({ storageKey }: IStorageKey) => {
+const removeValue = async ({ storageKey }: IStorageKey): Promise<void | string> => {
   try {
     await AsyncStorage.removeItem(storageKey);
   } catch (e) {

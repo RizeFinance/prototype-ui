@@ -1,0 +1,8 @@
+.expo
+.expo-shared
+.netlify
+.config
+
+web-build
+node_modules
+build

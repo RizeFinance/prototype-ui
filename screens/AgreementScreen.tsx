@@ -8,70 +8,66 @@ import { isEmpty } from 'lodash';
 import utils from '../utils/utils';
 
 interface AgreementInfoProps {
-    agreement: ComplianceDocumentSelection;
+  agreement: ComplianceDocumentSelection;
 }
 
 export default function AgreementScreen(): JSX.Element {
-    const {
-        agreements,
-        loadAgreements
-    } = useComplianceWorkflow();
+  const { agreements, loadAgreements } = useComplianceWorkflow();
 
-    useEffect(() => {
-        loadAgreements();
-    }, []);
+  useEffect(() => {
+    loadAgreements();
+  }, []);
 
-    const styles = StyleSheet.create({
-        heading: {
-            marginBottom: 25,
-        },
-        container: {
-            marginTop: 25,
-        },
-        agreementInfo: {
-            marginVertical: 16,
-        },
-        agreementName: {
-            marginBottom: 8,
-        }
-    });
+  const styles = StyleSheet.create({
+    heading: {
+      marginBottom: 25,
+    },
+    container: {
+      marginTop: 25,
+    },
+    agreementInfo: {
+      marginVertical: 16,
+    },
+    agreementName: {
+      marginBottom: 8,
+    },
+  });
 
-    const onPressAgreementName = async (agreement: ComplianceDocumentSelection) => {
-        window.open(agreement.compliance_document_url, '_blank');
-    };
+  const onPressAgreementName = async (agreement: ComplianceDocumentSelection) => {
+    window.open(agreement.compliance_document_url, '_blank');
+  };
 
-    const AgreementInfo = ({ agreement }: AgreementInfoProps): JSX.Element => {
-        return (
-            <View style={styles.agreementInfo}>
-                <TextLink
-                    textAlign='center'
-                    style={styles.agreementName}
-                    onPress={() => onPressAgreementName(agreement)}
-                    fontType={Heading4}
-                >
-                    {agreement.name}
-                </TextLink>
-                <Body fontWeight='semibold' textAlign='center'>
-                    Acknowledged {utils.formatDate(agreement.accepted_at)}
-                </Body>
-                
-            </View>
-        );
-    };
-
+  const AgreementInfo = ({ agreement }: AgreementInfoProps): JSX.Element => {
     return (
-        <Screen>
-            <Heading3 textAlign='center' style={styles.heading}>
-            Agreements
-            </Heading3>
-
-            { !isEmpty(agreements) && (
-                <View style={styles.container}>
-                    { agreements.map((agreement, i) => (
-                        <AgreementInfo key={i} agreement={agreement} />
-                    ))}
-                </View>
-            )}
-        </Screen>
+      <View style={styles.agreementInfo}>
+        <TextLink
+          textAlign="center"
+          style={styles.agreementName}
+          onPress={() => onPressAgreementName(agreement)}
+          fontType={Heading4}
+        >
+          {agreement.name}
+        </TextLink>
+        <Body fontWeight="semibold" textAlign="center">
+          Acknowledged {utils.formatDate(agreement.accepted_at)}
+        </Body>
+      </View>
     );
+  };
+
+  return (
+    <Screen>
+      <Heading3 textAlign="center" style={styles.heading}>
+        Agreements
+      </Heading3>
+
+      {!isEmpty(agreements) && (
+        <View style={styles.container}>
+          {agreements.map((agreement, i) => (
+            <AgreementInfo key={i} agreement={agreement} />
+          ))}
+        </View>
+      )}
+    </Screen>
+  );
 }

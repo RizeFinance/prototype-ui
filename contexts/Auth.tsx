@@ -1,32 +1,22 @@
-import React, {
-  useContext,
-  useEffect,
-  useState,
-  createContext,
-  useMemo,
-} from 'react';
+import React, { useContext, useEffect, useState, createContext, useMemo } from 'react';
 import AuthService from '../services/AuthService';
-import {storeData, getData, removeValue} from '../utils/asyncStorage'
+import { storeData, getData, removeValue } from '../utils/asyncStorage';
 import CustomerService from '../services/CustomerService';
 import { Customer } from '../models';
 
-
-
 export type AuthContextProps = {
-    accessToken?: string;
-    refreshToken?: string;
-    userName?: string;
-    login: (userName: string, password: string) => Promise<any>;
-    logout: () => void;
-    register: (username: string, password: string) => Promise<any>;
-    forgotPassword: (email: string) => Promise<any>;
-    setPassword: (username: string, oldPassword: string, newPassword: string) => Promise<any>;
-    refreshCustomer: () => Promise<Customer>;
-    customer?: Customer;
-    setCustomer: React.Dispatch<React.SetStateAction<Customer>>;
-
-
-}
+  accessToken?: string;
+  refreshToken?: string;
+  userName?: string;
+  login: (userName: string, password: string) => Promise<any>;
+  logout: () => void;
+  register: (username: string, password: string) => Promise<any>;
+  forgotPassword: (email: string) => Promise<any>;
+  setPassword: (username: string, oldPassword: string, newPassword: string) => Promise<any>;
+  refreshCustomer: () => Promise<Customer>;
+  customer?: Customer;
+  setCustomer: React.Dispatch<React.SetStateAction<Customer>>;
+};
 
 export const AuthContext = createContext<AuthContextProps>({
   accessToken: '',
@@ -43,10 +33,10 @@ export const AuthContext = createContext<AuthContextProps>({
 });
 
 export type AuthProviderState = {
-    accessToken?: string;
-    refreshToken?: string
-    userName?: string
-    customer?: Customer
+  accessToken?: string;
+  refreshToken?: string;
+  userName?: string;
+  customer?: Customer;
 };
 
 const initialState = {
@@ -57,10 +47,10 @@ const initialState = {
 };
 
 export interface AuthProviderProps {
-    children?: JSX.Element;
+  children?: JSX.Element;
 }
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps => {
   const [authData, setAuthData] = useState<AuthProviderState>({
     accessToken: '',
     refreshToken: '',
@@ -68,53 +58,51 @@ export const AuthProvider = ({ children }) => {
     customer: undefined,
   });
 
- 
-
   useEffect(() => {
     const getTokens = async () => {
       try {
-        const {accessToken, refreshToken} = await getData({storageKey: '@tokens'});
-  
+        const { accessToken, refreshToken } = await getData({ storageKey: '@tokens' });
+
         if (accessToken) {
           const customer = await CustomerService.getCustomer(accessToken);
           setAuthData({
             accessToken,
             refreshToken,
             customer,
-          })
+          });
         }
-      } catch(err) {
-        setAuthData(initialState)
+      } catch (err) {
+        setAuthData(initialState);
       }
     };
-    if(!authData.customer) {
+    if (!authData.customer) {
       getTokens();
     }
   }, []);
 
   const logout = (): void => {
     setAuthData(initialState);
-    removeValue({storageKey: '@tokens'});
+    removeValue({ storageKey: '@tokens' });
   };
 
   const login = async (userName: string, password: string): Promise<any> => {
-    setAuthData(initialState => ({ ...initialState, userName }));
+    setAuthData((initialState) => ({ ...initialState, userName }));
 
     try {
       const { data } = await AuthService.authorize(userName, password);
-      
+
       if (data && data.accessToken) {
         const customer = await CustomerService.getCustomer(data.accessToken);
 
-        if(customer) {
+        if (customer) {
           const customerData = {
             customer,
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
           };
-          setAuthData(customerData)
+          setAuthData(customerData);
         }
-        
+
         const tokens = {
           accessToken: data.accessToken,
           refreshToken: data.refreshToken,
@@ -142,49 +130,45 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (username: string, password: string): Promise<any> => {
-        try {
-            const result = await AuthService.register(username, password);
+    try {
+      const result = await AuthService.register(username, password);
 
-            if (result.success && result.data && result.data.accessToken) {
-        setAuthData(initialState => ({
+      if (result.success && result.data && result.data.accessToken) {
+        setAuthData((initialState) => ({
           ...initialState,
           accessToken: result.data.accessToken,
           refreshToken: result.data.refreshToken,
         }));
       }
 
-            return result;
-        } catch (err) {
-            return {
-                success: false
-            };
-        }
+      return result;
+    } catch (err) {
+      return {
+        success: false,
+      };
     }
+  };
 
   const forgotPassword = async (email: string): Promise<any> => {
-        try {
-            return await AuthService.forgotPassword(email);
-        } catch (err) {
-            return {
-                success: false
-            };
-        }
+    try {
+      return await AuthService.forgotPassword(email);
+    } catch (err) {
+      return {
+        success: false,
+      };
     }
+  };
 
   const setPassword = async (
     username: string,
     oldPassword: string,
-    newPassword: string,
+    newPassword: string
   ): Promise<any> => {
     try {
-      const result = await AuthService.setPassword(
-        username,
-        oldPassword,
-        newPassword,
-      );
+      const result = await AuthService.setPassword(username, oldPassword, newPassword);
 
       if (result.success && result.data.accessToken) {
-        setAuthData(initialState => ({
+        setAuthData((initialState) => ({
           ...initialState,
           accessToken: result.data.accessToken,
           refreshToken: result.data.refreshToken,
@@ -205,25 +189,21 @@ export const AuthProvider = ({ children }) => {
     }
 
     const customer = await CustomerService.getCustomer(authData.accessToken);
-    
-    if(customer) {
-      setAuthData(authData => ({
+
+    if (customer) {
+      setAuthData((authData) => ({
         ...authData,
         customer,
-      }))
+      }));
     }
-    
-    
   };
 
   const setCustomer = () => {
-    setAuthData(authData => ({
+    setAuthData((authData) => ({
       ...authData,
       customer,
-    }))
-  }
-
-  
+    }));
+  };
 
   const { accessToken, refreshToken, userName, customer } = authData;
 
@@ -239,7 +219,7 @@ export const AuthProvider = ({ children }) => {
       logout,
       customer,
       refreshCustomer,
-      setCustomer
+      setCustomer,
     }),
     [
       accessToken,
@@ -252,12 +232,11 @@ export const AuthProvider = ({ children }) => {
       logout,
       customer,
       refreshCustomer,
-      setCustomer
-    ],
+      setCustomer,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
 
 export const useAuth = (): AuthContextProps => useContext(AuthContext);
