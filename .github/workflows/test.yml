@@ -20,7 +20,10 @@ jobs:
         run: npm install -g expo-cli
 
       - name: Install Node.js dependencies
-        run: npm install
+        run: yarn install
+        env:
+          NPM_CONFIG_USERCONFIG: .npmrc.ci
+          NODE_AUTH_TOKEN: ${{ secrets.MASTER_PACKAGE_KEY }}
 
       - name: Run ESLint
         uses: wearerequired/lint-action@v1
@@ -32,4 +35,4 @@ jobs:
           eslint_extensions: js,ts,jsx,tsx
 
       - name: Perform Typescript Build
-        run: npm run tsc && npm run build
+        run: yarn tsc && yarn build:web
