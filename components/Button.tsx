@@ -23,33 +23,23 @@ const Button = (props: ButtonProps): JSX.Element => {
       paddingBottom: 11,
       cursor: 'pointer',
       width: '100%',
-      
     },
     pressableDisabled: {
       opacity: 0.5,
-      cursor: 'not-allowed'
+      cursor: 'not-allowed',
     },
     pressableText: {
       color: primaryAccent,
-
     },
   });
 
   return (
     <Pressable
-      style={[
-        defaultStyles.pressable,
-        disabled && defaultStyles.pressableDisabled,
-        style,
-      ]}
+      style={[defaultStyles.pressable, disabled && defaultStyles.pressableDisabled, style]}
       disabled={disabled}
       {...otherProps}
     >
-      <Body
-        style={defaultStyles.pressableText}
-        textAlign="center"
-        fontWeight="semibold"
-      >
+      <Body style={defaultStyles.pressableText} textAlign="center" fontWeight="semibold">
         {title}
       </Body>
     </Pressable>

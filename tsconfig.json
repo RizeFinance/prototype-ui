@@ -9,7 +9,5 @@
     "resolveJsonModule": true,
     "strict": true
   },
-  "include": [
-    "declarations.d.ts"
-  ]
+  "include": ["declarations.d.ts"]
 }

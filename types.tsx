@@ -1,10 +1,10 @@
 export type PDFReaderParams = {
   url: string;
-}
+};
 
 export type ApplicationUnapprovedParams = {
   status: 'rejected' | 'manual_review' | 'under_review';
-}
+};
 
 export type PIIFields = {
   firstName: string;
@@ -19,19 +19,19 @@ export type PIIFields = {
   zip: string;
   phone: string;
   ssn: string;
-}
+};
 
 export type ConfirmPIIParams = {
   fieldValues: PIIFields;
-}
+};
 
 export type LoginParams = {
   message?: string;
-}
+};
 
 export type AccountDetailsParams = {
   accountUid: string;
-}
+};
 
 export type RootStackParamList = {
   BankingDisclosures: undefined;

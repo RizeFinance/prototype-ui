@@ -2,17 +2,17 @@ import api from '../utils/api';
 import { RizeList, SyntheticAccount, SyntheticAccountType } from '../models';
 
 const getSyntheticAccounts = async (accessToken: string): Promise<RizeList<SyntheticAccount>> => {
-    return await api.get('/synthetic_accounts',
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-    )
-        .then((response) => response.data);
+  return await api
+    .get('/synthetic_accounts', { headers: { Authorization: `Bearer ${accessToken}` } })
+    .then((response) => response.data);
 };
 
-const getSyntheticAccountTypes = async (accessToken: string): Promise<RizeList<SyntheticAccountType>> => {
-    return await api.get('/synthetic_account_types',
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-    )
-        .then((response) => response.data);
+const getSyntheticAccountTypes = async (
+  accessToken: string
+): Promise<RizeList<SyntheticAccountType>> => {
+  return await api
+    .get('/synthetic_account_types', { headers: { Authorization: `Bearer ${accessToken}` } })
+    .then((response) => response.data);
 };
 
 interface CreateAccount {
@@ -42,21 +42,22 @@ const createSyntheticAccount = async ({
         account_id: accountId,
         public_token: publicToken,
       },
-      { headers: { Authorization: `Bearer ${accessToken}` } },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 const getLinkToken = async (accessToken: string): Promise<string> => {
-    return await api.get('/synthetic_accounts/auth/get_token',
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-    )
-        .then((response) => response.data.link_token);
+  return await api
+    .get('/synthetic_accounts/auth/get_token', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => response.data.link_token);
 };
 
 export default {
-    getSyntheticAccounts,
-    createSyntheticAccount,
-    getSyntheticAccountTypes,
-    getLinkToken
+  getSyntheticAccounts,
+  createSyntheticAccount,
+  getSyntheticAccountTypes,
+  getLinkToken,
 };

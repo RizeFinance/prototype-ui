@@ -1,38 +1,40 @@
 {
-    "env": {
-        "browser": true,
-        "jasmine": true,
-        "jest": true,
-        "node": true,
-        "es6": true
+  "env": {
+    "browser": true,
+    "jasmine": true,
+    "jest": true,
+    "node": true,
+    "es6": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
     },
-    "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:@typescript-eslint/recommended"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "ecmaVersion": 12,
-        "sourceType": "module"
-    },
-    "plugins": [
-        "react",
-        "@typescript-eslint"
-    ],
-    "rules": {
-        "indent": ["error", 4, { "SwitchCase": 1 }],
-        "quotes": ["error", "single"],
-        "semi": ["error", "always"],
-        "eqeqeq": ["warn", "smart"],
-        "no-var": "error",
-        "no-console": ["warn", { "allow": ["error"] }],
-        "no-async-promise-executor": "off",
-        "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-var-requires": 0,
-        "react/display-name": "off"
-    }
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "@typescript-eslint",
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": "error",
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+    "eqeqeq": ["warn", "smart"],
+    "no-var": "error",
+    "no-console": ["warn", { "allow": ["error"] }],
+    "no-async-promise-executor": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-var-requires": 0,
+    "react/display-name": "off",
+    "react/prop-types": "off"
+  }
 }

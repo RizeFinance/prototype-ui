@@ -4,7 +4,7 @@ import { DocumentsProvider } from './Documents';
 import { AuthProvider } from './Auth';
 import { AccountsProvider } from './Accounts';
 
-const ApplicationProviders = ({ children }) => {
+const ApplicationProviders = ({ children }: { children: JSX.Element }): JSX.Element => {
   return (
     <AuthProvider>
       <AccountsProvider>

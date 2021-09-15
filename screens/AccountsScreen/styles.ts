@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   heading: {
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
   },
   connectStatusMessage: {
     marginVertical: 8,
-},
+  },
 });
 
-export default styles
+export default styles;
