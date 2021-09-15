@@ -1,0 +1,35 @@
+name: Lint & Build
+
+on: [pull_request]
+
+jobs:
+  test:
+    name: Run Lint & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Run ESLint
+        uses: wearerequired/lint-action@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          eslint: true
+          prettier: true
+          auto_fix: true
+          eslint_extensions: js,ts,jsx,tsx
+
+      - name: Perform Typescript Build
+        run: npm run tsc && npm run build
