@@ -36,6 +36,7 @@ jobs:
           ALLOW_SIGNUP: false
           SENTRY_DSN: https://c705c0b521f7456dabe5d9e4cd24f64d@o56811.ingest.sentry.io/5855434
           RIZE_ENV: release
+          DEFAULT_PRODUCT_UID: M3s3gU7KtybCfNYk
           DEBIT_CARD_SERVICE_URL: https://web-card-service-release.netlify.app
 
       - name: Deploy to Netlify
