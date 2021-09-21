@@ -24,7 +24,9 @@ export default function PinSetScreen({ navigation, route }: PinSetScreenProps): 
 
   useEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <TextLink onPress={() => navigation.goBack()}>&lt; Debit Card</TextLink>,
+      headerLeft: () => (
+        <TextLink onPress={() => navigation.navigate('DebitCard')}>&lt; Debit·Card</TextLink>
+      ),
     });
   }, []);
 
