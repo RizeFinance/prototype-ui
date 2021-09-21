@@ -21,7 +21,7 @@ export default function ProcessingApplicationScreen(): JSX.Element {
   });
 
   const refreshCustomerPeriodically = async (): Promise<void> => {
-    if (customer.kyc_status === 'approved') return;
+    if (customer.status === 'active') return;
     await refreshCustomer();
     timeout = setTimeout(() => {
       refreshCustomerPeriodically();
