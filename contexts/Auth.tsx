@@ -110,6 +110,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
 
         storeData({ storageKey: '@tokens', data: tokens });
       }
+
+      return { data };
     } catch (err) {
       if (err.status === 403) {
         return {

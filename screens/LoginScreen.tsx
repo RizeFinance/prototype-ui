@@ -104,7 +104,7 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
     setCommonError('');
     const authData = await auth.login(values.email, values.password);
 
-    if (!authData.success) {
+    if ('success' in authData && !authData.success) {
       setCommonError(authData.message);
       return;
     }
