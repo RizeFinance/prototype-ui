@@ -41,7 +41,7 @@
     "expo-status-bar": "~1.0.3",
     "expo-updates": "~0.4.1",
     "expo-web-browser": "~8.6.0",
-    "formik": "^2.2.6",
+    "formik": "^2.2.9",
     "lodash": "^4.17.21",
     "modal-enhanced-react-native-web": "^0.2.0",
     "moment": "^2.29.1",
