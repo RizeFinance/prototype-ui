@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Switch, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Switch, ActivityIndicator, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Screen, Input, Button, Dropdown } from '../components';
 import { Heading3, Heading5, Body } from '../components/Typography';
 import TextLink from '../components/TextLink';
 import { useDebitCards } from '../contexts/DebitCards';
 import { useAccounts } from '../contexts/Accounts';
+import { RouteProp } from '@react-navigation/core';
 import { isEmpty, capitalize, isNil, startCase, toLower } from 'lodash';
 import utils from '../utils/utils';
 
 interface DebitCardScreenProps {
+    route: RouteProp<RootStackParamList, 'DebitCard'>;
     navigation: StackNavigationProp<RootStackParamList, 'DebitCard'>;
 }
 
-export default function DebitCardScreen({ navigation }: DebitCardScreenProps): JSX.Element {
+export default function DebitCardScreen({ navigation, route }: DebitCardScreenProps): JSX.Element {
     const { 
         isLoading, 
         debitCards, 
@@ -25,9 +27,8 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     } = useDebitCards();
 
     const { liabilityAccounts, refetchAccounts } = useAccounts();
-
     const displayStatus = ['normal', 'queued', 'shipped', 'printing_physical_card', 'card_replacement_shipped', 'usable_without_pin'];
-    const activeCard = debitCards.find(x => displayStatus.includes(x.status) && isNil(x.closed_at));
+    const activeCard = debitCards?.find(x => displayStatus.includes(x.status) && isNil(x.closed_at));
     const associatedAccount = liabilityAccounts.find(x => x.uid === activeCard?.synthetic_account_uid);
     const isCardActive = ['normal', 'shipped', 'printing_physical_card', 'card_replacement_shipped', 'usable_without_pin'].includes(activeCard?.status);
 
@@ -37,10 +38,10 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
 
     const alertDefault = { text: null, success: true };
     const [alert, setAlert] = useState(alertDefault);
-
+    const wasActivated = route.params?.activated;
     const [reissueReason, setReissueReason] = useState();
     const [reissueComment, setReissueComment] = useState();
-
+    const canBeActivated = ['card_replacement_shipped, card_replacement_shipment_returned', 'usable_without_pin'].includes(activeCard?.status);
 
     useEffect(() => {
         refetchDebitCards();
@@ -50,6 +51,12 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     useEffect(() => {
         activeCard && setIsLocked(!!activeCard?.locked_at);
     }, [activeCard]);
+
+    useEffect(() => {
+        if(wasActivated) {
+            setAlert({text: 'Card has been activated.', success: true});
+        }
+    }, [wasActivated]);
 
     useEffect(() => {
         if (!activeCard?.uid) return;
@@ -116,6 +123,9 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
             paddingTop: 40,
             marginTop: 60,
             marginBottom: 15,
+        },
+        activateContainer: {
+            marginTop: 60
         }
     });
 
@@ -135,6 +145,12 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
             setLoadingNewCard(true);
             refreshDebitCardPeriodically();
         }
+    };
+
+    const handleCardActivation = async () => {
+        navigation.navigate('DebitCardActivation', {
+            debitCardUid: activeCard?.uid
+        });
     };
 
     const handleSubmitRequest = async () => {
@@ -242,9 +258,8 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
                           </Heading5>
                       </View>
                   </View>
-              
-                  { isCardActive &&
-                    <>
+                  <>
+                      { isCardActive &&
                         <View style={styles.switchContainer}>
                             <Switch
                                 trackColor={{ false: '#2ecc71', true: '#e74c3c' }}
@@ -256,9 +271,18 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
                             />
                             <Body fontWeight='bold'>
                                 {`Card is ${isLocked ? 'Locked' : 'Unlocked'}`}
-                            </Body>
+                            </Body>      
                         </View>
-
+                      }
+                      { canBeActivated && 
+                        <View style={styles.activateContainer}>
+                            <Button
+                                title='Activate Card'
+                                onPress={handleCardActivation}
+                            />
+                        </View>
+                      }
+                      { isCardActive &&
                         <View style={styles.reissueContainer}>
                             <Body textAlign='center' fontWeight='bold' style={styles.columnHeading}>
                             Report Damaged, Lost or Stolen
@@ -287,8 +311,8 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
                                 onPress={handleSubmitReissue}
                             />
                         </View>
-                    </>
-                  }
+                      }
+                  </>
               </View>
             }
         </Screen>
