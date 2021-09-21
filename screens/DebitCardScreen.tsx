@@ -141,6 +141,12 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     });
   };
 
+  const handlePinSet = (): void => {
+    navigation.navigate('PinSet', {
+      debitCardUid: activeCard.uid,
+    });
+  };
+
   const handleSubmitReissue = async () => {
     const { success } = await reissueDebitCard(activeCard?.uid, reissueReason);
     const text = success
@@ -271,6 +277,9 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
                   style={styles.switch}
                 />
                 <Body fontWeight="bold">{`Card is ${isLocked ? 'Locked' : 'Unlocked'}`}</Body>
+              </View>
+              <View style={styles.container}>
+                <Button title="Set Pin" onPress={handlePinSet} />
               </View>
 
               <View style={styles.reissueContainer}>

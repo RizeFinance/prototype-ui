@@ -6,21 +6,25 @@ import { AuthContext } from './Auth';
 export type DebitCardsContextProps = {
   isLoading: boolean;
   debitCards?: DebitCard[];
+  pinSetToken?: string;
   refetchDebitCards: () => Promise<DebitCard[]>;
   lockDebitCard: (uid: string) => Promise<DebitCard[]>;
   unlockDebitCard: (uid: string) => Promise<DebitCard[]>;
   reissueDebitCard: (uid: string, reason: string) => Promise<DebitCard[]>;
   createDebitCard: (pool_uid: string) => Promise<DebitCard[]>;
+  loadPinSetToken: (uid: string) => Promise<string>;
 };
 
 export const DebitCardsContext = React.createContext<DebitCardsContextProps>({
   isLoading: false,
   debitCards: [],
+  pinSetToken: null,
   refetchDebitCards: () => Promise.resolve([]),
   lockDebitCard: () => Promise.resolve([]),
   unlockDebitCard: () => Promise.resolve([]),
   reissueDebitCard: () => Promise.resolve([]),
   createDebitCard: () => Promise.resolve([]),
+  loadPinSetToken: () => Promise.resolve([]),
 });
 
 export type DebitCardProviderState = {
@@ -104,20 +108,27 @@ export class DebitCardsProvider extends React.Component<
     }
   };
 
+  loadPinSetToken = async (uid: string): Promise<string> => {
+    const response = await DebitCardService.getPinSetToken(this.context.accessToken, uid);
+    this.setState({ pinSetToken: response.pin_change_token });
+  };
+
   render(): JSX.Element {
-    const { isLoading, debitCards } = this.state;
+    const { isLoading, debitCards, pinSetToken } = this.state;
 
     return (
       <DebitCardsContext.Provider
         value={{
           isLoading: isLoading,
           debitCards: debitCards,
+          pinSetToken: pinSetToken,
           enabled: true,
           refetchDebitCards: this.refetchDebitCards,
           lockDebitCard: this.lockDebitCard,
           unlockDebitCard: this.unlockDebitCard,
           reissueDebitCard: this.reissueDebitCard,
           createDebitCard: this.createDebitCard,
+          loadPinSetToken: this.loadPinSetToken,
         }}
       >
         {this.props.children}

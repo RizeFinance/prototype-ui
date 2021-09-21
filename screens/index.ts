@@ -19,3 +19,4 @@ export { default as DebitCardScreen } from './DebitCardScreen';
 export { default as StatementScreen } from './StatementScreen';
 export { default as AgreementScreen } from './AgreementScreen';
 export { default as LockedScreen } from './LockedScreen';
+export { default as PinSetScreen } from './DebitCard/PinSetScreen';

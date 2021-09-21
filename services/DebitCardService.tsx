@@ -47,10 +47,22 @@ const createDebitCard = async (accessToken: string, pool_uid: string): Promise<D
     .then((response) => response.data);
 };
 
+const getPinSetToken = async (
+  accessToken: string,
+  debitCardUid: string
+): Promise<{ pin_change_token: string }> => {
+  return await api
+    .get(`/debit_cards/${debitCardUid}/pin_set_token`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => response.data);
+};
+
 export default {
   getDebitCards,
   lockDebitCard,
   unlockDebitCard,
   reissueDebitCard,
   createDebitCard,
+  getPinSetToken,
 };
