@@ -37,6 +37,7 @@ jobs:
           ALLOW_SIGNUP: true
           SENTRY_DSN: https://c705c0b521f7456dabe5d9e4cd24f64d@o56811.ingest.sentry.io/5855434
           RIZE_ENV: staging
+          DEBIT_CARD_SERVICE_URL: https://web-card-service-staging.netlify.app
           DEFAULT_PRODUCT_UID: XN2e84KTjTeYkDns
           BROKERAGE_PRODUCT_UID: ETVG5Vzr9jBV9fQD
 

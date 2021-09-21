@@ -45,6 +45,7 @@ import {
   StatementScreen,
   AgreementScreen,
   LockedScreen,
+  PinSetScreen,
 } from '../screens';
 
 // Contexts
@@ -179,6 +180,7 @@ function MainStackScreen() {
               <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
               <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
               <Stack.Screen name="DebitCard" component={DebitCardScreen} />
+              <Stack.Screen name="PinSet" component={PinSetScreen} />
               <Stack.Screen name="Statements" component={StatementScreen} />
               <Stack.Screen name="Agreements" component={AgreementScreen} />
             </Stack.Navigator>
