@@ -1,5 +1,5 @@
-import React  from 'react';
-import { Platform} from 'react-native';
+import React from 'react';
+import { Platform } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
@@ -8,35 +8,32 @@ import Screen from '../components/Screen';
 import { RootStackParamList } from '../types';
 
 interface PDFReaderScreenProps {
-    route: RouteProp<RootStackParamList, 'PDFReader'>;
+  route: RouteProp<RootStackParamList, 'PDFReader'>;
 }
 
 const PDFReaderScreen = ({ route }: PDFReaderScreenProps): JSX.Element => {
-    const navigation = useNavigation();
-    if (!route.params?.url) {
-        return <></>;
-    }
+  const navigation = useNavigation();
+  if (!route.params?.url) {
+    return <></>;
+  }
 
-    const uri = route.params.url;
+  const uri = route.params.url;
 
-    const onPressBack = () => {
-        navigation.goBack();
-    };
+  const onPressBack = () => {
+    navigation.goBack();
+  };
 
-    return (
-        <Screen>
-            { Platform.OS === 'web' ? (
-                <iframe src={uri} style={{ flex: 1 }}/>
-            ) : (
-                <WebView style={{ flex: 1 }} source={{ uri: uri }} /> 
-            )}
-           
-            <Button
-                title='Back'
-                onPress={onPressBack}
-            />
-        </Screen>
-    );
+  return (
+    <Screen>
+      {Platform.OS === 'web' ? (
+        <iframe src={uri} style={{ flex: 1 }} />
+      ) : (
+        <WebView style={{ flex: 1 }} source={{ uri: uri }} />
+      )}
+
+      <Button title="Back" onPress={onPressBack} />
+    </Screen>
+  );
 };
 
 export default PDFReaderScreen;

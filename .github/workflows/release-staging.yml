@@ -12,19 +12,23 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v1
-        
+
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 14
 
       - name: Install Yarn
-        run: npm install -g yarn 
+        run: npm install -g yarn
+
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
 
       - name: Install Node.js dependencies
         run: yarn install
         env:
-          GITHUB_PACKAGE_AUTH_TOKEN: ${{ secrets.PACKAGE_AUTH_TOKEN }}
+          NPM_CONFIG_USERCONFIG: .npmrc.ci
+          NODE_AUTH_TOKEN: ${{ secrets.MASTER_PACKAGE_KEY }}
 
       - name: Create Build
         run: yarn build:web
@@ -33,12 +37,14 @@ jobs:
           ALLOW_SIGNUP: true
           SENTRY_DSN: https://c705c0b521f7456dabe5d9e4cd24f64d@o56811.ingest.sentry.io/5855434
           RIZE_ENV: staging
+          DEBIT_CARD_SERVICE_URL: https://web-card-service-staging.netlify.app
+          DEFAULT_PRODUCT_UID: XN2e84KTjTeYkDns
+          BROKERAGE_PRODUCT_UID: ETVG5Vzr9jBV9fQD
 
       - name: Deploy to Netlify
         uses: netlify/actions/cli@master
+        with:
+          args: deploy --dir=web-build/ --prod
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.STAGING_NETLIFY_SITE_ID }}
-        with:
-          args: deploy --dir=web-build/ --prod
-          secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'

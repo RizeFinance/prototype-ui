@@ -11,6 +11,7 @@ web-build/
 .env
 .idea
 yarn-error.log
+.eslintcache
 
 # macOS
 .DS_Store

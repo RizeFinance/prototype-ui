@@ -3,7 +3,7 @@ import { Screen } from '../components';
 import { StyleSheet, View } from 'react-native';
 import { Body, Heading3 } from '../components/Typography';
 
-const LockedScreen = () => {
+const LockedScreen = (): JSX.Element => {
   return (
     <Screen>
       <View
@@ -14,9 +14,7 @@ const LockedScreen = () => {
         <Heading3 style={styles.heading} textAlign="center">
           Your account is locked.
         </Heading3>
-        <Body style={styles.body}>
-          Please contact customer support for additional help.
-        </Body>
+        <Body style={styles.body}>Please contact customer support for additional help.</Body>
       </View>
     </Screen>
   );

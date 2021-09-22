@@ -1,5 +1,5 @@
 export { default as AccountDetailsScreen } from './AccountDetailsScreen';
-export { default as AccountsScreen } from './AccountsScreen';
+export { default as AccountsScreen } from './AccountsScreen/AccountsScreen';
 export { default as ApplicationUnapprovedScreen } from './ApplicationUnapprovedScreen';
 export { default as BankingDisclosuresScreen } from './BankingDisclosuresScreen';
 export { default as ConfirmPIIScreen } from './ConfirmPIIScreen';
@@ -20,3 +20,4 @@ export { default as DebitCardActivationScreen } from './DebitCardActivationScree
 export { default as StatementScreen } from './StatementScreen';
 export { default as AgreementScreen } from './AgreementScreen';
 export { default as LockedScreen } from './LockedScreen';
+export { default as PinSetScreen } from './DebitCard/PinSetScreen';

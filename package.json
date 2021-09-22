@@ -1,5 +1,6 @@
 {
   "main": "node_modules/expo/AppEntry.js",
+  "license": "UNLICENSED",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -8,13 +9,16 @@
     "build:web": "expo build:web",
     "eject": "expo eject",
     "test": "jest --watchAll",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "eslint . --ext .ts,.tsx",
+    "tsc": "tsc --noEmit",
+    "prepare": "husky install"
   },
   "jest": {
     "preset": "jest-expo"
   },
   "dependencies": {
     "@expo/vector-icons": "^12.0.0",
+    "@react-native-async-storage/async-storage": "^1.15.7",
     "@react-native-community/datetimepicker": "3.0.4",
     "@react-native-community/masked-view": "0.1.10",
     "@react-native-picker/picker": "1.9.2",
@@ -22,7 +26,8 @@
     "@react-navigation/native": "~5.8.10",
     "@react-navigation/stack": "~5.12.8",
     "@rizefinance/rize-js": "^1.0.0-beta.2",
-    "axios": "^0.21.1",
+    "@types/jest": "^27.0.1",
+    "axios": "^0.21.2",
     "dotenv": "^8.2.0",
     "expo": "~40.0.0",
     "expo-application": "~2.4.1",
@@ -36,8 +41,9 @@
     "expo-status-bar": "~1.0.3",
     "expo-updates": "~0.4.1",
     "expo-web-browser": "~8.6.0",
-    "formik": "^2.2.6",
+    "formik": "^2.2.9",
     "lodash": "^4.17.21",
+    "modal-enhanced-react-native-web": "^0.2.0",
     "moment": "^2.29.1",
     "query-string": "^7.0.0",
     "react": "16.13.1",
@@ -69,10 +75,22 @@
     "@typescript-eslint/parser": "^4.16.1",
     "eslint": "^7.21.0",
     "eslint-config-react": "^1.1.7",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.22.0",
+    "husky": "^7.0.2",
     "jest-expo": "~40.0.0",
+    "lint-staged": "^11.1.2",
+    "precise-commits": "^1.0.2",
+    "prettier": "2.4.0",
+    "pretty-quick": "^3.1.1",
     "react-native-svg-transformer": "^0.14.3",
     "typescript": "~4.0.0"
   },
-  "private": true
+  "private": true,
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint"
+    ],
+    "*.{ts,tsx}": "eslint --cache --fix"
+  }
 }

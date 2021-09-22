@@ -14,12 +14,12 @@ categories:
       - 'bug'
 
   - title: '🧰 Maintenance'
-    labels: 
+    labels:
       - 'chore'
       - 'task'
 
   - title: '🔒 Security'
-    labels: 
+    labels:
       - 'security'
       - 'dependencies'
 

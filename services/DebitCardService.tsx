@@ -2,42 +2,49 @@ import api from '../utils/api';
 import { RizeList, DebitCard } from '../models';
 
 const getDebitCards = async (accessToken: string): Promise<RizeList<DebitCard>> => {
-    return await api.get('/debit_cards',
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-    )
-        .then((response) => response.data);
+  return await api
+    .get('/debit_cards', { headers: { Authorization: `Bearer ${accessToken}` } })
+    .then((response) => response.data);
 };
 
 const lockDebitCard = async (accessToken: string, debitCardUid: string): Promise<DebitCard> => {
-    return await api.put(`/debit_cards/${debitCardUid}/lock`,
-        { reason: 'Customer Request' },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+  return await api
+    .put(
+      `/debit_cards/${debitCardUid}/lock`,
+      { reason: 'Customer Request' },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
     )
-        .then((response) => response.data);
+    .then((response) => response.data);
 };
 
 const unlockDebitCard = async (accessToken: string, debitCardUid: string): Promise<DebitCard> => {
-    return await api.put(`/debit_cards/${debitCardUid}/unlock`,
-        {},
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+  return await api
+    .put(
+      `/debit_cards/${debitCardUid}/unlock`,
+      {},
+      { headers: { Authorization: `Bearer ${accessToken}` } }
     )
-        .then((response) => response.data);
+    .then((response) => response.data);
 };
 
-const reissueDebitCard = async (accessToken: string, debitCardUid: string, reason: string): Promise<DebitCard> => {
-    return await api.put(`/debit_cards/${debitCardUid}/reissue`,
-        { reissue_reason: reason },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+const reissueDebitCard = async (
+  accessToken: string,
+  debitCardUid: string,
+  reason: string
+): Promise<DebitCard> => {
+  return await api
+    .put(
+      `/debit_cards/${debitCardUid}/reissue`,
+      { reissue_reason: reason },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
     )
-        .then((response) => response.data);
+    .then((response) => response.data);
 };
 
 const createDebitCard = async (accessToken: string, pool_uid: string): Promise<DebitCard> => {
-    return await api.post('/debit_cards',
-        { pool_uid },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-    )
-        .then((response) => response.data);
+  return await api
+    .post('/debit_cards', { pool_uid }, { headers: { Authorization: `Bearer ${accessToken}` } })
+    .then((response) => response.data);
 };
 
 const activateDebitCard = async (accessToken: string, debitCardUid: string, cardLastFourDigits: string, cvv: string, expiryDate: string): Promise<DebitCard> => {
@@ -52,11 +59,23 @@ const activateDebitCard = async (accessToken: string, debitCardUid: string, card
         .then((response) => response.data);
 };
 
+const getPinSetToken = async (
+  accessToken: string,
+  debitCardUid: string
+): Promise<{ pin_change_token: string }> => {
+  return await api
+    .get(`/debit_cards/${debitCardUid}/pin_set_token`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => response.data);
+};
+
 export default {
-    getDebitCards,
-    lockDebitCard,
-    unlockDebitCard,
-    reissueDebitCard,
-    createDebitCard,
-    activateDebitCard
+  getDebitCards,
+  lockDebitCard,
+  unlockDebitCard,
+  reissueDebitCard,
+  createDebitCard,
+  getPinSetToken,
+  activateDebitCard
 };
