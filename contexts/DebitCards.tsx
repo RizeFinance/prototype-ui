@@ -12,7 +12,12 @@ export type DebitCardsContextProps = {
   unlockDebitCard: (uid: string) => Promise<DebitCard[]>;
   reissueDebitCard: (uid: string, reason: string) => Promise<DebitCard[]>;
   createDebitCard: (pool_uid: string) => Promise<DebitCard[]>;
-  activateDebitCard: (uid: string, cardLastFourDigits: string, cvv: string, expiryDate: string) => Promise<DebitCard[]>;
+  activateDebitCard: (
+    uid: string,
+    cardLastFourDigits: string,
+    cvv: string,
+    expiryDate: string
+  ) => Promise<DebitCard[]>;
   loadPinSetToken: (uid: string) => Promise<string>;
 };
 
@@ -98,7 +103,7 @@ export class DebitCardsProvider extends React.Component<
 
   createDebitCard = async (pool_uid: string): Promise<DebitCard[]> => {
     this.setState({ isLoading: true });
-        
+
     try {
       await DebitCardService.createDebitCard(this.context.accessToken, pool_uid);
       const response = await this.refetchDebitCards();
@@ -110,16 +115,27 @@ export class DebitCardsProvider extends React.Component<
     }
   };
 
-  activateDebitCard = async (uid: string, cardLastFourDigits: string, cvv: string, expiryDate: string): Promise<DebitCard[]> => {
+  activateDebitCard = async (
+    uid: string,
+    cardLastFourDigits: string,
+    cvv: string,
+    expiryDate: string
+  ): Promise<DebitCard[]> => {
     this.setState({ isLoading: true });
 
     try {
-      await DebitCardService.activateDebitCard(this.context.accessToken, uid, cardLastFourDigits, cvv, expiryDate);
-        const response = await this.refetchDebitCards();
-        return response;
-      } catch (err) {
-        return { success: false, error: err };
-      } finally {
+      await DebitCardService.activateDebitCard(
+        this.context.accessToken,
+        uid,
+        cardLastFourDigits,
+        cvv,
+        expiryDate
+      );
+      const response = await this.refetchDebitCards();
+      return response;
+    } catch (err) {
+      return { success: false, error: err };
+    } finally {
       this.setState({ isLoading: false });
     }
   };

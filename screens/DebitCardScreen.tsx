@@ -36,7 +36,9 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
     'card_replacement_shipped',
     'usable_without_pin',
   ];
-  const activeCard = debitCards?.find(x => displayStatus.includes(x.status) && isNil(x.closed_at));
+  const activeCard = debitCards?.find(
+    (x) => displayStatus.includes(x.status) && isNil(x.closed_at)
+  );
   const associatedAccount = liabilityAccounts.find(
     (x) => x.uid === activeCard?.synthetic_account_uid
   );
@@ -57,7 +59,10 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
   const wasActivated = route.params?.activated;
   const [reissueReason, setReissueReason] = useState();
   const [reissueComment, setReissueComment] = useState();
-  const canBeActivated = ['card_replacement_shipped, card_replacement_shipment_returned', 'usable_without_pin'].includes(activeCard?.status);
+  const canBeActivated = [
+    'card_replacement_shipped, card_replacement_shipment_returned',
+    'usable_without_pin',
+  ].includes(activeCard?.status);
 
   useEffect(() => {
     refetchDebitCards();
@@ -69,8 +74,8 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
   }, [activeCard]);
 
   useEffect(() => {
-    if(wasActivated) {
-        setAlert({text: 'Card has been activated.', success: true});
+    if (wasActivated) {
+      setAlert({ text: 'Card has been activated.', success: true });
     }
   }, [wasActivated]);
 
@@ -143,8 +148,8 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
       marginBottom: 15,
     },
     activateContainer: {
-      marginTop: 60
-    }
+      marginTop: 60,
+    },
   });
 
   const onPressAccountName = (accountUid: string): void => {
@@ -155,9 +160,9 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
 
   const handleCardActivation = async () => {
     navigation.navigate('DebitCardActivation', {
-        debitCardUid: activeCard?.uid
+      debitCardUid: activeCard?.uid,
     });
-  };  
+  };
 
   const handlePinSet = (): void => {
     navigation.navigate('PinSet', {
@@ -283,9 +288,8 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
             </View>
           </View>
 
-          
           <>
-            {isCardActive && 
+            {isCardActive && (
               <>
                 <View style={styles.switchContainer}>
                   <Switch
@@ -302,16 +306,13 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
                   <Button title="Set Pin" onPress={handlePinSet} />
                 </View>
               </>
-            }
-            { canBeActivated && 
+            )}
+            {canBeActivated && (
               <View style={styles.activateContainer}>
-                <Button
-                  title='Activate Card'
-                  onPress={handleCardActivation}
-                />
+                <Button title="Activate Card" onPress={handleCardActivation} />
               </View>
-            }
-            { isCardActive &&
+            )}
+            {isCardActive && (
               <View style={styles.reissueContainer}>
                 <Body textAlign="center" fontWeight="bold" style={styles.columnHeading}>
                   Report Damaged, Lost or Stolen
@@ -339,8 +340,8 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
                   disabled={isNil(reissueReason)}
                   onPress={handleSubmitReissue}
                 />
-              </View>  
-            }
+              </View>
+            )}
           </>
         </View>
       )}
