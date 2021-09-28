@@ -49,8 +49,11 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
     (async () => {
       const brokerageProductUid = config.application.brokerageProductUid;
 
+      if (brokerageProductUid) {
+        await loadComplanceWorkflows({ product_uid: [brokerageProductUid] });
+      }
+
       await getAccounts();
-      await loadComplanceWorkflows({ product_uid: [brokerageProductUid] });
     })();
 
     return () => clearTimeout(accountTimeout);
