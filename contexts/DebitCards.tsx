@@ -12,6 +12,12 @@ export type DebitCardsContextProps = {
   unlockDebitCard: (uid: string) => Promise<DebitCard[]>;
   reissueDebitCard: (uid: string, reason: string) => Promise<DebitCard[]>;
   createDebitCard: (pool_uid: string) => Promise<DebitCard[]>;
+  activateDebitCard: (
+    uid: string,
+    cardLastFourDigits: string,
+    cvv: string,
+    expiryDate: string
+  ) => Promise<DebitCard[]>;
   loadPinSetToken: (uid: string) => Promise<string>;
 };
 
@@ -24,6 +30,7 @@ export const DebitCardsContext = React.createContext<DebitCardsContextProps>({
   unlockDebitCard: () => Promise.resolve([]),
   reissueDebitCard: () => Promise.resolve([]),
   createDebitCard: () => Promise.resolve([]),
+  activateDebitCard: () => Promise.resolve([]),
   loadPinSetToken: () => Promise.resolve([]),
 });
 
@@ -108,6 +115,31 @@ export class DebitCardsProvider extends React.Component<
     }
   };
 
+  activateDebitCard = async (
+    uid: string,
+    cardLastFourDigits: string,
+    cvv: string,
+    expiryDate: string
+  ): Promise<DebitCard[]> => {
+    this.setState({ isLoading: true });
+
+    try {
+      await DebitCardService.activateDebitCard(
+        this.context.accessToken,
+        uid,
+        cardLastFourDigits,
+        cvv,
+        expiryDate
+      );
+      const response = await this.refetchDebitCards();
+      return response;
+    } catch (err) {
+      return { success: false, error: err };
+    } finally {
+      this.setState({ isLoading: false });
+    }
+  };
+
   loadPinSetToken = async (uid: string): Promise<string> => {
     const response = await DebitCardService.getPinSetToken(this.context.accessToken, uid);
     this.setState({ pinSetToken: response.pin_change_token });
@@ -129,6 +161,7 @@ export class DebitCardsProvider extends React.Component<
           reissueDebitCard: this.reissueDebitCard,
           createDebitCard: this.createDebitCard,
           loadPinSetToken: this.loadPinSetToken,
+          activateDebitCard: this.activateDebitCard,
         }}
       >
         {this.props.children}

@@ -42,6 +42,7 @@ import {
   SignupScreen,
   SetPasswordScreen,
   DebitCardScreen,
+  DebitCardActivationScreen,
   StatementScreen,
   AgreementScreen,
   LockedScreen,
@@ -180,6 +181,7 @@ function MainStackScreen() {
               <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
               <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
               <Stack.Screen name="DebitCard" component={DebitCardScreen} />
+              <Stack.Screen name="DebitCardActivation" component={DebitCardActivationScreen} />
               <Stack.Screen name="PinSet" component={PinSetScreen} />
               <Stack.Screen name="Statements" component={StatementScreen} />
               <Stack.Screen name="Agreements" component={AgreementScreen} />
