@@ -9,6 +9,12 @@ import { AuthContextProps } from '../contexts/Auth';
 import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 import CustomerService from '../services/CustomerService';
 
+interface IComplanceWorkflowQuery {
+  product_uid?: string[];
+  in_progress?: boolean;
+  limit?: number;
+  offset?: number;
+}
 export type ComplianceDocumentSelection = ComplianceDocument & {
   selected?: boolean;
   alreadyAccepted: boolean;
@@ -16,6 +22,7 @@ export type ComplianceDocumentSelection = ComplianceDocument & {
 
 export type ComplianceWorkflowContextProps = {
   complianceWorkflow?: ComplianceWorkflow;
+  customerWorkflows?: ComplianceWorkflow[];
   agreements: ComplianceDocumentSelection[];
   disclosures: ComplianceDocumentSelection[];
   bankingDisclosures: ComplianceDocumentSelection[];
@@ -23,10 +30,12 @@ export type ComplianceWorkflowContextProps = {
   setDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
   setBankingDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
   loadAgreements: () => Promise<void>;
+  loadComplanceWorkflows: (query: IComplanceWorkflowQuery) => Promise<void>;
 };
 
 export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowContextProps>({
   complianceWorkflow: undefined,
+  customerWorkflows: [],
   agreements: [],
   disclosures: [],
   bankingDisclosures: [],
@@ -35,6 +44,7 @@ export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowC
   setBankingDisclosures: () => Promise.resolve(),
   loadBankingDisclosures: () => Promise.resolve(),
   loadAgreements: () => Promise.resolve(),
+  loadComplanceWorkflows: () => Promise.resolve(),
 });
 
 export interface ComplianceWorkflowProviderProps {
@@ -45,6 +55,7 @@ export interface ComplianceWorkflowProviderProps {
 
 export type ComplianceWorkflowProviderState = {
   complianceWorkflow?: ComplianceWorkflow;
+  customerWorkflows?: ComplianceWorkflow[];
   agreements: ComplianceDocumentSelection[];
   disclosures: ComplianceDocumentSelection[];
   bankingDisclosures: ComplianceDocumentSelection[];
@@ -52,6 +63,7 @@ export type ComplianceWorkflowProviderState = {
 
 const initialState = {
   complianceWorkflow: undefined,
+  customerWorkflows: [],
   agreements: [],
   disclosures: [],
   bankingDisclosures: [],
@@ -100,6 +112,19 @@ export class ComplianceWorkflowProvider extends React.Component<
       );
       this.setState({ agreements });
       return { data: agreements };
+    } catch (err) {
+      return { data: err };
+    }
+  };
+
+  loadComplanceWorkflows = async (query: any = {}): Promise<void> => {
+    try {
+      const { data: customerWorkflows } = await ComplianceWorkflowService.getCustomerWorkflows(
+        this.props.auth.accessToken,
+        query
+      );
+      this.setState({ customerWorkflows });
+      return { data: customerWorkflows };
     } catch (err) {
       return { data: err };
     }
@@ -251,12 +276,14 @@ export class ComplianceWorkflowProvider extends React.Component<
   };
 
   render(): JSX.Element {
-    const { complianceWorkflow, disclosures, agreements, bankingDisclosures } = this.state;
+    const { complianceWorkflow, customerWorkflows, disclosures, agreements, bankingDisclosures } =
+      this.state;
 
     return (
       <ComplianceWorkflowContext.Provider
         value={{
           complianceWorkflow: complianceWorkflow,
+          customerWorkflows: customerWorkflows,
           disclosures: disclosures,
           agreements: agreements,
           bankingDisclosures: bankingDisclosures,
@@ -266,6 +293,7 @@ export class ComplianceWorkflowProvider extends React.Component<
           setBankingDisclosures: this.setBankingDisclosures,
           loadBankingDisclosures: this.loadBankingDisclosures,
           loadAgreements: this.loadAgreements,
+          loadComplanceWorkflows: this.loadComplanceWorkflows,
         }}
       >
         {this.props.children}

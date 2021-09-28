@@ -56,6 +56,7 @@ export default {
       sentryDsn: process.env.SENTRY_DSN,
       rizeEnv: process.env.RIZE_ENV,
       defaultProductUid: process.env.DEFAULT_PRODUCT_UID,
+      brokerageProductUid: process.env.BROKERAGE_PRODUCT_UID,
       debitCardServiceUrl: process.env.DEBIT_CARD_SERVICE_URL,
     },
   },

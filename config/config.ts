@@ -9,6 +9,7 @@ export type Config = {
     sentryDsn: string;
     rizeEnv: string;
     defaultProductUid: string;
+    brokerageProductUid: string;
     debitCardServiceUrl: string;
   };
 };
