@@ -124,7 +124,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
     const result = await register(values.email, values.password);
 
     if (!result.success) {
-      setCommonError('Unable to register user.');
+      setCommonError(`Unable to register user. ${result.message || ''}`);
     } else {
       if (!result.data.accessToken) {
         navigation.navigate('Login', {

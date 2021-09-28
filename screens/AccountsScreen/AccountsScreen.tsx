@@ -31,6 +31,8 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
   const [disabled, setDisabled] = useState(true);
   const { accessToken } = useAuth();
 
+  let accountTimeout;
+
   const onPressAccountName = (account: SyntheticAccount): void => {
     navigation.navigate('AccountDetails', {
       accountUid: account.uid,
@@ -43,6 +45,8 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
     (async () => {
       await getAccounts();
     })();
+
+    return () => clearTimeout(accountTimeout);
   }, []);
 
   useEffect(() => {
@@ -106,7 +110,7 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
       return;
     }
 
-    setTimeout(() => {
+    accountTimeout = setTimeout(() => {
       refreshAccountsPeriodically();
     }, 5000);
   };

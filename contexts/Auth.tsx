@@ -147,6 +147,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     } catch (err) {
       return {
         success: false,
+        message: err.data.message,
       };
     }
   };

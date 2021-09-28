@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Switch, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, View, Switch, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Screen, Input, Button, Dropdown } from '../components';
 import { Heading3, Heading5, Body } from '../components/Typography';
@@ -60,6 +60,7 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
   const [reissueReason, setReissueReason] = useState();
   const [reissueComment, setReissueComment] = useState();
   const canBeActivated = ['card_replacement_shipped', 'shipped'].includes(activeCard?.status);
+  const canSetPin = ['usable_without_pin', 'normal'].includes(activeCard?.status);
 
   useEffect(() => {
     refetchDebitCards();
@@ -73,6 +74,7 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
   useEffect(() => {
     if (wasActivated) {
       setAlert({ text: 'Card has been activated.', success: true });
+      refetchDebitCards();
     }
   }, [wasActivated]);
 
@@ -299,14 +301,17 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
                   />
                   <Body fontWeight="bold">{`Card is ${isLocked ? 'Locked' : 'Unlocked'}`}</Body>
                 </View>
-                <View style={styles.container}>
-                  <Button title="Set Pin" onPress={handlePinSet} />
-                </View>
               </>
             )}
             {canBeActivated && (
               <View style={styles.activateContainer}>
                 <Button title="Activate Card" onPress={handleCardActivation} />
+              </View>
+            )}
+
+            {canSetPin && (
+              <View style={styles.container}>
+                <Button title="Set Pin" onPress={handlePinSet} />
               </View>
             )}
             {isCardActive && (
