@@ -15,7 +15,7 @@ interface PinSetScreenProps {
 }
 
 export default function PinSetScreen({ navigation, route }: PinSetScreenProps): JSX.Element {
-  const { pinSetToken, loadPinSetToken } = useDebitCards();
+  const { pinSetToken, loadPinSetToken, refetchDebitCards } = useDebitCards();
   const [debitCardUid] = useState(route.params?.debitCardUid);
 
   useEffect(() => {
@@ -24,11 +24,14 @@ export default function PinSetScreen({ navigation, route }: PinSetScreenProps): 
 
   useEffect(() => {
     navigation.setOptions({
-      headerLeft: () => (
-        <TextLink onPress={() => navigation.navigate('DebitCard')}>&lt; Debit·Card</TextLink>
-      ),
+      headerLeft: () => <TextLink onPress={handleBackButton}>&lt; Debit·Card</TextLink>,
     });
   }, []);
+
+  const handleBackButton = () => {
+    refetchDebitCards();
+    navigation.navigate('DebitCard');
+  };
 
   const styles = StyleSheet.create({
     heading: {

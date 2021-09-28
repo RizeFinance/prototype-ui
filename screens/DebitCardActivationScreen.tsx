@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Formik, FormikHelpers } from 'formik';
+import { Formik } from 'formik';
 import { Button, Input, Screen, TextLink } from '../components';
 import { Body, Heading3 } from '../components/Typography';
 import DebitCardService from '../services/DebitCardService';
@@ -26,7 +26,6 @@ export default function DebitCardActivationScreen({
 }: DebitCardActivationScreenProps): JSX.Element {
   const { accessToken } = useAuth();
 
-  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
   const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
   const debitCardUid = route.params?.debitCardUid;
   const styles = StyleSheet.create({
@@ -85,7 +84,6 @@ export default function DebitCardActivationScreen({
 
   const onSubmit = async (values: DebitCardActivationFields): Promise<void> => {
     setShowFailedMessage(false);
-    setShowSuccessMessage(false);
     try {
       await DebitCardService.activateDebitCard(
         accessToken,
@@ -119,8 +117,6 @@ export default function DebitCardActivationScreen({
           handleChange,
           handleBlur,
           handleSubmit,
-          setFieldValue,
-          setFieldTouched,
           values,
           errors,
           isValid,

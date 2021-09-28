@@ -29,6 +29,7 @@
     "no-console": ["warn", { "allow": ["error"] }],
     "no-async-promise-executor": "off",
     "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/no-var-requires": 0,
     "react/display-name": "off",
     "react/prop-types": "off"
