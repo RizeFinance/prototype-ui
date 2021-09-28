@@ -59,10 +59,7 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
   const wasActivated = route.params?.activated;
   const [reissueReason, setReissueReason] = useState();
   const [reissueComment, setReissueComment] = useState();
-  const canBeActivated = [
-    'card_replacement_shipped, card_replacement_shipment_returned',
-    'usable_without_pin',
-  ].includes(activeCard?.status);
+  const canBeActivated = ['card_replacement_shipped', 'shipped'].includes(activeCard?.status);
 
   useEffect(() => {
     refetchDebitCards();
