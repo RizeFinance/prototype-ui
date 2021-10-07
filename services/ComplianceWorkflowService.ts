@@ -1,6 +1,22 @@
 import { ComplianceWorkflow } from '@rizefinance/rize-js/types/lib/core/compliance-workflow';
 import { ComplianceDocumentAcknowledgementRequest, RizeList } from '../models';
+import toQueryString from '../utils/toQueryString';
 import api from '../utils/api';
+
+interface IQuery {
+  product_uid: string[];
+  in_progress: boolean;
+  limit: number;
+  offset: number;
+}
+
+const getCustomerWorkflows = async (accessToken: string, query: IQuery): Promise<any> => {
+  return await api
+    .get(`/compliance_workflows${toQueryString(query)}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => response.data);
+};
 
 const viewLatestWorkflow = async (accessToken: string): Promise<any> => {
   return await api
@@ -43,6 +59,7 @@ const getComplianceWorkflows = async (
 };
 
 export default {
+  getCustomerWorkflows,
   viewLatestWorkflow,
   acknowledgeDocuments,
   renewWorkflow,

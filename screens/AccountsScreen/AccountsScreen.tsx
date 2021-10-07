@@ -5,6 +5,7 @@ import { Screen, Button } from '../../components';
 import { Body, Heading3, Heading4 } from '../../components/Typography';
 import { RootStackParamList } from '../../types';
 import { useAccounts } from '../../contexts/Accounts';
+import { useComplianceWorkflow } from '../../contexts/ComplianceWorkflow';
 import { SyntheticAccount } from '../../models';
 import TextLink from '../../components/TextLink';
 import utils from '../../utils/utils';
@@ -12,7 +13,9 @@ import AddAccountModal from '../../modals/AddAccountModal';
 import styles from './styles';
 import { useAuth } from '../../contexts/Auth';
 import AccountService from '../../services/AccountService';
+import config from '../../config/config';
 import { isEmpty } from 'lodash';
+
 interface AccountsScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'Accounts'>;
 }
@@ -22,6 +25,7 @@ type AccountInfoProps = {
 };
 
 export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX.Element {
+  const { loadComplanceWorkflows } = useComplianceWorkflow();
   const { liabilityAccounts, refetchAccounts } = useAccounts();
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState('');
@@ -43,6 +47,12 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
 
   useEffect(() => {
     (async () => {
+      const brokerageProductUid = config.application.brokerageProductUid;
+
+      if (brokerageProductUid) {
+        await loadComplanceWorkflows({ product_uid: [brokerageProductUid] });
+      }
+
       await getAccounts();
     })();
 
