@@ -127,8 +127,9 @@ export class ComplianceWorkflowProvider extends React.Component<
       );
       const ourAgreements = workflows.data.map((workflow, i) => {
         return {
-          productName: customerProducts[i].product_name,
-          agreements: workflow.accepted_documents,
+          productName:
+            customerProducts && customerProducts[i] ? customerProducts[i].product_name : '',
+          agreements: workflow ? workflow.accepted_documents : [],
         };
       }) as ProductAgreements[];
       this.setState({ productAgreements: ourAgreements });
