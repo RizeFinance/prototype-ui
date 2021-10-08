@@ -12,7 +12,7 @@ interface AgreementInfoProps {
 }
 
 export default function AgreementScreen(): JSX.Element {
-  const { agreements, loadAgreements } = useComplianceWorkflow();
+  const { productAgreements, loadAgreements } = useComplianceWorkflow();
 
   useEffect(() => {
     loadAgreements();
@@ -61,11 +61,18 @@ export default function AgreementScreen(): JSX.Element {
         Agreements
       </Heading3>
 
-      {!isEmpty(agreements) && (
+      {!isEmpty(productAgreements) && (
         <View style={styles.container}>
-          {agreements.map((agreement, i) => (
-            <AgreementInfo key={i} agreement={agreement} />
-          ))}
+          {productAgreements.map((productAgreement) => {
+            return (
+              <>
+                <Heading4 textAlign="center">{productAgreement.productName}</Heading4>
+                {productAgreement.agreements.map((agreement, i) => {
+                  return <AgreementInfo key={i} agreement={agreement} />;
+                })}
+              </>
+            );
+          })}
         </View>
       )}
     </Screen>

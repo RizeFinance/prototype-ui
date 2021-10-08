@@ -1,4 +1,4 @@
-import { Customer, CustomerDetails } from '../models';
+import { RizeList, Customer, CustomerDetails, CustomerProduct } from '../models';
 import api from '../utils/api';
 
 const getCustomer = async (accessToken: string): Promise<Customer> => {
@@ -23,6 +23,17 @@ const createCustomerProduct = async (
     .then((response) => response.data);
 };
 
+const getCustomerProducts = async (
+  accessToken: string,
+  customerUid: string
+): Promise<RizeList<CustomerProduct>> => {
+  return await api
+    .get(`/customer/customer_products?customer_uid[]=${customerUid}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => response.data);
+};
+
 const updateCustomer = async (
   accessToken: string,
   customerEmail: string,
@@ -44,6 +55,7 @@ const updateCustomer = async (
 
 export default {
   getCustomer,
+  getCustomerProducts,
   updateCustomer,
   createCustomerProduct,
 };

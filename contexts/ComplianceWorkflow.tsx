@@ -1,6 +1,6 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ComplianceWorkflow } from '@rizefinance/rize-js/types/lib/core/compliance-workflow';
-import { Customer } from '@rizefinance/rize-js/types/lib/core/customer';
+import { Customer } from '../models';
 import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 import React, { useContext } from 'react';
 import { RootStackParamList } from '../types';
@@ -20,28 +20,36 @@ export type ComplianceDocumentSelection = ComplianceDocument & {
   alreadyAccepted: boolean;
 };
 
+export interface ProductAgreements {
+  productName: string;
+  agreements: ComplianceDocumentSelection[];
+}
+
 export type ComplianceWorkflowContextProps = {
   complianceWorkflow?: ComplianceWorkflow;
+  productAgreements: ProductAgreements[];
   customerWorkflows?: ComplianceWorkflow[];
-  agreements: ComplianceDocumentSelection[];
   disclosures: ComplianceDocumentSelection[];
   bankingDisclosures: ComplianceDocumentSelection[];
   setComplianceWorkflow: (complianceWorkflow: ComplianceWorkflow) => Promise<void>;
   setDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
   setBankingDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
+  evaluateCurrentStep: () => Promise<void>;
+  loadBankingDisclosures: () => Promise<void>;
   loadAgreements: () => Promise<void>;
   loadComplanceWorkflows: (query: IComplanceWorkflowQuery) => Promise<void>;
 };
 
 export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowContextProps>({
   complianceWorkflow: undefined,
+  productAgreements: [],
   customerWorkflows: [],
-  agreements: [],
   disclosures: [],
   bankingDisclosures: [],
   setComplianceWorkflow: () => Promise.resolve(),
   setDisclosures: () => Promise.resolve(),
   setBankingDisclosures: () => Promise.resolve(),
+  evaluateCurrentStep: () => Promise.resolve(),
   loadBankingDisclosures: () => Promise.resolve(),
   loadAgreements: () => Promise.resolve(),
   loadComplanceWorkflows: () => Promise.resolve(),
@@ -55,16 +63,16 @@ export interface ComplianceWorkflowProviderProps {
 
 export type ComplianceWorkflowProviderState = {
   complianceWorkflow?: ComplianceWorkflow;
+  productAgreements: ProductAgreements[];
   customerWorkflows?: ComplianceWorkflow[];
-  agreements: ComplianceDocumentSelection[];
   disclosures: ComplianceDocumentSelection[];
   bankingDisclosures: ComplianceDocumentSelection[];
 };
 
 const initialState = {
   complianceWorkflow: undefined,
+  productAgreements: [],
   customerWorkflows: [],
-  agreements: [],
   disclosures: [],
   bankingDisclosures: [],
 };
@@ -75,10 +83,8 @@ export class ComplianceWorkflowProvider extends React.Component<
 > {
   static contextType = AuthContext;
   context: React.ContextType<typeof AuthContext>;
-
   constructor(props: ComplianceWorkflowProviderProps) {
     super(props);
-
     this.state = initialState;
   }
 
@@ -106,14 +112,32 @@ export class ComplianceWorkflowProvider extends React.Component<
   };
 
   loadAgreements = async (): Promise<void> => {
+    const customer = this.context.customer;
+    this.setState((prevState) => {
+      return { ...prevState, loadingAgreements: true };
+    });
     try {
-      const { accepted_documents: agreements } = await ComplianceWorkflowService.viewLatestWorkflow(
-        this.props.auth.accessToken
+      const { data: customerProducts } = await CustomerService.getCustomerProducts(
+        this.props.auth.accessToken,
+        customer.uid
       );
-      this.setState({ agreements });
-      return { data: agreements };
+      const workflows = await ComplianceWorkflowService.getComplianceWorkflows(
+        this.props.auth.accessToken,
+        customer.uid
+      );
+      const ourAgreements = workflows.data.map((workflow, i) => {
+        return {
+          productName: customerProducts[i].product_name,
+          agreements: workflow.accepted_documents,
+        };
+      }) as ProductAgreements[];
+      this.setState({ productAgreements: ourAgreements });
     } catch (err) {
-      return { data: err };
+      throw new Error(err);
+    } finally {
+      this.setState((prevState) => {
+        return { ...prevState, loadingAgreements: false };
+      });
     }
   };
 
@@ -276,8 +300,13 @@ export class ComplianceWorkflowProvider extends React.Component<
   };
 
   render(): JSX.Element {
-    const { complianceWorkflow, customerWorkflows, disclosures, agreements, bankingDisclosures } =
-      this.state;
+    const {
+      complianceWorkflow,
+      customerWorkflows,
+      disclosures,
+      productAgreements,
+      bankingDisclosures,
+    } = this.state;
 
     return (
       <ComplianceWorkflowContext.Provider
@@ -285,7 +314,7 @@ export class ComplianceWorkflowProvider extends React.Component<
           complianceWorkflow: complianceWorkflow,
           customerWorkflows: customerWorkflows,
           disclosures: disclosures,
-          agreements: agreements,
+          productAgreements: productAgreements,
           bankingDisclosures: bankingDisclosures,
           evaluateCurrentStep: this.evaluateCurrentStep,
           setComplianceWorkflow: this.setComplianceWorkflow,
