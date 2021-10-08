@@ -66,7 +66,9 @@ export default function AgreementScreen(): JSX.Element {
           {productAgreements.map((productAgreement) => {
             return (
               <>
-                <Heading4 textAlign="center">{productAgreement.productName}</Heading4>
+                {productAgreement.productName && (
+                  <Heading4 textAlign="center">{productAgreement.productName}</Heading4>
+                )}
                 {productAgreement.agreements.map((agreement, i) => {
                   return <AgreementInfo key={i} agreement={agreement} />;
                 })}
