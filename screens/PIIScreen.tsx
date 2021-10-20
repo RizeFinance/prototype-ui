@@ -33,16 +33,16 @@ function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
       if (updatedCustomer && updatedCustomer?.details?.first_name) {
         const details = updatedCustomer.details;
 
-        setFieldValue('firstName', details.first_name ?? '');
-        setFieldValue('middleName', details.middle_name ?? '');
-        setFieldValue('lastName', details.last_name ?? '');
+        setFieldValue('first_name', details.first_name ?? '');
+        setFieldValue('middle_name', details.middle_name ?? '');
+        setFieldValue('last_name', details.last_name ?? '');
         setFieldValue('suffix', details.suffix ?? '');
         setFieldValue('dob', details.dob ? new Date(details.dob) : undefined);
-        setFieldValue('address1', details.address.street1 ?? '');
-        setFieldValue('address2', details.address.street2 ?? '');
+        setFieldValue('street1', details.address.street1 ?? '');
+        setFieldValue('street2', details.address.street2 ?? '');
         setFieldValue('city', details.address.city ?? '');
         setFieldValue('state', details.address.state ?? '');
-        setFieldValue('zip', details.address.postal_code ?? '');
+        setFieldValue('postal_code', details.address.postal_code ?? '');
         setFieldValue('phone', details.phone ? phoneFormatter.apply(details.phone) : '');
       }
     });
@@ -67,16 +67,16 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
   });
 
   const initialValues: PIIScreenFields = {
-    firstName: '',
-    middleName: '',
-    lastName: '',
+    first_name: '',
+    middle_name: '',
+    last_name: '',
     suffix: '',
     dob: undefined,
-    address1: '',
-    address2: '',
+    street1: '',
+    street2: '',
     city: '',
     state: '',
-    zip: '',
+    postal_code: '',
     phone: '',
     ssn: '',
   };
@@ -85,15 +85,15 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
   maxDob.setFullYear(maxDob.getFullYear() - 18);
 
   const piiSchema = Yup.object().shape({
-    firstName: Yup.string().required('First Name is required.'),
-    lastName: Yup.string().required('Last Name is required.'),
+    first_name: Yup.string().required('First Name is required.'),
+    last_name: Yup.string().required('Last Name is required.'),
     dob: Yup.date()
       .required('Date of Birth is required.')
       .max(maxDob, 'You should be at least 18 years old.'),
-    address1: Yup.string().required('Address is required.'),
+    street1: Yup.string().required('Address is required.'),
     city: Yup.string().required('City is required.'),
     state: Yup.string().required('State is required.'),
-    zip: Yup.string()
+    postal_code: Yup.string()
       .required('Zip Code is required.')
       .min(5, 'Invalid Zip Code.')
       .max(5, 'Invalid Zip Code.')
@@ -142,28 +142,28 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
               <Input
                 label="First Name"
                 placeholder="First Name"
-                onChangeText={handleChange('firstName')}
-                onBlur={handleBlur('firstName')}
-                value={values.firstName}
-                errorText={!touched.firstName ? '' : errors.firstName}
+                onChangeText={handleChange('first_name')}
+                onBlur={handleBlur('first_name')}
+                value={values.first_name}
+                errorText={!touched.first_name ? '' : errors.first_name}
                 editable={!isSubmitting}
               />
               <Input
                 label="Middle Name (optional)"
                 placeholder="Middle Name"
-                onChangeText={handleChange('middleName')}
-                onBlur={handleBlur('middleName')}
-                value={values.middleName}
-                errorText={!touched.middleName ? '' : errors.middleName}
+                onChangeText={handleChange('middle_name')}
+                onBlur={handleBlur('middle_name')}
+                value={values.middle_name}
+                errorText={!touched.middle_name ? '' : errors.middle_name}
                 editable={!isSubmitting}
               />
               <Input
                 label="Last Name"
                 placeholder="Last Name"
-                onChangeText={handleChange('lastName')}
-                onBlur={handleBlur('lastName')}
-                value={values.lastName}
-                errorText={!touched.lastName ? '' : errors.lastName}
+                onChangeText={handleChange('last_name')}
+                onBlur={handleBlur('last_name')}
+                value={values.last_name}
+                errorText={!touched.last_name ? '' : errors.last_name}
                 editable={!isSubmitting}
               />
               <Input
@@ -206,18 +206,18 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
               <Input
                 label="Physical Address"
                 placeholder="Address"
-                onChangeText={handleChange('address1')}
-                onBlur={handleBlur('address1')}
-                value={values.address1}
-                errorText={!touched.address1 ? '' : errors.address1}
+                onChangeText={handleChange('street1')}
+                onBlur={handleBlur('street1')}
+                value={values.street1}
+                errorText={!touched.street1 ? '' : errors.street1}
                 editable={!isSubmitting}
               />
               <Input
                 placeholder="Apt, Unit, ETC"
-                onChangeText={handleChange('address2')}
-                onBlur={handleBlur('address2')}
-                value={values.address2}
-                errorText={!touched.address2 ? '' : errors.address2}
+                onChangeText={handleChange('street2')}
+                onBlur={handleBlur('street2')}
+                value={values.street2}
+                errorText={!touched.street2 ? '' : errors.street2}
                 editable={!isSubmitting}
               />
               <Input
@@ -239,10 +239,10 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
 
               <Input
                 placeholder="Zip Code"
-                onChangeText={handleChange('zip')}
-                onBlur={handleBlur('zip')}
-                value={values.zip}
-                errorText={!touched.zip ? '' : errors.zip}
+                onChangeText={handleChange('postal_code')}
+                onBlur={handleBlur('postal_code')}
+                value={values.postal_code}
+                errorText={!touched.postal_code ? '' : errors.postal_code}
                 editable={!isSubmitting}
                 maxLength={5}
                 keyboardType="number-pad"
