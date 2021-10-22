@@ -107,9 +107,11 @@ export default function ConfirmPIIScreen({
         }}
         disabled={isSubmitting}
       >
-        <Body textAlign="center" fontWeight="semibold" style={styles.editButton}>
-          &#60; Edit Information
-        </Body>
+        {productType === ProductType.Checking && (
+          <Body textAlign="center" fontWeight="semibold" style={styles.editButton}>
+            &#60; Edit Information
+          </Body>
+        )}
       </Pressable>
       <Button
         title="Confirm Information"
