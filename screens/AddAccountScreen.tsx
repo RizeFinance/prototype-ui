@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik } from 'formik';
 import { View, StyleSheet } from 'react-native';
-import { Screen, Input, Dropdown, Button } from '../components';
+import { Screen, Input, Dropdown, Button, TextLink } from '../components';
 import { Body } from '../components/Typography';
 import { RootStackParamList } from '../types';
 import * as Yup from 'yup';
@@ -44,6 +44,10 @@ export default function AddAccountScreen({ navigation }: AddAccountScreenProps):
     });
     navigation.navigate('Accounts');
   };
+
+  navigation.setOptions({
+    headerLeft: () => <TextLink onPress={() => navigation.goBack()}>&lt; Accounts</TextLink>,
+  });
 
   const types = accountTypes.map((type) => {
     return { label: capitalize(type.name), value: type.uid };
