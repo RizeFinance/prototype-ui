@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { SyntheticAccount } from '../models';
+import { SyntheticAccount, SyntheticAccountType } from '../models';
 import AccountsService from '../services/AccountService';
 import { AuthContext } from './Auth';
 import _ from 'lodash';
@@ -15,6 +15,7 @@ export type AccountsContextProps = {
   isLoading: boolean;
   liabilityAccounts?: SyntheticAccount[];
   externalAccounts?: SyntheticAccount[];
+  accountTypes?: SyntheticAccountType[];
   poolUids?: string[];
   linkToken?: string;
   refetchAccounts: () => Promise<IAccountAPIResponse>;
@@ -25,6 +26,7 @@ export const AccountsContext = React.createContext<AccountsContextProps>({
   isLoading: false,
   liabilityAccounts: [],
   externalAccounts: [],
+  accountTypes: [],
   poolUids: [],
   refetchAccounts: () => Promise.resolve([]),
   fetchLinkToken: () => Promise.resolve(),
@@ -34,6 +36,7 @@ export type AccountsProviderState = {
   isLoading: boolean;
   liabilityAccounts?: SyntheticAccount[];
   externalAccounts?: SyntheticAccount[];
+  accountTypes?: SyntheticAccountType[];
   poolUids?: string[];
   linkToken?: string;
 };
@@ -42,6 +45,7 @@ const initialState = {
   isLoading: false,
   liabilityAccounts: [],
   externalAccounts: [],
+  accountTypes: [],
   poolUids: [],
   linkToken: null,
 };
@@ -68,6 +72,8 @@ export class AccountsProvider extends React.Component<
 
     try {
       const accountList = await AccountsService.getSyntheticAccounts(this.context.accessToken);
+      const typesPromise = await AccountsService.getSyntheticAccountTypes(this.context.accessToken);
+      const accountTypes = typesPromise.data;
       const nonArchivedAccounts = accountList.data.filter((x) => x.status !== 'archived');
       const sortedAccounts = nonArchivedAccounts.sort(
         (a, b) => new Date(a.opened_at).getTime() - new Date(b.opened_at).getTime()
@@ -78,7 +84,7 @@ export class AccountsProvider extends React.Component<
       );
       const poolUids = _.uniq(sortedAccounts.map((x) => x.pool_uid));
 
-      this.setState({ liabilityAccounts, externalAccounts, poolUids });
+      this.setState({ liabilityAccounts, externalAccounts, accountTypes, poolUids });
 
       return accountList;
     } finally {
@@ -101,7 +107,8 @@ export class AccountsProvider extends React.Component<
   };
 
   render(): JSX.Element {
-    const { isLoading, liabilityAccounts, externalAccounts, poolUids, linkToken } = this.state;
+    const { isLoading, liabilityAccounts, externalAccounts, accountTypes, poolUids, linkToken } =
+      this.state;
 
     return (
       <AccountsContext.Provider
@@ -109,6 +116,7 @@ export class AccountsProvider extends React.Component<
           isLoading: isLoading,
           liabilityAccounts: liabilityAccounts,
           externalAccounts: externalAccounts,
+          accountTypes: accountTypes,
           poolUids: poolUids,
           linkToken: linkToken,
           refetchAccounts: this.refetchAccounts,

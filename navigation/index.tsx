@@ -26,6 +26,7 @@ import { RootStackParamList } from '../types';
 import {
   AccountDetailsScreen,
   AccountsScreen,
+  AddAccountScreen,
   ApplicationUnapprovedScreen,
   BankingDisclosuresScreen,
   ConfirmPIIScreen,
@@ -177,6 +178,7 @@ function MainStackScreen() {
           ) : (
             <Stack.Navigator screenOptions={screenOptions.withHeader}>
               <Stack.Screen name="Accounts" component={AccountsScreen} />
+              <Stack.Screen name="AddAccount" component={AddAccountScreen} />
               <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
               <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
               <Stack.Screen name="InitTransfer" component={InitTransferScreen} />

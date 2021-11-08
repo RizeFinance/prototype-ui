@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Button, Input } from '../components';
+import { Button, Input, Dropdown } from '../components';
 import Modal from '../modals/Modal';
 
 interface IAddAccountModal {
@@ -20,10 +20,25 @@ const AddAccountModal = ({
   handleSubmit,
   disabled,
 }: IAddAccountModal): JSX.Element => {
+  const accountTypes = [
+    { label: 'Checking', value: 'checking' },
+    { label: 'Target Yield Brokerage', value: 'targetYieldBrokerage' },
+  ];
+
   return (
     <Modal isVisible={visible}>
       <View style={{ flex: 1 }}>
-        <Input label="Account Name" autoCapitalize={'none'} onChangeText={setName} value={name} />
+        <Dropdown
+          label="Type Of Account"
+          placeholder="Select Type Of Account"
+          items={accountTypes}
+        />
+        <Input
+          label="Name Your New Account"
+          autoCapitalize={'none'}
+          onChangeText={setName}
+          value={name}
+        />
       </View>
       <View>
         <Button title="Submit" onPress={handleSubmit} disabled={disabled} />

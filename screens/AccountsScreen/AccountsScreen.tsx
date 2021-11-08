@@ -9,10 +9,7 @@ import { useComplianceWorkflow } from '../../contexts/ComplianceWorkflow';
 import { SyntheticAccount } from '../../models';
 import TextLink from '../../components/TextLink';
 import utils from '../../utils/utils';
-import AddAccountModal from '../../modals/AddAccountModal';
 import styles from './styles';
-import { useAuth } from '../../contexts/Auth';
-import AccountService from '../../services/AccountService';
 import config from '../../config/config';
 import { isEmpty } from 'lodash';
 
@@ -27,13 +24,9 @@ type AccountInfoProps = {
 export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX.Element {
   const { loadComplanceWorkflows } = useComplianceWorkflow();
   const { liabilityAccounts, refetchAccounts } = useAccounts();
-  const [showModal, setShowModal] = useState(false);
-  const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [showFailedMessage, setShowFailedMessage] = useState(false);
-  const [disabled, setDisabled] = useState(true);
-  const { accessToken } = useAuth();
+  const [showSuccessMessage] = useState(false);
+  const [showFailedMessage] = useState(false);
 
   let accountTimeout;
 
@@ -41,6 +34,10 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
     navigation.navigate('AccountDetails', {
       accountUid: account.uid,
     });
+  };
+
+  const onPressOpenAccount = (): void => {
+    navigation.navigate('AddAccount');
   };
 
   const getAccounts = async () => await refetchAccounts();
@@ -58,14 +55,6 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
 
     return () => clearTimeout(accountTimeout);
   }, []);
-
-  useEffect(() => {
-    if (name.trim().length > 0) {
-      setDisabled(false);
-    } else {
-      setDisabled(true);
-    }
-  }, [name]);
 
   useEffect(() => {
     navigation.addListener('focus', getAccounts);
@@ -91,27 +80,6 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
     );
   };
 
-  const createAccount = async () => {
-    const syntheticAccountTypeUid = liabilityAccounts[0].synthetic_account_type_uid;
-    const poolUid = liabilityAccounts[0].pool_uid;
-
-    try {
-      await AccountService.createSyntheticAccount({
-        accessToken,
-        name,
-        syntheticAccountTypeUid,
-        poolUid,
-      });
-      setShowModal(false);
-      setShowSuccessMessage(true);
-      refreshAccountsPeriodically();
-    } catch (e) {
-      setShowFailedMessage(true);
-      setIsLoading(false);
-      throw e;
-    }
-  };
-
   const refreshAccountsPeriodically = async (): Promise<void> => {
     const { data: accounts } = await refetchAccounts();
     const readyAccounts = accounts.filter((account) => account.liability);
@@ -121,6 +89,7 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
     }
 
     accountTimeout = setTimeout(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       refreshAccountsPeriodically();
     }, 5000);
   };
@@ -176,21 +145,12 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
             </Heading3>
           </View>
         )}
-
-        <AddAccountModal
-          disabled={disabled}
-          handleSubmit={createAccount}
-          name={name}
-          setName={setName}
-          visible={showModal}
-          setShowModal={setShowModal}
-        />
       </Screen>
       <View style={styles.btnContainer}>
         <Button
           style={styles.button}
-          title="Add Additional Account"
-          onPress={() => setShowModal(true)}
+          title="Open Additional Account"
+          onPress={() => onPressOpenAccount()}
         />
       </View>
     </>

@@ -46,7 +46,10 @@ export type RootStackParamList = {
   ApplicationUnapproved: ApplicationUnapprovedParams;
   PDFReader: PDFReaderParams;
   Accounts: undefined;
+  AddAccount: undefined;
   AccountDetails: AccountDetailsParams;
+  DebitCardActivation: undefined;
+  PinSet: undefined;
   ExternalAccount: undefined;
   InitTransfer: undefined;
   Menu: undefined;
