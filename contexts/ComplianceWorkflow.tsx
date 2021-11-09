@@ -8,6 +8,9 @@ import { AuthContext } from './Auth';
 import { AuthContextProps } from '../contexts/Auth';
 import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 import CustomerService from '../services/CustomerService';
+import ProductService from '../services/ProductService';
+import config from '../config/config';
+import { find } from 'lodash';
 
 interface IComplanceWorkflowQuery {
   product_uid?: string[];
@@ -15,6 +18,12 @@ interface IComplanceWorkflowQuery {
   limit?: number;
   offset?: number;
 }
+
+export enum ProductType {
+  Checking = 'checking',
+  Brokerage = 'brokerage',
+}
+
 export type ComplianceDocumentSelection = ComplianceDocument & {
   selected?: boolean;
   alreadyAccepted: boolean;
@@ -37,7 +46,8 @@ export type ComplianceWorkflowContextProps = {
   evaluateCurrentStep: () => Promise<void>;
   loadBankingDisclosures: () => Promise<void>;
   loadAgreements: () => Promise<void>;
-  loadComplanceWorkflows: (query: IComplanceWorkflowQuery) => Promise<void>;
+  loadComplianceWorkflows: (query: IComplanceWorkflowQuery) => Promise<void>;
+  createComplianceWorkflow: (product_uid: string) => Promise<void>;
 };
 
 export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowContextProps>({
@@ -52,7 +62,8 @@ export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowC
   evaluateCurrentStep: () => Promise.resolve(),
   loadBankingDisclosures: () => Promise.resolve(),
   loadAgreements: () => Promise.resolve(),
-  loadComplanceWorkflows: () => Promise.resolve(),
+  loadComplianceWorkflows: () => Promise.resolve(),
+  createComplianceWorkflow: () => Promise.resolve(),
 });
 
 export interface ComplianceWorkflowProviderProps {
@@ -94,6 +105,11 @@ export class ComplianceWorkflowProvider extends React.Component<
 
   evaluateCurrentStep = async (): Promise<void> => {
     const customer = this.context.customer;
+    const workflow = this.state.complianceWorkflow;
+
+    if (customer?.status === 'active' && workflow) {
+      await this.redirectToProductStep(workflow, customer);
+    }
 
     if (customer?.status === 'initiated') {
       // Get the latest workflow of the customer
@@ -142,7 +158,7 @@ export class ComplianceWorkflowProvider extends React.Component<
     }
   };
 
-  loadComplanceWorkflows = async (query: any = {}): Promise<void> => {
+  loadComplianceWorkflows = async (query: any = {}): Promise<void> => {
     try {
       const { data: customerWorkflows } = await ComplianceWorkflowService.getCustomerWorkflows(
         this.props.auth.accessToken,
@@ -212,6 +228,37 @@ export class ComplianceWorkflowProvider extends React.Component<
     await this.promisedSetState({ bankingDisclosures: allDisclosures });
   };
 
+  redirectToProductStep = async (): Promise<void> => {
+    const brokerageProductUid = config.application.brokerageProductUid;
+    const navigation = this.props.navigation;
+
+    let currentScreen: keyof RootStackParamList = 'ProfileQuestions';
+    const routeParams = {
+      productType: ProductType.Brokerage,
+      productId: brokerageProductUid,
+    };
+
+    const { data: products } = await ProductService.getProducts(this.props.auth.accessToken);
+
+    const brokerageProduct = find(products, { uid: brokerageProductUid });
+
+    if (brokerageProduct.profile_requirements.length >= 1) {
+      currentScreen = 'ProfileQuestions';
+    }
+
+    const steps: (keyof RootStackParamList)[] = ['ProfileQuestions', 'BrokerageDisclosures'];
+
+    if (currentScreen && steps.includes(currentScreen)) {
+      for (const step of steps) {
+        navigation.navigate(step, routeParams);
+
+        if (step === currentScreen) {
+          break;
+        }
+      }
+    }
+  };
+
   redirectToCurrentStep = async (
     workflow: ComplianceWorkflow,
     customer: Customer
@@ -221,6 +268,7 @@ export class ComplianceWorkflowProvider extends React.Component<
     await this.loadDisclosures();
 
     let currentScreen: keyof RootStackParamList = 'Disclosures';
+    let routeParams = {};
 
     if (workflow.summary.current_step === 1) {
       currentScreen = 'Disclosures';
@@ -242,22 +290,38 @@ export class ComplianceWorkflowProvider extends React.Component<
       }
     }
 
+    if (customer.status === 'active') {
+      currentScreen = 'ConfirmPII';
+      routeParams = { hasChanged: false };
+    }
+
     const steps: (keyof RootStackParamList)[] = [
       'Disclosures',
       'PatriotAct',
       'PII',
       'BankingDisclosures',
+      'ConfirmPII',
     ];
 
     if (currentScreen && steps.includes(currentScreen)) {
       for (const step of steps) {
-        navigation.navigate(step);
+        navigation.navigate(step, routeParams);
 
         if (step === currentScreen) {
           break;
         }
       }
     }
+  };
+
+  createComplianceWorkflow = async (productUid: string): Promise<ComplianceWorkflow> => {
+    const newComplianceWorkflow = await ComplianceWorkflowService.createWorkflow(
+      this.props.auth.accessToken,
+      productUid
+    );
+
+    await this.setComplianceWorkflow(newComplianceWorkflow);
+    return newComplianceWorkflow;
   };
 
   renewComplianceWorkflow = async (): Promise<void> => {
@@ -323,7 +387,8 @@ export class ComplianceWorkflowProvider extends React.Component<
           setBankingDisclosures: this.setBankingDisclosures,
           loadBankingDisclosures: this.loadBankingDisclosures,
           loadAgreements: this.loadAgreements,
-          loadComplanceWorkflows: this.loadComplanceWorkflows,
+          loadComplianceWorkflows: this.loadComplianceWorkflows,
+          createComplianceWorkflow: this.createComplianceWorkflow,
         }}
       >
         {this.props.children}

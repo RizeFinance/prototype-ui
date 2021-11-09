@@ -12,6 +12,7 @@ export type CheckboxProps = {
 const defaultStyles = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    marginBottom: 20,
   },
   pressable: {
     display: 'flex',
@@ -43,7 +44,7 @@ const Checkbox = (props: PropsWithChildren<CheckboxProps>): JSX.Element => {
   const renderChildren = (props: PropsWithChildren<CheckboxProps>): JSX.Element => {
     return (
       <>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginLeft: 10 }}>
           {typeof props.children === 'string' ? <Body>{props.children}</Body> : props.children}
         </View>
       </>

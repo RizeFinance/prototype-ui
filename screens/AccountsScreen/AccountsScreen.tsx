@@ -5,12 +5,14 @@ import { Screen, Button } from '../../components';
 import { Body, Heading3, Heading4 } from '../../components/Typography';
 import { RootStackParamList } from '../../types';
 import { useAccounts } from '../../contexts/Accounts';
-import { useComplianceWorkflow } from '../../contexts/ComplianceWorkflow';
 import { SyntheticAccount } from '../../models';
 import TextLink from '../../components/TextLink';
 import utils from '../../utils/utils';
 import styles from './styles';
 import config from '../../config/config';
+import { useAuth } from '../../contexts/Auth';
+import AccountService from '../../services/AccountService';
+import BrokerageOnboardingButton from './BrokerageOnboardingButton';
 import { isEmpty } from 'lodash';
 
 interface AccountsScreenProps {
@@ -22,7 +24,6 @@ type AccountInfoProps = {
 };
 
 export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX.Element {
-  const { loadComplanceWorkflows } = useComplianceWorkflow();
   const { liabilityAccounts, refetchAccounts } = useAccounts();
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessMessage] = useState(false);
@@ -43,24 +44,17 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
   const getAccounts = async () => await refetchAccounts();
 
   useEffect(() => {
-    (async () => {
-      const brokerageProductUid = config.application.brokerageProductUid;
-
-      if (brokerageProductUid) {
-        await loadComplanceWorkflows({ product_uid: [brokerageProductUid] });
-      }
-
-      await getAccounts();
-    })();
-
+    refreshAccountsPeriodically();
     return () => clearTimeout(accountTimeout);
   }, []);
 
   useEffect(() => {
-    navigation.addListener('focus', getAccounts);
-
-    return () => removeEventListener('focus', getAccounts);
-  }, [navigation]);
+    if (name.trim().length > 0) {
+      setDisabled(false);
+    } else {
+      setDisabled(true);
+    }
+  }, [name]);
 
   const AccountInfo = ({ account }: AccountInfoProps): JSX.Element => {
     return (
@@ -147,6 +141,7 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
         )}
       </Screen>
       <View style={styles.btnContainer}>
+        <BrokerageOnboardingButton navigation={navigation} />
         <Button
           style={styles.button}
           title="Open Additional Account"
