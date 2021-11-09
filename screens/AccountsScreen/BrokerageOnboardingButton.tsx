@@ -61,7 +61,12 @@ const BrokerageOnboardingButton = (): JSX.Element => {
     },
   });
 
-  if ((existingBrokerageAccount && existingBrokerageProduct) || !brokerageProductUid) return null;
+  if (
+    existingBrokerageAccount ||
+    (existingBrokerageAccount && existingBrokerageProduct) ||
+    !brokerageProductUid
+  )
+    return null;
 
   return (
     <Button
