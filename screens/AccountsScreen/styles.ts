@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
   },
   button: {
     maxWidth: 500,
+    marginBottom: 25,
   },
   connectStatusMessage: {
     marginVertical: 8,

@@ -5,7 +5,6 @@ import { Screen, Button } from '../../components';
 import { Body, Heading3, Heading4 } from '../../components/Typography';
 import { RootStackParamList } from '../../types';
 import { useAccounts } from '../../contexts/Accounts';
-import { useComplianceWorkflow } from '../../contexts/ComplianceWorkflow';
 import { SyntheticAccount } from '../../models';
 import TextLink from '../../components/TextLink';
 import utils from '../../utils/utils';
@@ -13,7 +12,7 @@ import AddAccountModal from '../../modals/AddAccountModal';
 import styles from './styles';
 import { useAuth } from '../../contexts/Auth';
 import AccountService from '../../services/AccountService';
-import config from '../../config/config';
+import BrokerageOnboardingButton from './BrokerageOnboardingButton';
 import { isEmpty } from 'lodash';
 
 interface AccountsScreenProps {
@@ -25,7 +24,6 @@ type AccountInfoProps = {
 };
 
 export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX.Element {
-  const { loadComplanceWorkflows } = useComplianceWorkflow();
   const { liabilityAccounts, refetchAccounts } = useAccounts();
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState('');
@@ -43,19 +41,8 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
     });
   };
 
-  const getAccounts = async () => await refetchAccounts();
-
   useEffect(() => {
-    (async () => {
-      const brokerageProductUid = config.application.brokerageProductUid;
-
-      if (brokerageProductUid) {
-        await loadComplanceWorkflows({ product_uid: [brokerageProductUid] });
-      }
-
-      await getAccounts();
-    })();
-
+    refreshAccountsPeriodically();
     return () => clearTimeout(accountTimeout);
   }, []);
 
@@ -66,12 +53,6 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
       setDisabled(true);
     }
   }, [name]);
-
-  useEffect(() => {
-    navigation.addListener('focus', getAccounts);
-
-    return () => removeEventListener('focus', getAccounts);
-  }, [navigation]);
 
   const AccountInfo = ({ account }: AccountInfoProps): JSX.Element => {
     return (
@@ -187,6 +168,7 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
         />
       </Screen>
       <View style={styles.btnContainer}>
+        <BrokerageOnboardingButton navigation={navigation} />
         <Button
           style={styles.button}
           title="Add Additional Account"

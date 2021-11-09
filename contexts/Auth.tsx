@@ -15,6 +15,7 @@ export type AuthContextProps = {
   setPassword: (username: string, oldPassword: string, newPassword: string) => Promise<any>;
   refreshCustomer: () => Promise<Customer>;
   customer?: Customer;
+  customerProducts?: any;
   setCustomer: React.Dispatch<React.SetStateAction<Customer>>;
 };
 
@@ -29,6 +30,7 @@ export const AuthContext = createContext<AuthContextProps>({
   setPassword: () => Promise.resolve(null),
   refreshCustomer: () => Promise.resolve(null),
   customer: undefined,
+  customerProducts: [],
   setCustomer: () => null,
 });
 
@@ -37,6 +39,7 @@ export type AuthProviderState = {
   refreshToken?: string;
   userName?: string;
   customer?: Customer;
+  customerProducts?: any;
 };
 
 const initialState = {
@@ -44,6 +47,7 @@ const initialState = {
   refreshToken: '',
   userName: '',
   customer: undefined,
+  customerProducts: [],
 };
 
 export interface AuthProviderProps {
@@ -51,12 +55,7 @@ export interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps => {
-  const [authData, setAuthData] = useState<AuthProviderState>({
-    accessToken: '',
-    refreshToken: '',
-    userName: '',
-    customer: undefined,
-  });
+  const [authData, setAuthData] = useState<AuthProviderState>(initialState);
 
   useEffect(() => {
     const getTokens = async () => {
@@ -65,10 +64,16 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
 
         if (accessToken) {
           const customer = await CustomerService.getCustomer(accessToken);
+          const { data: customerProducts } = await CustomerService.getCustomerProducts(
+            accessToken,
+            customer.uid
+          );
+
           setAuthData({
             accessToken,
             refreshToken,
             customer,
+            customerProducts,
           });
         }
       } catch (err) {
@@ -192,11 +197,16 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     }
 
     const customer = await CustomerService.getCustomer(authData.accessToken);
+    const { data: customerProducts } = await CustomerService.getCustomerProducts(
+      authData.accessToken,
+      customer.uid
+    );
 
     if (customer) {
       setAuthData((authData) => ({
         ...authData,
         customer,
+        customerProducts,
       }));
     }
   };
@@ -208,7 +218,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     }));
   };
 
-  const { accessToken, refreshToken, userName, customer } = authData;
+  const { accessToken, refreshToken, userName, customer, customerProducts } = authData;
 
   const value = useMemo(
     () => ({
@@ -221,6 +231,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       setPassword,
       logout,
       customer,
+      customerProducts,
       refreshCustomer,
       setCustomer,
     }),
@@ -234,6 +245,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       setPassword,
       logout,
       customer,
+      customerProducts,
       refreshCustomer,
       setCustomer,
     ]

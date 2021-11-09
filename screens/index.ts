@@ -21,3 +21,6 @@ export { default as StatementScreen } from './StatementScreen';
 export { default as AgreementScreen } from './AgreementScreen';
 export { default as LockedScreen } from './LockedScreen';
 export { default as PinSetScreen } from './DebitCard/PinSetScreen';
+export { default as ProfileQuestionsScreen } from './ProductOnboarding/ProfileQuestionsScreen';
+export { default as BrokerageDisclosuresScreen } from './ProductOnboarding/BrokerageDisclosuresScreen';
+export { default as ProcessingScreen } from './ProductOnboarding/ProcessingScreen';

@@ -18,6 +18,8 @@ export default {
           Disclosures: 'disclosures',
           PatriotAct: 'patriot-act',
           PII: 'pii',
+          BrokerageDisclosures: 'brokerage-disclosures',
+          ProfileQuestions: 'profile-questions',
           DebitCard: 'debit-card',
           PinSet: 'pin-set',
           Statements: 'statements',

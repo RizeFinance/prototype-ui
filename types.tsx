@@ -7,16 +7,16 @@ export type ApplicationUnapprovedParams = {
 };
 
 export type PIIFields = {
-  firstName: string;
-  middleName: string;
-  lastName: string;
+  first_name: string;
+  middle_name: string;
+  last_name: string;
   suffix: string;
   dob: string;
-  address1: string;
-  address2: string;
+  street1: string;
+  street2: string;
   city: string;
   state: string;
-  zip: string;
+  postal_code: string;
   phone: string;
   ssn: string;
 };

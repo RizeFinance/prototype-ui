@@ -53,9 +53,34 @@ const updateCustomer = async (
     });
 };
 
+const updateCustomerProfileAnswers = async (
+  accessToken: string,
+  answers: Record<string, unknown>
+): Promise<Customer> => {
+  return await api
+    .post(
+      '/customer/batch_profile_answers',
+      { answers },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    )
+    .then((response) => {
+      return response.data;
+    });
+};
+
+const verifyCustomer = async (accessToken: string): Promise<Customer> => {
+  return await api
+    .put('/customer/verify', {}, { headers: { Authorization: `Bearer ${accessToken}` } })
+    .then((response) => {
+      return response.data;
+    });
+};
+
 export default {
   getCustomer,
+  verifyCustomer,
   getCustomerProducts,
-  updateCustomer,
   createCustomerProduct,
+  updateCustomer,
+  updateCustomerProfileAnswers,
 };

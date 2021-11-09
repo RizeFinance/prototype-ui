@@ -47,6 +47,9 @@ import {
   AgreementScreen,
   LockedScreen,
   PinSetScreen,
+  ProfileQuestionsScreen,
+  BrokerageDisclosuresScreen,
+  ProcessingScreen,
 } from '../screens';
 
 // Contexts
@@ -185,6 +188,14 @@ function MainStackScreen() {
               <Stack.Screen name="PinSet" component={PinSetScreen} />
               <Stack.Screen name="Statements" component={StatementScreen} />
               <Stack.Screen name="Agreements" component={AgreementScreen} />
+
+              {/* Product Onboarding */}
+              <Stack.Screen name="PII" component={PIIScreen} />
+              <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
+              <Stack.Screen name="ProfileQuestions" component={ProfileQuestionsScreen} />
+              <Stack.Screen name="BrokerageDisclosures" component={BrokerageDisclosuresScreen} />
+              <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} />
+              <Stack.Screen name="ProcessingScreen" component={ProcessingScreen} />
             </Stack.Navigator>
           )}
         </ComplianceWorkflowProvider>
