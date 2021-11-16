@@ -38,7 +38,7 @@ export type AuthProviderState = {
   accessToken?: string;
   refreshToken?: string;
   userName?: string;
-  customer?: Customer;
+  customer: Customer;
   customerProducts?: any;
 };
 
@@ -94,7 +94,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     setAuthData((initialState) => ({ ...initialState, userName }));
 
     try {
-      const { data } = await AuthService.authorize(userName, password);
+      const response = await AuthService.authorize(userName, password);
+      const { data } = response;
 
       if (data && data.accessToken) {
         const customer = await CustomerService.getCustomer(data.accessToken);
@@ -116,7 +117,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
         storeData({ storageKey: '@tokens', data: tokens });
       }
 
-      return { data };
+      return response;
     } catch (err) {
       if (err.status === 403) {
         return {
@@ -174,7 +175,6 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
   ): Promise<any> => {
     try {
       const result = await AuthService.setPassword(username, oldPassword, newPassword);
-
       if (result.success && result.data.accessToken) {
         setAuthData((initialState) => ({
           ...initialState,
@@ -185,9 +185,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
 
       return result;
     } catch (err) {
-      return {
-        success: false,
-      };
+      return err;
     }
   };
 
@@ -211,8 +209,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     }
   };
 
-  const setCustomer = () => {
-    setAuthData((authData) => ({
+  const setCustomer = async (customer: Customer) => {
+    await setAuthData((authData) => ({
       ...authData,
       customer,
     }));
