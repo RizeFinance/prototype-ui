@@ -6,9 +6,11 @@ import { Formik } from 'formik';
 import validator from 'validator';
 import { RootStackParamList } from '../types';
 import CustomerService from '../services/CustomerService';
+import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useThemeColor } from '../components/Themed';
 import { useAuth } from '../contexts/Auth';
+import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 
 const logo = require('../assets/images/logo.png');
 
@@ -24,6 +26,7 @@ interface SetPasswordFields {
 
 export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps): JSX.Element {
   const { setCustomer, ...auth } = useAuth();
+  const { setComplianceWorkflow, evaluateCurrentStep } = useComplianceWorkflow();
 
   const [message, setMesage] = useState<string>('');
 
@@ -79,16 +82,24 @@ export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps
   const onSubmit = async (values: SetPasswordFields): Promise<void> => {
     setMesage('');
     const { username, oldPassword, newPassword } = values;
-    const result = await auth.setPassword(username, oldPassword, newPassword);
 
-    if (result.success) {
-      setMesage('Success! Redirecting you to admin');
+    try {
+      const result = await auth.setPassword(username, oldPassword, newPassword);
 
-      const customer = await CustomerService.getCustomer(result.data.accessToken);
+      if (result.success) {
+        const customer = await CustomerService.getCustomer(result.data.accessToken);
+        const workflow = await ComplianceWorkflowService.viewLatestWorkflow(
+          result.data.accessToken
+        );
 
-      await setCustomer(customer);
-    } else {
-      setMesage('Failed reset password.');
+        await setCustomer(customer);
+        await setComplianceWorkflow(workflow);
+        await evaluateCurrentStep();
+      } else {
+        setMesage('Failed reset password.');
+      }
+    } catch (err) {
+      setMesage('Something went wrong! Try again later.');
     }
   };
 
