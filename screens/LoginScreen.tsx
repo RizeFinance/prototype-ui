@@ -102,16 +102,21 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
 
   const onSubmit = async (values: LoginFields): Promise<void> => {
     setCommonError('');
-    const authData = await auth.login(values.email, values.password);
 
-    if ('success' in authData && !authData.success) {
-      setCommonError(authData.message);
-      return;
-    }
+    try {
+      const authData = await auth.login(values.email, values.password);
 
-    if (authData.data.require_new_password) {
-      navigation.navigate('SetPassword');
-      return;
+      if (!authData.success) {
+        setCommonError(authData.message);
+        return;
+      }
+
+      if (authData.data.require_new_password) {
+        navigation.navigate('SetPassword');
+        return;
+      }
+    } catch (err) {
+      setCommonError('Something went wrong! Try again later');
     }
   };
 
