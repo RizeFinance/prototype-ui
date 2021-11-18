@@ -28,17 +28,7 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
 
   const { liabilityAccounts, refetchAccounts } = useAccounts();
 
-  const displayStatus = [
-    'normal',
-    'queued',
-    'shipped',
-    'printing_physical_card',
-    'card_replacement_shipped',
-    'usable_without_pin',
-  ];
-  const activeCard = debitCards?.find(
-    (x) => displayStatus.includes(x.status) && isNil(x.closed_at)
-  );
+  const activeCard = debitCards?.find((x) => isNil(x.closed_at));
   const associatedAccount = liabilityAccounts.find(
     (x) => x.uid === activeCard?.synthetic_account_uid
   );
@@ -59,6 +49,9 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
   const wasActivated = route.params?.activated;
   const [reissueReason, setReissueReason] = useState();
   const [reissueComment, setReissueComment] = useState();
+  const unableToLock = ['closed', 'closed_by_administrator', 'lost', 'stolen', 'queued'].includes(
+    activeCard?.status
+  );
   const canBeActivated = ['card_replacement_shipped', 'shipped'].includes(activeCard?.status);
   const canSetPin = ['usable_without_pin', 'normal'].includes(activeCard?.status);
 
@@ -253,7 +246,9 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
                 Card Number
               </Body>
               <Heading5>
-                {!isCardActive ? 'Pending' : `**** **** **** ${activeCard.card_last_four_digit}`}
+                {!activeCard.card_last_four_digit
+                  ? 'Pending'
+                  : `**** **** **** ${activeCard.card_last_four_digit}`}
               </Heading5>
             </View>
             <View style={styles.column}>
@@ -276,7 +271,7 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
                 Issued
               </Body>
               <Heading5>
-                {!isCardActive ? 'Pending' : utils.formatDate(activeCard.issued_on)}
+                {!activeCard.issued_on ? 'Pending' : utils.formatDate(activeCard.issued_on)}
               </Heading5>
             </View>
             <View style={styles.column}>
@@ -288,7 +283,7 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
           </View>
 
           <>
-            {isCardActive && (
+            {!unableToLock && (
               <>
                 <View style={styles.switchContainer}>
                   <Switch
@@ -303,6 +298,7 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
                 </View>
               </>
             )}
+
             {canBeActivated && (
               <View style={styles.activateContainer}>
                 <Button title="Activate Card" onPress={handleCardActivation} />
