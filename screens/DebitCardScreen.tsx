@@ -28,17 +28,7 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
 
   const { liabilityAccounts, refetchAccounts } = useAccounts();
 
-  const displayStatus = [
-    'normal',
-    'queued',
-    'shipped',
-    'printing_physical_card',
-    'card_replacement_shipped',
-    'usable_without_pin',
-  ];
-  const activeCard = debitCards?.find(
-    (x) => displayStatus.includes(x.status) && isNil(x.closed_at)
-  );
+  const activeCard = debitCards?.find((x) => isNil(x.closed_at));
   const associatedAccount = liabilityAccounts.find(
     (x) => x.uid === activeCard?.synthetic_account_uid
   );
