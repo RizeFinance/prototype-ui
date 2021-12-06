@@ -1,14 +1,15 @@
 import { Formik, useFormikContext } from 'formik';
 import React, { useEffect } from 'react';
 import { StyleSheet, View, Platform } from 'react-native';
-import { Button, DatePickerInput, Input, Screen } from '../components';
+import { Button, DatePickerInput, Input, Screen, Dropdown } from '../components';
 import { Heading3 } from '../components/Typography';
 import * as Yup from 'yup';
-import StringMask from 'string-mask';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { PIIFields, RootStackParamList } from '../types';
 import moment from 'moment';
+import states from '../constants/States';
 import { useAuth } from '../contexts/Auth';
+import formatStringByPattern from 'format-string-by-pattern';
 
 interface PIIScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'PII'>;
@@ -17,9 +18,6 @@ interface PIIScreenProps {
 type PIIScreenFields = Omit<PIIFields, 'dob'> & {
   dob?: Date;
 };
-
-const phoneFormatter = new StringMask('(000) 000-0000');
-const ssnFormatter = new StringMask('AAA-AA-AAAA');
 
 function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
   const { refreshCustomer } = useAuth();
@@ -43,7 +41,10 @@ function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
         setFieldValue('city', details.address.city ?? '');
         setFieldValue('state', details.address.state ?? '');
         setFieldValue('postal_code', details.address.postal_code ?? '');
-        setFieldValue('phone', details.phone ? phoneFormatter.apply(details.phone) : '');
+        setFieldValue(
+          'phone',
+          details.phone ? formatStringByPattern('(999) 999-9999', details.phone) : ''
+        );
       }
     });
 
@@ -89,7 +90,8 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
     last_name: Yup.string().required('Last Name is required.'),
     dob: Yup.date()
       .required('Date of Birth is required.')
-      .max(maxDob, 'You should be at least 18 years old.'),
+      .max(maxDob, 'You should be at least 18 years old.')
+      .typeError('You must enter a valid Date of Birth'),
     street1: Yup.string().required('Address is required.'),
     city: Yup.string().required('City is required.'),
     state: Yup.string().required('State is required.'),
@@ -182,7 +184,10 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                 <Input
                   label="Date of Birth"
                   placeholder="Month/Date/Year"
-                  onChangeText={handleChange('dob')}
+                  onChangeText={(e) => {
+                    const value = formatStringByPattern('MM/DD/YYYY', e);
+                    setFieldValue('dob', value);
+                  }}
                   onBlur={handleBlur('dob')}
                   value={values.dob}
                   errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
@@ -228,15 +233,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                 errorText={!touched.city ? '' : errors.city}
                 editable={!isSubmitting}
               />
-              <Input
-                placeholder="State"
-                onChangeText={handleChange('state')}
-                onBlur={handleBlur('state')}
-                value={values.state}
-                errorText={!touched.state ? '' : errors.state}
-                editable={!isSubmitting}
-              />
-
+              <Dropdown items={states} value={values.state} onChange={handleChange('state')} />
               <Input
                 placeholder="Zip Code"
                 onChangeText={handleChange('postal_code')}
@@ -254,8 +251,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                 label="Phone Number"
                 placeholder="(xxx) xxx-xxxx"
                 onChangeText={(e) => {
-                  let value = e.replace(/\D/g, '');
-                  value = phoneFormatter.apply(value);
+                  const value = formatStringByPattern('(999) 999-9999', e);
                   setFieldValue('phone', value);
                 }}
                 multiline={true}
@@ -273,8 +269,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                 label="Social Security Number"
                 placeholder="xxx-xx-xxxx"
                 onChangeText={(e) => {
-                  let value = e.replace(/[^A-Za-z0-9]+/g, '');
-                  value = ssnFormatter.apply(value);
+                  const value = formatStringByPattern('999-99-9999', e);
                   setFieldValue('ssn', value);
                 }}
                 multiline={true}
