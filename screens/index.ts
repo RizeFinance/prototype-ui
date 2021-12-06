@@ -7,7 +7,7 @@ export { default as DisclosuresScreen } from './DisclosuresScreen';
 export { default as ExternalAccountScreen } from './ExternalAccountScreen';
 export { default as ForgotPasswordScreen } from './ForgotPasswordScreen';
 export { default as InitTransferScreen } from './InitTransferScreen';
-export { default as LoginScreen } from './LoginScreen';
+export { default as LoginScreen } from './LoginScreen/LoginScreen';
 export { default as MenuScreen } from './MenuScreen';
 export { default as PatriotActScreen } from './PatriotActScreen';
 export { default as PDFReaderScreen } from './PDFReaderScreen';

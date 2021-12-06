@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { Formik } from 'formik';
 import validator from 'validator';
-import { useAuth } from '../contexts/Auth';
-import { Button, Input, Screen } from '../components';
-import { Body, BodySmall, Heading3 } from '../components/Typography';
-import { useThemeColor } from '../components/Themed';
-import CustomerService from '../services/CustomerService';
+import { useAuth } from '../../contexts/Auth';
+import { Button, Input, Screen, TextLink } from '../../components';
+import { BodySmall, Heading3 } from '../../components/Typography';
+import CustomerService from '../../services/CustomerService';
 import { RouteProp } from '@react-navigation/core';
-import { RootStackParamList } from '../types';
+import { RootStackParamList } from '../../types';
 import { StackNavigationProp } from '@react-navigation/stack';
-import config from '../config/config';
-import { removeValue } from '../utils/asyncStorage';
-
-const logo = require('../assets/images/logo.png');
+import config from '../../config/config';
+import { removeValue } from '../../utils/asyncStorage';
+import { styles } from './styles';
+const logo = require('../../assets/images/logo.png');
 
 interface LoginScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'Login'>;
@@ -36,39 +35,6 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
   };
 
   const allowSignup = config.application.allowSignup === 'true';
-  const primary = useThemeColor('primary');
-
-  const styles = StyleSheet.create({
-    logo: {
-      height: 200,
-      width: 200,
-      marginTop: -30,
-      marginBottom: -25,
-    },
-    message: {
-      marginTop: 4,
-    },
-    commonError: {
-      marginTop: 4,
-      marginBottom: -20,
-    },
-    inputContainer: {
-      marginTop: 35,
-      marginBottom: 30,
-    },
-    underline: {
-      marginTop: 20,
-      textDecorationLine: 'underline',
-      textDecorationColor: primary,
-      color: primary,
-    },
-    forgotAccount: {
-      textDecorationLine: 'underline',
-      textDecorationColor: primary,
-      color: primary,
-      marginTop: 20,
-    },
-  });
 
   const validateForm = (values: LoginFields): any => {
     const errors: any = {};
@@ -192,23 +158,23 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
               onPress={(): void => handleSubmit()}
             />
 
-            {allowSignup && (
-              <Pressable onPress={(): void => gotoSignupScreen()}>
-                <Body textAlign="center" fontWeight="semibold" style={styles.underline}>
+            <View style={styles.links}>
+              {allowSignup && (
+                <TextLink onPress={(): void => gotoSignupScreen()}>
                   I need to create an account
-                </Body>
-              </Pressable>
-            )}
-            <Pressable
-              onPress={(): void => {
-                onPressForgotPassword();
-              }}
-              disabled={isSubmitting}
-            >
-              <Body textAlign="center" fontWeight="semibold" style={styles.forgotAccount}>
+                </TextLink>
+              )}
+
+              <TextLink
+                onPress={(): void => {
+                  onPressForgotPassword();
+                }}
+                disabled={isSubmitting}
+                style={styles.forgotAccount}
+              >
                 Forgot password
-              </Body>
-            </Pressable>
+              </TextLink>
+            </View>
           </>
         )}
       </Formik>
