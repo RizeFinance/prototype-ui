@@ -233,7 +233,13 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                 errorText={!touched.city ? '' : errors.city}
                 editable={!isSubmitting}
               />
-              <Dropdown items={states} value={values.state} onChange={handleChange('state')} />
+              <Dropdown
+                items={states}
+                value={values.state}
+                placeholder="State"
+                onChange={handleChange('state')}
+                inputStyle={{ fontSize: 16 }}
+              />
               <Input
                 placeholder="Zip Code"
                 onChangeText={handleChange('postal_code')}
