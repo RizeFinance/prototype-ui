@@ -24,7 +24,6 @@ const Input = (props: InputProps): JSX.Element => {
       marginVertical: 4,
     },
     label: {
-      marginHorizontal: 8,
       marginBottom: 4,
     },
     textInput: {

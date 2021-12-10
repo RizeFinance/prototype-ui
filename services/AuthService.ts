@@ -18,7 +18,14 @@ const authorize = async (username: string, password: string): Promise<any> => {
 };
 
 const forgotPassword = async (email: string): Promise<any> => {
-  return await api.post('/auth/forgot_password', { email }).then((response) => response.data);
+  const { data } = await api.post('/auth/forgot_password', { email });
+
+  return data;
+};
+
+const confirmPassword = async (userData: IConfirmPW): Promise<any> => {
+  const { data } = await api.post('/auth/confirm_password', userData);
+  return data;
 };
 
 const setPassword = async (
@@ -36,4 +43,11 @@ export default {
   register,
   forgotPassword,
   setPassword,
+  confirmPassword,
 };
+
+export interface IConfirmPW {
+  email: string;
+  code: string;
+  password: string;
+}
