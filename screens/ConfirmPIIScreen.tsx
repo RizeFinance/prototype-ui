@@ -74,7 +74,12 @@ export default function ConfirmPIIScreen({
           navigation.navigate('BankingDisclosures');
         },
         (error) => {
-          setErrorText(error.message);
+          if (error[0]) {
+            const message = error[0].extra
+              ? `${error[0].detail}. ${error[0].extra},`
+              : `${error[0].detail}.`;
+            setErrorText(message);
+          }
         }
       );
     } finally {

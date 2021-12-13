@@ -183,7 +183,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
               {Platform.OS === 'web' ? (
                 <Input
                   label="Date of Birth"
-                  placeholder="Month/Date/Year"
+                  placeholder="MM/DD/YYYY"
                   onChangeText={(e) => {
                     const value = formatStringByPattern('MM/DD/YYYY', e);
                     setFieldValue('dob', value);
