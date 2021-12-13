@@ -12,6 +12,7 @@ web-build/
 .idea
 yarn-error.log
 .eslintcache
+.vscode
 
 # macOS
 .DS_Store
