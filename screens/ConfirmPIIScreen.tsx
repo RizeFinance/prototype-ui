@@ -23,13 +23,14 @@ export default function ConfirmPIIScreen({
   const { evaluateCurrentStep } = useComplianceWorkflow();
   const { accessToken, customer } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
+  const [errorText, setErrorText] = useState<string>('');
   const params = get(route, ['params', 'fieldValues'], {});
   const productType = get(route, ['params', 'productType'], ProductType.Checking);
   const data = { ...customer, ...params };
 
   const gray = useThemeColor('gray');
   const primary = useThemeColor('primary');
+  const error = useThemeColor('error');
 
   const styles = StyleSheet.create({
     editButton: {
@@ -68,9 +69,17 @@ export default function ConfirmPIIScreen({
           state: data.state,
           postal_code: data.postal_code,
         },
-      });
-
-      navigation.navigate('BankingDisclosures');
+      }).then(
+        () => {
+          navigation.navigate('BankingDisclosures');
+        },
+        (errors) => {
+          const errorString = errors.map((error) => {
+            return error.extra ? `${error.detail}. ${error.extra},` : `${error.detail}. `;
+          });
+          setErrorText(errorString);
+        }
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -121,6 +130,7 @@ export default function ConfirmPIIScreen({
           marginTop: 20,
         }}
       />
+      <Body style={{ color: error }}>{errorText}</Body>
     </Screen>
   );
 }

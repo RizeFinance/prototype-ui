@@ -50,6 +50,9 @@ const updateCustomer = async (
     )
     .then((response) => {
       return response.data;
+    })
+    .catch((error) => {
+      throw error.data.errors;
     });
 };
 
