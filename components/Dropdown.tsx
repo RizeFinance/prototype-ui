@@ -38,6 +38,10 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
   const defaultStyles = StyleSheet.create({
     container: {
       marginVertical: 4,
+      borderRadius: 4,
+      borderColor: border,
+      color: body,
+      fontSize: 16,
     },
     label: {
       marginHorizontal: 8,
@@ -50,6 +54,8 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
       borderWidth: 2,
       padding: 10,
       lineHeight: 20,
+      fontSize: 16,
+      paddingLeft: 6,
     },
     errorInput: {
       borderColor: error,
