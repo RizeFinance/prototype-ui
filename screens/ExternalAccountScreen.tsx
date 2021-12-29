@@ -6,7 +6,7 @@ import { useAccounts } from '../contexts/Accounts';
 import { SyntheticAccount } from '../models';
 import PlaidLink from '../components/PlaidLink';
 import { useAuth } from '../contexts/Auth';
-import AccountService from '../services/AccountService';
+import { AccountService } from '../services';
 import { useThemeColor } from '../components/Themed';
 import { capitalize, isEmpty } from 'lodash';
 

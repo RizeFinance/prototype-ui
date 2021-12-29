@@ -55,9 +55,4 @@ const getLinkToken = async (accessToken: string): Promise<string> => {
     .then((response) => response.data.link_token);
 };
 
-export default {
-  getSyntheticAccounts,
-  createSyntheticAccount,
-  getSyntheticAccountTypes,
-  getLinkToken,
-};
+export { getSyntheticAccounts, createSyntheticAccount, getSyntheticAccountTypes, getLinkToken };

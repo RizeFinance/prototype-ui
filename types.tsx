@@ -57,4 +57,10 @@ export type RootStackParamList = {
   Statements: undefined;
   Agreements: undefined;
   Main: any;
+  AccountsSetup: any;
+  DebitCardActivation: any;
+  PinSet: any;
+  ProfileQuestions: any;
+  BrokerageDisclosures: any;
+  ProcessingScreen: any;
 };

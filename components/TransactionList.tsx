@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { useAuth } from '../contexts/Auth';
 import { Transaction } from '../models';
 import TransactionService from '../services/TransactionService';
-import HorizontalLine from './HorizontalLine';
+import { HorizontalLine, Body } from '.';
 import TransactionListItem from './TransactionListItem';
 
 export type TransactionListProps = {
@@ -41,12 +41,18 @@ const TransactionList = (props: TransactionListProps): JSX.Element => {
 
   return (
     <>
-      {transactions.map((transaction, idx) => (
-        <View key={idx}>
-          <TransactionListItem transaction={transaction} />
-          <HorizontalLine style={styles.hr} />
-        </View>
-      ))}
+      {transactions.length < 1 ? (
+        <Body style={{ textAlign: 'center' }}>No Transactions Yet</Body>
+      ) : (
+        <>
+          {transactions.map((transaction, idx) => (
+            <View key={idx}>
+              <TransactionListItem transaction={transaction} />
+              <HorizontalLine style={styles.hr} />
+            </View>
+          ))}
+        </>
+      )}
     </>
   );
 };
