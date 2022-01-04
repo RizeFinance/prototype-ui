@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Screen, Button } from '../../components';
-import { Body, Heading3, Heading4 } from '../../components/Typography';
+import { Screen, Button, Body, Heading3, Heading4, TextLink } from '../../components';
 import { RootStackParamList } from '../../types';
 import { useAccounts } from '../../contexts/Accounts';
 import { SyntheticAccount } from '../../models';
-import TextLink from '../../components/TextLink';
 import utils from '../../utils/utils';
-import AddAccountModal from '../../modals/AddAccountModal';
 import styles from './styles';
-import { useAuth } from '../../contexts/Auth';
-import AccountService from '../../services/AccountService';
-import BrokerageOnboardingButton from './BrokerageOnboardingButton';
 import { isEmpty } from 'lodash';
 
 interface AccountsScreenProps {
@@ -25,13 +19,7 @@ type AccountInfoProps = {
 
 export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX.Element {
   const { liabilityAccounts, refetchAccounts } = useAccounts();
-  const [showModal, setShowModal] = useState(false);
-  const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [showFailedMessage, setShowFailedMessage] = useState(false);
-  const [disabled, setDisabled] = useState(true);
-  const { accessToken } = useAuth();
 
   let accountTimeout;
 
@@ -45,14 +33,6 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
     refreshAccountsPeriodically();
     return () => clearTimeout(accountTimeout);
   }, []);
-
-  useEffect(() => {
-    if (name.trim().length > 0) {
-      setDisabled(false);
-    } else {
-      setDisabled(true);
-    }
-  }, [name]);
 
   const AccountInfo = ({ account }: AccountInfoProps): JSX.Element => {
     return (
@@ -70,27 +50,6 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
         </Body>
       </View>
     );
-  };
-
-  const createAccount = async () => {
-    const syntheticAccountTypeUid = liabilityAccounts[0].synthetic_account_type_uid;
-    const poolUid = liabilityAccounts[0].pool_uid;
-
-    try {
-      await AccountService.createSyntheticAccount({
-        accessToken,
-        name,
-        syntheticAccountTypeUid,
-        poolUid,
-      });
-      setShowModal(false);
-      setShowSuccessMessage(true);
-      refreshAccountsPeriodically();
-    } catch (e) {
-      setShowFailedMessage(true);
-      setIsLoading(false);
-      throw e;
-    }
   };
 
   const refreshAccountsPeriodically = async (): Promise<void> => {
@@ -123,26 +82,7 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
         <Heading3 textAlign="center" style={styles.heading}>
           Accounts
         </Heading3>
-        {showSuccessMessage && (
-          <Body
-            color="success"
-            textAlign="center"
-            fontWeight="semibold"
-            style={styles.connectStatusMessage}
-          >
-            Account successfully connected.
-          </Body>
-        )}
-        {showFailedMessage && (
-          <Body
-            color="error"
-            textAlign="center"
-            fontWeight="semibold"
-            style={styles.connectStatusMessage}
-          >
-            Account failed to connect.
-          </Body>
-        )}
+
         {liabilityAccounts?.length > 0 ? (
           <>
             {liabilityAccounts.map((account, idx) => (
@@ -157,22 +97,12 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
             </Heading3>
           </View>
         )}
-
-        <AddAccountModal
-          disabled={disabled}
-          handleSubmit={createAccount}
-          name={name}
-          setName={setName}
-          visible={showModal}
-          setShowModal={setShowModal}
-        />
       </Screen>
       <View style={styles.btnContainer}>
-        <BrokerageOnboardingButton navigation={navigation} />
         <Button
           style={styles.button}
-          title="Add Additional Account"
-          onPress={() => setShowModal(true)}
+          title="Open Additional Account"
+          onPress={() => navigation.navigate('AccountsSetup')}
         />
       </View>
     </>

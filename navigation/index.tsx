@@ -50,6 +50,7 @@ import {
   ProfileQuestionsScreen,
   BrokerageDisclosuresScreen,
   ProcessingScreen,
+  AccountsSetupScreen,
 } from '../screens';
 
 // Contexts
@@ -180,6 +181,8 @@ function MainStackScreen() {
           ) : (
             <Stack.Navigator screenOptions={screenOptions.withHeader}>
               <Stack.Screen name="Accounts" component={AccountsScreen} />
+              <Stack.Screen name="AccountsSetup" component={AccountsSetupScreen} />
+
               <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
               <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
               <Stack.Screen name="InitTransfer" component={InitTransferScreen} />

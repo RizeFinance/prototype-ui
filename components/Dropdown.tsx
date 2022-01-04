@@ -56,6 +56,8 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
       lineHeight: 20,
       fontSize: 16,
       paddingLeft: 6,
+      borderStyle: 'solid',
+      backgroundColor: 'transparent',
     },
     errorInput: {
       borderColor: error,
@@ -96,7 +98,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
       <RNPickerSelect
         useNativeAndroidPickerStyle={false}
         onValueChange={(value, index): void => {
-          if (onChange) {
+          if (onChange && value) {
             onChange(value, index);
           }
         }}

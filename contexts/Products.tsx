@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Product } from '../models';
-import ProductService from '../services/ProductService';
+import { ProductService } from '../services';
 import { AuthContext } from './Auth';
 
 export type ProductsContextProps = {

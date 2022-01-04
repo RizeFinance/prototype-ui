@@ -1,9 +1,11 @@
 import { StyleSheet } from 'react-native';
+import { useThemeColor } from '../../components/Themed';
+
+const errorColor = useThemeColor('error');
 
 const styles = StyleSheet.create({
   heading: {
-    marginTop: 24,
-    marginBottom: 24,
+    marginVertical: 24,
   },
   loading: {
     marginTop: 25,
@@ -23,8 +25,12 @@ const styles = StyleSheet.create({
     maxWidth: 500,
     marginBottom: 25,
   },
-  connectStatusMessage: {
+  error: {
     marginVertical: 8,
+    color: errorColor,
+  },
+  marginBottom: {
+    marginBottom: 15,
   },
 });
 

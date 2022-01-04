@@ -8,7 +8,7 @@ import { AuthContext } from './Auth';
 import { AuthContextProps } from '../contexts/Auth';
 import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 import CustomerService from '../services/CustomerService';
-import ProductService from '../services/ProductService';
+import { ProductService } from '../services';
 import config from '../config/config';
 import { find } from 'lodash';
 
@@ -47,7 +47,7 @@ export type ComplianceWorkflowContextProps = {
   loadBankingDisclosures: () => Promise<void>;
   loadAgreements: () => Promise<void>;
   loadComplianceWorkflows: (query: IComplanceWorkflowQuery) => Promise<void>;
-  createComplianceWorkflow: (product_uid: string) => Promise<void>;
+  createComplianceWorkflow: (product_uid: string) => Promise<any>;
 };
 
 export const ComplianceWorkflowContext = React.createContext<ComplianceWorkflowContextProps>({

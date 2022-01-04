@@ -1,5 +1,12 @@
 import React from 'react';
-import { Pressable, PressableProps, StyleSheet, ViewStyle } from 'react-native';
+import {
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  ViewStyle,
+  ActivityIndicator,
+  View,
+} from 'react-native';
 import { useThemeColor } from './Themed';
 import { Body } from './Typography';
 
@@ -7,15 +14,16 @@ export type ButtonProps = Omit<PressableProps, 'style'> & {
   title: string;
   style?: ViewStyle;
   disabled?: boolean;
+  loading?: boolean;
 };
 
 const Button = (props: ButtonProps): JSX.Element => {
-  const { title, style, disabled, ...otherProps } = props;
+  const { title, style, disabled, loading = false, ...otherProps } = props;
 
   const primary = useThemeColor('primary');
   const primaryAccent = useThemeColor('primaryAccent');
 
-  const defaultStyles = StyleSheet.create({
+  const styles = StyleSheet.create({
     pressable: {
       backgroundColor: primary,
       borderRadius: 4,
@@ -31,17 +39,27 @@ const Button = (props: ButtonProps): JSX.Element => {
     pressableText: {
       color: primaryAccent,
     },
+    container: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+    },
+    spinner: {
+      marginRight: 10,
+    },
   });
 
   return (
     <Pressable
-      style={[defaultStyles.pressable, disabled && defaultStyles.pressableDisabled, style]}
+      style={[styles.pressable, disabled && styles.pressableDisabled, style]}
       disabled={disabled}
       {...otherProps}
     >
-      <Body style={defaultStyles.pressableText} textAlign="center" fontWeight="semibold">
-        {title}
-      </Body>
+      <View style={styles.container}>
+        {loading && <ActivityIndicator size="small" color="white" style={styles.spinner} />}
+        <Body style={styles.pressableText} textAlign="center" fontWeight="semibold">
+          {title}
+        </Body>
+      </View>
     </Pressable>
   );
 };

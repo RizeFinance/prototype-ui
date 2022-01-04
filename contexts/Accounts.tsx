@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { SyntheticAccount } from '../models';
-import AccountsService from '../services/AccountService';
+import { AccountService } from '../services';
 import { AuthContext } from './Auth';
 import _ from 'lodash';
 
@@ -67,7 +67,7 @@ export class AccountsProvider extends React.Component<
     this.setState({ isLoading: true });
 
     try {
-      const accountList = await AccountsService.getSyntheticAccounts(this.context.accessToken);
+      const accountList = await AccountService.getSyntheticAccounts(this.context.accessToken);
       const nonArchivedAccounts = accountList.data.filter((x) => x.status !== 'archived');
       const sortedAccounts = nonArchivedAccounts.sort(
         (a, b) => new Date(a.opened_at).getTime() - new Date(b.opened_at).getTime()
@@ -90,7 +90,7 @@ export class AccountsProvider extends React.Component<
     this.setState({ isLoading: true });
 
     try {
-      const linkToken = await AccountsService.getLinkToken(this.context.accessToken);
+      const linkToken = await AccountService.getLinkToken(this.context.accessToken);
 
       this.setState({ linkToken });
 
