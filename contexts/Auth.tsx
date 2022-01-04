@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState, createContext, useMemo } from 'react';
-import AuthService from '../services/AuthService';
+import AuthService, { IConfirmPW } from '../services/AuthService';
 import { storeData, getData, removeValue } from '../utils/asyncStorage';
 import CustomerService from '../services/CustomerService';
 import { Customer } from '../models';
@@ -12,6 +12,7 @@ export type AuthContextProps = {
   logout: () => void;
   register: (username: string, password: string) => Promise<any>;
   forgotPassword: (email: string) => Promise<any>;
+  confirmPassword: (data: IConfirmPW) => Promise<any>;
   setPassword: (username: string, oldPassword: string, newPassword: string) => Promise<any>;
   refreshCustomer: () => Promise<Customer>;
   customer?: Customer;
@@ -29,6 +30,7 @@ export const AuthContext = createContext<AuthContextProps>({
   forgotPassword: () => Promise.resolve(null),
   setPassword: () => Promise.resolve(null),
   refreshCustomer: () => Promise.resolve(null),
+  confirmPassword: () => Promise.resolve(null),
   customer: undefined,
   customerProducts: [],
   setCustomer: () => null,
@@ -51,7 +53,7 @@ const initialState = {
 };
 
 export interface AuthProviderProps {
-  children?: JSX.Element;
+  children?: React.ReactChildren[];
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps => {
@@ -160,11 +162,31 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
 
   const forgotPassword = async (email: string): Promise<any> => {
     try {
-      return await AuthService.forgotPassword(email);
+      const response = await AuthService.forgotPassword(email);
+      return {
+        ...response,
+        message: 'The password reset code has been sent to your email address.',
+      };
     } catch (err) {
+      if (err.status === 429) {
+        return {
+          success: false,
+          message: 'Too many attempts, please try again after some time',
+        };
+      }
       return {
         success: false,
+        message: 'Something went wrong. Please try again.',
       };
+    }
+  };
+
+  const confirmPassword = async (data: IConfirmPW): Promise<any> => {
+    try {
+      const response = await AuthService.confirmPassword(data);
+      return response;
+    } catch (err) {
+      return { success: false };
     }
   };
 
@@ -232,6 +254,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       customerProducts,
       refreshCustomer,
       setCustomer,
+      confirmPassword,
     }),
     [
       accessToken,
@@ -246,6 +269,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       customerProducts,
       refreshCustomer,
       setCustomer,
+      confirmPassword,
     ]
   );
 

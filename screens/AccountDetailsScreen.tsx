@@ -1,11 +1,17 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { HorizontalLine, Screen, TextLink, TransactionList } from '../components';
-import { Body, Heading3, Heading5 } from '../components/Typography';
+import {
+  HorizontalLine,
+  Screen,
+  TextLink,
+  TransactionList,
+  Body,
+  Heading3,
+  Heading5,
+} from '../components';
 import { RootStackParamList } from '../types';
-import { useAccounts } from '../contexts/Accounts';
-import { useDebitCards } from '../contexts/DebitCards';
+import { useAccounts, useDebitCards } from '../contexts';
 import { RouteProp } from '@react-navigation/core';
 import utils from '../utils/utils';
 import { find } from 'lodash';
@@ -83,7 +89,7 @@ export default function AccountsScreen({ navigation, route }: AccountsScreenProp
             <Body fontWeight="bold" style={styles.columnHeading}>
               Associated Debit Card
             </Body>
-            <Heading5>**** **** **** {associatedDebitCard.card_last_four_digit}</Heading5>
+            <Heading5>**** **** **** {associatedDebitCard.card_last_four_digits}</Heading5>
           </View>
         </View>
       )}

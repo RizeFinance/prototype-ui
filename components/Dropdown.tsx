@@ -38,6 +38,10 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
   const defaultStyles = StyleSheet.create({
     container: {
       marginVertical: 4,
+      borderRadius: 4,
+      borderColor: border,
+      color: body,
+      fontSize: 16,
     },
     label: {
       marginHorizontal: 8,
@@ -50,6 +54,10 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
       borderWidth: 2,
       padding: 10,
       lineHeight: 20,
+      fontSize: 16,
+      paddingLeft: 6,
+      borderStyle: 'solid',
+      backgroundColor: 'transparent',
     },
     errorInput: {
       borderColor: error,
@@ -90,7 +98,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
       <RNPickerSelect
         useNativeAndroidPickerStyle={false}
         onValueChange={(value, index): void => {
-          if (onChange) {
+          if (onChange && value) {
             onChange(value, index);
           }
         }}

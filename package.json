@@ -19,7 +19,7 @@
   "dependencies": {
     "@expo/vector-icons": "^12.0.0",
     "@react-native-async-storage/async-storage": "^1.15.7",
-    "@react-native-community/datetimepicker": "3.0.4",
+    "@react-native-community/datetimepicker": "^4.0.1",
     "@react-native-community/masked-view": "0.1.10",
     "@react-native-picker/picker": "1.9.2",
     "@react-navigation/bottom-tabs": "5.11.2",
@@ -27,6 +27,7 @@
     "@react-navigation/stack": "~5.12.8",
     "@rizefinance/rize-js": "^1.0.0-beta.2",
     "@types/jest": "^27.0.1",
+    "@xstate/react": "^1.6.3",
     "axios": "^0.21.2",
     "dotenv": "^8.2.0",
     "expo": "~40.0.0",
@@ -42,6 +43,7 @@
     "expo-status-bar": "~1.0.3",
     "expo-updates": "~0.4.1",
     "expo-web-browser": "~8.6.0",
+    "format-string-by-pattern": "^1.2.2",
     "formik": "^2.2.9",
     "lodash": "^4.17.21",
     "modal-enhanced-react-native-web": "^0.2.0",
@@ -59,12 +61,12 @@
     "react-native-webview": "^11.6.4",
     "react-plaid-link": "^3.1.0",
     "sentry-expo": "^4.0.1",
-    "string-mask": "^0.3.0",
     "validator": "^13.5.2",
+    "xstate": "^4.26.1",
     "yup": "^0.32.9"
   },
   "devDependencies": {
-    "@babel/core": "~7.9.0",
+    "@babel/core": "~7.16.5",
     "@types/lodash": "^4.14.168",
     "@types/moment": "^2.13.0",
     "@types/query-string": "^6.3.0",
@@ -85,7 +87,8 @@
     "prettier": "2.4.0",
     "pretty-quick": "^3.1.1",
     "react-native-svg-transformer": "^0.14.3",
-    "typescript": "~4.0.0"
+    "tsconfig-paths": "^3.12.0",
+    "typescript": "~4.5.4"
   },
   "private": true,
   "lint-staged": {

@@ -7,6 +7,4 @@ const getProducts = async (accessToken: string): Promise<RizeList<Product>> => {
     .then((response) => response.data);
 };
 
-export default {
-  getProducts,
-};
+export { getProducts };
