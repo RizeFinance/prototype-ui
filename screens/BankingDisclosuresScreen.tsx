@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Screen, Checkbox, Button } from '../components';
+import { Screen, Checkbox, Button, useThemeColor } from '../components';
 import { Heading3, Body, BodySmall } from '../components/Typography';
 import { View, Pressable, StyleSheet } from 'react-native';
-import { useThemeColor } from '../components/Themed';
 import { useNavigation } from '@react-navigation/native';
 import cloneDeep from 'lodash/cloneDeep';
 import { ComplianceDocumentSelection, useComplianceWorkflow } from '../contexts/ComplianceWorkflow';

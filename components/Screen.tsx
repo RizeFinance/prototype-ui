@@ -1,6 +1,6 @@
 import React from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
-import { useThemeColor } from './Themed';
+import { useThemeColor } from '../components';
 
 export type ScreenProps = View['props'] &
   ScrollView['props'] & {

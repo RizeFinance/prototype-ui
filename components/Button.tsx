@@ -4,10 +4,10 @@ import {
   PressableProps,
   StyleSheet,
   ViewStyle,
-  ActivityIndicator,
   View,
+  ActivityIndicator,
 } from 'react-native';
-import { useThemeColor } from './Themed';
+import { useThemeColor } from '../components';
 import { Body } from './Typography';
 
 export type ButtonProps = Omit<PressableProps, 'style'> & {

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
-import { Screen } from '../components';
+import { Screen, useThemeColor } from '../components';
 import { Body, Heading3, Heading5 } from '../components/Typography';
 import { useAccounts } from '../contexts/Accounts';
 import { SyntheticAccount } from '../models';
 import PlaidLink from '../components/PlaidLink';
 import { useAuth } from '../contexts/Auth';
 import { AccountService } from '../services';
-import { useThemeColor } from '../components/Themed';
 import { capitalize, isEmpty } from 'lodash';
 
 const ExternalAccountScreen = (): JSX.Element => {

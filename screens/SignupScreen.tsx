@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
-import { Button, Input, Screen } from '../components';
+import { Button, Input, Screen, useThemeColor } from '../components';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
-import { useThemeColor } from '../components/Themed';
 import { useAuth } from '../contexts/Auth';
 import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 import CustomerService from '../services/CustomerService';

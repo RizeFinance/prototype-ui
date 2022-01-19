@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { Pressable, PressableProps, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import { useThemeColor } from './Themed';
+import { useThemeColor } from '../components';
 import { Body, Heading5, Heading4 } from './Typography';
 
 type BaseTextLinkProps = Omit<PressableProps, 'style'> & {

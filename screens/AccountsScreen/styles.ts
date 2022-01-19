@@ -1,7 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { useThemeColor } from '../../components/Themed';
-
-const errorColor = useThemeColor('error');
+import { defaultColors } from '../../constants/Colors';
 
 const styles = StyleSheet.create({
   heading: {
@@ -27,7 +25,7 @@ const styles = StyleSheet.create({
   },
   error: {
     marginVertical: 8,
-    color: errorColor,
+    color: defaultColors.error,
   },
   marginBottom: {
     marginBottom: 15,

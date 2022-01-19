@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, createContext, useMemo } from 'react';
+import React, { useContext, useEffect, useState, createContext, useMemo, useCallback } from 'react';
 import AuthService, { IConfirmPW } from '../services/AuthService';
 import { storeData, getData, removeValue } from '../utils/asyncStorage';
 import CustomerService from '../services/CustomerService';
@@ -85,14 +85,14 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     if (!authData.customer) {
       getTokens();
     }
-  }, []);
+  }, [authData.customer]);
 
-  const logout = (): void => {
+  const logout = useCallback(() => {
     setAuthData(initialState);
     removeValue({ storageKey: '@tokens' });
-  };
+  }, []);
 
-  const login = async (userName: string, password: string): Promise<any> => {
+  const login = useCallback(async (userName: string, password: string): Promise<any> => {
     setAuthData((initialState) => ({ ...initialState, userName }));
 
     try {
@@ -137,9 +137,9 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
         throw err;
       }
     }
-  };
+  }, []);
 
-  const register = async (username: string, password: string): Promise<any> => {
+  const register = useCallback(async (username: string, password: string): Promise<any> => {
     try {
       const result = await AuthService.register(username, password);
 
@@ -158,9 +158,9 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
         message: err.data.message,
       };
     }
-  };
+  }, []);
 
-  const forgotPassword = async (email: string): Promise<any> => {
+  const forgotPassword = useCallback(async (email: string): Promise<any> => {
     try {
       const response = await AuthService.forgotPassword(email);
       return {
@@ -179,39 +179,38 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
         message: 'Something went wrong. Please try again.',
       };
     }
-  };
+  }, []);
 
-  const confirmPassword = async (data: IConfirmPW): Promise<any> => {
+  const confirmPassword = useCallback(async (data: IConfirmPW): Promise<any> => {
     try {
       const response = await AuthService.confirmPassword(data);
       return response;
     } catch (err) {
       return { success: false };
     }
-  };
+  }, []);
 
-  const setPassword = async (
-    username: string,
-    oldPassword: string,
-    newPassword: string
-  ): Promise<any> => {
-    try {
-      const result = await AuthService.setPassword(username, oldPassword, newPassword);
-      if (result.success && result.data.accessToken) {
-        setAuthData((initialState) => ({
-          ...initialState,
-          accessToken: result.data.accessToken,
-          refreshToken: result.data.refreshToken,
-        }));
+  const setPassword = useCallback(
+    async (username: string, oldPassword: string, newPassword: string): Promise<any> => {
+      try {
+        const result = await AuthService.setPassword(username, oldPassword, newPassword);
+        if (result.success && result.data.accessToken) {
+          setAuthData((initialState) => ({
+            ...initialState,
+            accessToken: result.data.accessToken,
+            refreshToken: result.data.refreshToken,
+          }));
+        }
+
+        return result;
+      } catch (err) {
+        return err;
       }
+    },
+    []
+  );
 
-      return result;
-    } catch (err) {
-      return err;
-    }
-  };
-
-  const refreshCustomer = async (): Promise<Customer> => {
+  const refreshCustomer = useCallback(async (): Promise<Customer> => {
     if (!authData.customer) {
       return undefined;
     }
@@ -229,14 +228,14 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
         customerProducts,
       }));
     }
-  };
+  }, [authData.accessToken, authData.customer]);
 
-  const setCustomer = async (customer: Customer) => {
+  const setCustomer = useCallback(async (customer: Customer) => {
     await setAuthData((authData) => ({
       ...authData,
       customer,
     }));
-  };
+  }, []);
 
   const { accessToken, refreshToken, userName, customer, customerProducts } = authData;
 

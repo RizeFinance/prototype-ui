@@ -4,6 +4,11 @@ import { AccountService } from '../services';
 import { AuthContext } from './Auth';
 import _ from 'lodash';
 
+export const AccountType = {
+  target_yield_account: 'target_yield_account',
+  general: 'general',
+} as const;
+
 interface IAccountAPIResponse {
   total_count: string;
   limit: string;

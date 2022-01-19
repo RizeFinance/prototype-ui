@@ -85,7 +85,7 @@ const ForgotPasswordScreen = ({ navigation }: { navigation: IProps }): JSX.Eleme
     if (fetchState.matches('login.success')) {
       navigation.navigate('Accounts');
     }
-  }, [fetchState]);
+  }, [fetchState, navigation]);
 
   const emailValidation = yup.object().shape({
     email: yup.string().email('Must be a valid email address').required('Email is Required'),
