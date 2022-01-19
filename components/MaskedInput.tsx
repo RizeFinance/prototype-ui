@@ -1,20 +1,43 @@
 import React from 'react';
-import { StyleProp, StyleSheet, TextInput, TextStyle, View, ViewStyle } from 'react-native';
-import { useThemeColor } from '../components';
+import { StyleProp, StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
+import { useThemeColor } from '.';
 import { Body, BodySmall, fontStyles } from './Typography';
+import {
+  TextInputMask,
+  TextInputMaskOptionProp,
+  TextInputMaskTypeProp,
+} from 'react-native-masked-text';
 
-export type InputProps = Omit<TextInput['props'], 'style'> & {
+export type InputProps = {
   label?: string;
   errorState?: boolean;
   errorText?: string;
   labelStyle?: TextStyle;
   inputStyle?: StyleProp<TextStyle>;
   containerStyle?: ViewStyle;
+  value: string;
+  onChangeText: any;
+  placeholder?: string;
+  type: TextInputMaskTypeProp;
+  options: TextInputMaskOptionProp;
+  onBlur: any;
 };
 
-const Input = (props: InputProps): JSX.Element => {
-  const { label, errorState, errorText, labelStyle, inputStyle, containerStyle, ...otherProps } =
-    props;
+const MaskedInput = (props: InputProps): JSX.Element => {
+  const {
+    type,
+    label,
+    errorState,
+    errorText,
+    value,
+    onChangeText,
+    labelStyle,
+    inputStyle,
+    containerStyle,
+    placeholder,
+    options,
+    onBlur,
+  } = props;
 
   const border = useThemeColor('border');
   const error = useThemeColor('error');
@@ -50,15 +73,22 @@ const Input = (props: InputProps): JSX.Element => {
           {label}
         </Body>
       )}
-      <TextInput
+      <TextInputMask
+        value={value}
+        type={type}
+        onChangeText={onChangeText}
+        includeRawValueInChangeText={true}
+        placeholder={placeholder}
+        options={options}
+        onBlur={onBlur}
         style={[
           fontStyles.body,
           defaultStyles.textInput,
           (errorState || !!errorText) && defaultStyles.errorTextInput,
           inputStyle,
         ]}
-        {...otherProps}
       />
+
       {!!errorText && (
         <BodySmall fontWeight="semibold" style={defaultStyles.errorText}>
           {errorText}
@@ -68,4 +98,4 @@ const Input = (props: InputProps): JSX.Element => {
   );
 };
 
-export default Input;
+export default MaskedInput;

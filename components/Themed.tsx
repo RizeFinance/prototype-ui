@@ -1,7 +1,7 @@
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 
-export function useThemeColor(
+export default function useThemeColor(
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark,
   props?: { light?: string; dark?: string }
 ): string {

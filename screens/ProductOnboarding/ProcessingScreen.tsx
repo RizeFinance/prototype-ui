@@ -4,7 +4,7 @@ import { ActivityIndicator, StyleSheet } from 'react-native';
 import { Screen } from '../../components';
 import { Heading3, Heading4 } from '../../components/Typography';
 import { useAuth } from '../../contexts/Auth';
-import { useAccounts } from '../../contexts/Accounts';
+import { useAccounts, AccountType } from '../../contexts/Accounts';
 import CustomerService from '../../services/CustomerService';
 import config from '../../config/config';
 import { find } from 'lodash';
@@ -30,7 +30,7 @@ export default function ProcessingScreen(): JSX.Element {
 
   useEffect(() => {
     const newAccount = find(liabilityAccounts, {
-      synthetic_account_category: 'target_yield_account',
+      synthetic_account_category: AccountType.target_yield_account,
     });
     if (newAccount) navigation.navigate('Accounts');
   }, [customerProducts, liabilityAccounts]);

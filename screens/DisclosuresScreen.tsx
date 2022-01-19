@@ -3,12 +3,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Pressable, View, StyleSheet } from 'react-native';
 import * as Network from 'expo-network';
 import { ComplianceDocumentAcknowledgementRequest } from '@rizefinance/rize-js/lib/core/compliance-workflow';
-
-import Checkbox from '../components/Checkbox';
-import { Screen } from '../components';
+import { Screen, useThemeColor, Checkbox, Button } from '../components';
 import { Heading3, BodySmall, Body } from '../components/Typography';
-import Button from '../components/Button';
-import { useThemeColor } from '../components/Themed';
 import { ComplianceDocumentSelection, useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';

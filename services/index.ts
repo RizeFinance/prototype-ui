@@ -5,8 +5,9 @@ import * as CustomerService from './CustomerService';
 import * as DebitCardService from './DebitCardService';
 import * as DocumentService from './DocumentService';
 import * as ProductService from './ProductService';
-import * as TransactionService from './TransactionService';
 import * as TransferService from './TransferService';
+
+export { default as TransactionService } from './TransactionService';
 
 export {
   AccountService,
@@ -16,6 +17,5 @@ export {
   DebitCardService,
   DocumentService,
   ProductService,
-  TransactionService,
   TransferService,
 };

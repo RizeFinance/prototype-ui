@@ -1,7 +1,4 @@
 import { StyleSheet } from 'react-native';
-import { useThemeColor } from '../../components/Themed';
-
-const primary = useThemeColor('primary');
 
 export const styles = StyleSheet.create({
   logo: {
@@ -20,12 +17,6 @@ export const styles = StyleSheet.create({
   inputContainer: {
     marginTop: 35,
     marginBottom: 30,
-  },
-  underline: {
-    marginTop: 20,
-    textDecorationLine: 'underline',
-    textDecorationColor: primary,
-    color: primary,
   },
   forgotAccount: {
     marginTop: 20,

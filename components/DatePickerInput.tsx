@@ -9,7 +9,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { useThemeColor } from './Themed';
+import { useThemeColor } from '../components';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Button from './Button';
 import { Body, BodySmall } from './Typography';

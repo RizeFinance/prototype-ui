@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
-import { Button, Input, Screen } from '../components';
+import { Button, Input, Screen, useThemeColor } from '../components';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { Formik } from 'formik';
 import validator from 'validator';
@@ -8,7 +8,6 @@ import { RootStackParamList } from '../types';
 import CustomerService from '../services/CustomerService';
 import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useThemeColor } from '../components/Themed';
 import { useAuth } from '../contexts/Auth';
 import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleProp, StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
 import RNPickerSelect, { Item } from 'react-native-picker-select';
-import { useThemeColor } from './Themed';
+import { useThemeColor } from '../components';
 import { Body, BodySmall, fontStyles } from './Typography';
 
 export type DropdownItem = Item;
@@ -16,6 +16,7 @@ export type DropdownProps = {
   inputStyle?: StyleProp<TextStyle>;
   containerStyle?: ViewStyle;
   onChange?: (value: any, index: number) => void;
+  disabled?: boolean;
 };
 
 const Dropdown = (props: DropdownProps): JSX.Element => {
@@ -29,6 +30,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
     inputStyle,
     containerStyle,
     onChange,
+    disabled,
   } = props;
 
   const body = useThemeColor('body');
@@ -96,6 +98,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
         </Body>
       )}
       <RNPickerSelect
+        disabled={disabled}
         useNativeAndroidPickerStyle={false}
         onValueChange={(value, index): void => {
           if (onChange && value) {
@@ -105,7 +108,9 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
         style={{
           inputIOS: actualInputStyle,
           inputAndroid: actualInputStyle,
-          inputWeb: defaultStyles.input,
+          inputWeb: disabled
+            ? { ...StyleSheet.flatten(defaultStyles.input), backgroundColor: 'unset' }
+            : defaultStyles.input,
         }}
         placeholder={{
           label: placeholder ?? '',

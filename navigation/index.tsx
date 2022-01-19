@@ -58,7 +58,7 @@ import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
 import { useAuth } from '../contexts/Auth';
 
 // Components
-import { useThemeColor } from '../components/Themed';
+import { useThemeColor } from '../components';
 import { Body } from '../components/Typography';
 import { TextLink } from '../components';
 

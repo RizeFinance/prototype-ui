@@ -47,7 +47,7 @@ const AccountsSetupScreen = ({ navigation }) => {
     if (brokerageProductUid) {
       loadComplianceWorflows();
     }
-  }, []);
+  }, [brokerageProductUid]);
 
   const completedWorkflow = find(
     customerWorkflows,
@@ -98,15 +98,14 @@ const AccountsSetupScreen = ({ navigation }) => {
     }
   };
 
-  const getTypes = async () => {
-    const { data: types } = await AccountService.getSyntheticAccountTypes(accessToken);
-
-    if (types.length > 0) {
-      products(types);
-    }
-  };
-
   useEffect(() => {
+    const getTypes = async () => {
+      const { data: types } = await AccountService.getSyntheticAccountTypes(accessToken);
+
+      if (types.length > 0) {
+        products(types);
+      }
+    };
     getTypes();
   }, []);
 
@@ -114,7 +113,7 @@ const AccountsSetupScreen = ({ navigation }) => {
     navigation.setOptions({
       headerLeft: () => <TextLink onPress={() => navigation.goBack()}>&lt; Accounts</TextLink>,
     });
-  }, []);
+  }, [navigation]);
 
   const poolUid = liabilityAccounts[0].pool_uid;
 
@@ -153,11 +152,13 @@ const AccountsSetupScreen = ({ navigation }) => {
     setAccount(value);
     const account = selection.find((accountType) => accountType.value === value);
 
-    setTypeSelected(
-      account.label === AccountTypes.target_yield_account
-        ? AccountTypes.target_yield_account
-        : AccountTypes.general
-    );
+    if (account && account.label) {
+      setTypeSelected(
+        account.label === AccountTypes.target_yield_account
+          ? AccountTypes.target_yield_account
+          : AccountTypes.general
+      );
+    }
   };
 
   useEffect(() => {
@@ -171,7 +172,7 @@ const AccountsSetupScreen = ({ navigation }) => {
       }
     };
     buttonDisabled();
-  }, [typeSelected, name]);
+  }, [typeSelected, name, brokerageSelected]);
 
   const buttonTitle = () => {
     if (hideBrokerageOption()) {
@@ -203,6 +204,7 @@ const AccountsSetupScreen = ({ navigation }) => {
         label="Issue"
         placeholder="Select Type of Account"
         items={selection}
+        disabled={selection.length < 1}
         value={account}
         containerStyle={styles.marginBottom}
         onChange={handleSelection}

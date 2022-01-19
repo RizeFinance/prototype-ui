@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Formik, FormikHelpers } from 'formik';
+import { Formik, FormikHelpers, Field } from 'formik';
 import { View, StyleSheet } from 'react-native';
-import { Button, Dropdown, DropdownItem, Input, Screen } from '../components';
-import { Body, Heading3 } from '../components/Typography';
-import { useAccounts } from '../contexts/Accounts';
+import { Button, Dropdown, DropdownItem, Screen, Checkbox, MaskedInput } from '../components';
+import { Body, Heading3, BodySmall } from '../components/Typography';
+import { useAccounts, AccountType, useAuth } from '../contexts';
 import { RootStackParamList } from '../types';
 import * as Yup from 'yup';
 import TransferService from '../services/TransferService';
-import { useAuth } from '../contexts/Auth';
 import utils from '../utils/utils';
 import { SyntheticAccount } from '../models';
 import Reference from 'yup/lib/Reference';
@@ -21,12 +20,14 @@ type TransferFields = {
   fromSyntheticAccountUid: string;
   toSyntheticAccountUid: string;
   amount: string;
+  checked: boolean;
 };
 
 declare module 'yup' {
   interface StringSchema {
     validSourceBalance(liabilityAccounts: SyntheticAccount[], message: string): StringSchema;
   }
+
   interface NumberSchema {
     amountWithinSourceBalance(
       sourceSyntheticAccountUidRef: Reference<string>,
@@ -77,27 +78,29 @@ Yup.addMethod(
 export default function InitTransferScreen({ navigation }: InitTransferScreenProps): JSX.Element {
   const { accessToken } = useAuth();
   const { refetchAccounts, liabilityAccounts, externalAccounts } = useAccounts();
+
   const syntheticAccounts = [...liabilityAccounts, ...externalAccounts].map(
-    (x) =>
+    (account) =>
       ({
         label:
-          x.name +
-          (['plaid_external', 'external'].includes(x.synthetic_account_category)
+          account.name +
+          (['plaid_external', 'external'].includes(account.synthetic_account_category)
             ? ''
-            : ` (${utils.formatCurrency(x.net_usd_available_balance)})`),
-        value: x.uid,
+            : ` (${utils.formatCurrency(account.net_usd_available_balance)})`),
+        value: account.uid,
       } as DropdownItem)
   );
 
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
   const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
   const styles = StyleSheet.create({
     heading: {
       marginTop: 24,
       marginBottom: 24,
     },
-    formGroup: {
+    marginVertical10: {
       marginVertical: 10,
     },
     inputs: {
@@ -114,7 +117,15 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
   const initialValues: TransferFields = {
     fromSyntheticAccountUid: '',
     toSyntheticAccountUid: '',
-    amount: '',
+    amount: null,
+    checked: false,
+  };
+
+  const isBrokerageAccount = (selectedUid) => {
+    const account = liabilityAccounts.find(
+      (liabilityAccount) => liabilityAccount.uid === selectedUid
+    );
+    return account && account.synthetic_account_category === AccountType.target_yield_account;
   };
 
   const transferValidationSchema = Yup.object().shape({
@@ -134,13 +145,19 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
       .amountWithinSourceBalance(
         Yup.ref<string>('fromSyntheticAccountUid'),
         liabilityAccounts,
-        'Amount should not be greater than the source accounts balance.'
+        'Amount should not be greater than the source account balance.'
       ),
+    checked: Yup.boolean().when('toSyntheticAccountUid', (value, schema) => {
+      if (isBrokerageAccount(value)) {
+        return Yup.boolean().oneOf([true]).default(false).required();
+      }
+      return schema;
+    }),
   });
 
   useEffect(() => {
     refetchAccounts();
-  }, []);
+  }, [refetchAccounts]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
@@ -148,7 +165,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
     });
 
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, refetchAccounts]);
 
   const onSubmit = async (
     values: TransferFields,
@@ -156,19 +173,22 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
   ): Promise<void> => {
     setShowFailedMessage(false);
     setShowSuccessMessage(false);
+    setLoading(true);
 
     try {
       await TransferService.initiateTransfer(
         accessToken,
         values.fromSyntheticAccountUid,
         values.toSyntheticAccountUid,
-        values.amount
+        values.amount.toString()
       );
 
       setShowSuccessMessage(true);
       actions.resetForm();
+      setLoading(false);
     } catch {
       setShowFailedMessage(true);
+      setLoading(false);
     } finally {
       refetchAccounts();
     }
@@ -205,7 +225,6 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
         validationSchema={transferValidationSchema}
       >
         {({
-          handleChange,
           handleBlur,
           handleSubmit,
           setFieldValue,
@@ -218,7 +237,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
           touched,
         }) => (
           <>
-            <View style={styles.formGroup}>
+            <View style={styles.marginVertical10}>
               <Dropdown
                 label="From"
                 placeholder="Select Account"
@@ -247,23 +266,61 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
                 errorText={!touched.toSyntheticAccountUid ? '' : errors.toSyntheticAccountUid}
                 containerStyle={styles.inputs}
               />
-              <Input
-                label="Amount"
-                placeholder="$0"
-                onChangeText={handleChange('amount')}
-                onBlur={handleBlur('amount')}
-                value={values.amount}
-                errorText={!touched.amount ? '' : errors.amount}
-                editable={!isSubmitting}
-                keyboardType="numeric"
-                containerStyle={styles.inputs}
-              />
+              <Field name="amount">
+                {({ field: { value, name }, form: { touched, errors, setFieldValue } }) => (
+                  <>
+                    <MaskedInput
+                      label="Amount"
+                      type={'money'}
+                      options={{
+                        precision: 2,
+                        separator: '.',
+                        delimiter: ',',
+                        unit: '$',
+                      }}
+                      placeholder="$0.00"
+                      value={value}
+                      onChangeText={(_text: string, rawText: string) => {
+                        setFieldValue(name, rawText);
+                      }}
+                      errorText={!touched.amount ? '' : errors.amount}
+                      onBlur={handleBlur('amount')}
+                    />
+                  </>
+                )}
+              </Field>
             </View>
+
+            {isBrokerageAccount(values.toSyntheticAccountUid) && (
+              <Checkbox
+                onChange={(value) => setFieldValue('checked', value)}
+                checked={values.checked}
+              >
+                <BodySmall style={{ marginBottom: 10 }} fontWeight="semibold">
+                  By proceeding with this transfer, I am acknowledging that as a consumer I am aware
+                  that my brokerage account with YieldX:
+                </BodySmall>
+                <BodySmall fontWeight="semibold" style={styles.marginVertical10}>
+                  &#8226; is NOT insured by the FDIC
+                </BodySmall>
+                <BodySmall fontWeight="semibold" style={styles.marginVertical10}>
+                  &#8226;{' '}
+                  {
+                    'is NOT a desposit or other obligation and is NOT guaranteed by Lewis & Clark Bank, where my deposit account is held'
+                  }
+                </BodySmall>
+                <BodySmall style={{ marginTop: 10 }} fontWeight="semibold">
+                  &#8226; is subject to investment risks, including possible loss of the principal
+                  investment
+                </BodySmall>
+              </Checkbox>
+            )}
             <Button
               title="Send Transfer"
               disabled={!dirty || !isValid || isSubmitting}
               onPress={(): void => handleSubmit()}
               style={styles.submitButton}
+              loading={loading}
             />
           </>
         )}

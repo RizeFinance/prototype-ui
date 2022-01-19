@@ -4,31 +4,9 @@ import { Transaction } from '../models';
 import utils from '../utils/utils';
 import { Body } from './Typography';
 import moment from 'moment';
-import _ from 'lodash';
+import { startCase } from 'lodash';
 
-export type TransactionListItemProps = {
-  transaction: Transaction;
-};
-
-const TransactionListItem = (props: TransactionListItemProps): JSX.Element => {
-  const { transaction } = props;
-
-  const styles = StyleSheet.create({
-    description: {
-      marginBottom: 16,
-    },
-    row: {
-      flexDirection: 'row',
-    },
-    leftColumn: {
-      flex: 1,
-    },
-    rightColumn: {
-      flex: 1,
-      alignItems: 'flex-end',
-    },
-  });
-
+const TransactionListItem = ({ transaction }: { transaction: Transaction }) => {
   return (
     <>
       <Body style={styles.description}>{transaction.description}</Body>
@@ -37,7 +15,7 @@ const TransactionListItem = (props: TransactionListItemProps): JSX.Element => {
           <Body fontStyle={transaction.settled_at ? 'regular' : 'italic'}>
             {transaction.settled_at
               ? moment(transaction.settled_at).format('M/DD/YY')
-              : _.startCase(transaction.status)}
+              : startCase(transaction.status)}
           </Body>
         </View>
         <View style={styles.rightColumn}>
@@ -56,3 +34,19 @@ const TransactionListItem = (props: TransactionListItemProps): JSX.Element => {
 };
 
 export default TransactionListItem;
+
+const styles = StyleSheet.create({
+  description: {
+    marginBottom: 16,
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  leftColumn: {
+    flex: 1,
+  },
+  rightColumn: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+});
