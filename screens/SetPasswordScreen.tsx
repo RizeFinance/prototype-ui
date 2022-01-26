@@ -9,7 +9,7 @@ import CustomerService from '../services/CustomerService';
 import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../contexts/Auth';
-import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { useCompliance } from '../contexts/ComplianceWorkflow';
 
 const logo = require('../assets/images/logo.png');
 
@@ -25,7 +25,7 @@ interface SetPasswordFields {
 
 export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps): JSX.Element {
   const { setCustomer, ...auth } = useAuth();
-  const { setComplianceWorkflow, evaluateCurrentStep } = useComplianceWorkflow();
+  const { setComplianceWorkflow, evaluateCurrentStep } = useCompliance();
 
   const [message, setMesage] = useState<string>('');
 

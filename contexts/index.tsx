@@ -4,7 +4,7 @@ import { DocumentsProvider } from './Documents';
 import { AuthProvider, useAuth } from './Auth';
 import { AccountsProvider, useAccounts, AccountType } from './Accounts';
 import { ProductsProvider } from './Products';
-import { useComplianceWorkflow, ProductType } from './ComplianceWorkflow';
+import { useCompliance, ProductType, ComplianceProvider, ComplianceDocumentSelection } from './ComplianceWorkflow';
 
 const ApplicationProviders = ({ children }: { children: JSX.Element }): JSX.Element => {
   return (
@@ -21,11 +21,13 @@ const ApplicationProviders = ({ children }: { children: JSX.Element }): JSX.Elem
 };
 
 export {
+  ComplianceDocumentSelection,
   ApplicationProviders,
   useAuth,
   useAccounts,
   useDebitCards,
-  useComplianceWorkflow,
+  useCompliance,
   ProductType,
   AccountType,
+  ComplianceProvider
 };

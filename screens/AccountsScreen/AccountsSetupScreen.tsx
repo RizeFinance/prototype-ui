@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Dropdown, Screen, Input, Button, Body, Heading3, TextLink } from '../../components';
-import { useAuth, useAccounts, useComplianceWorkflow, ProductType } from '../../contexts';
+import { useAuth, useAccounts, useCompliance, ProductType } from '../../contexts';
 import { AccountService } from '../../services';
 import styles from './styles';
 import config from '../../config/config';
@@ -37,7 +37,7 @@ const AccountsSetupScreen = ({ navigation }) => {
     setComplianceWorkflow,
     customerWorkflows,
     createComplianceWorkflow,
-  } = useComplianceWorkflow();
+  } = useCompliance();
 
   useEffect(() => {
     const loadComplianceWorflows = async () => {

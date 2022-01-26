@@ -17,6 +17,7 @@ const defaultStyles = StyleSheet.create({
   pressable: {
     display: 'flex',
     flexDirection: 'row',
+    cursor: 'pointer',
   },
   pressableDisabled: {
     opacity: 0.5,

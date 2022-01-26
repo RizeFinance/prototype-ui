@@ -4,7 +4,7 @@ import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Screen } from '../components';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
-import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { useCompliance } from '../contexts/ComplianceWorkflow';
 import { RootStackParamList } from '../types';
 import * as Network from 'expo-network';
 import { useAuth } from '../contexts/Auth';
@@ -15,7 +15,7 @@ interface PatriotActScreenProps {
 }
 
 export default function PatriotActScreen({ navigation }: PatriotActScreenProps): JSX.Element {
-  const { complianceWorkflow, setComplianceWorkflow } = useComplianceWorkflow();
+  const { complianceWorkflow, setComplianceWorkflow } = useCompliance();
   const { accessToken } = useAuth();
 
   const styles = StyleSheet.create({

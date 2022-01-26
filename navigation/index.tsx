@@ -53,14 +53,8 @@ import {
   AccountsSetupScreen,
 } from '../screens';
 
-// Contexts
-import { ComplianceWorkflowProvider } from '../contexts/ComplianceWorkflow';
-import { useAuth } from '../contexts/Auth';
-
-// Components
-import { useThemeColor } from '../components';
-import { Body } from '../components/Typography';
-import { TextLink } from '../components';
+import { ComplianceProvider, useAuth } from '../contexts';
+import { useThemeColor, Body, TextLink } from '../components';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
   return (
@@ -149,7 +143,7 @@ function MainStackScreen() {
           <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
         </Stack.Navigator>
       ) : (
-        <ComplianceWorkflowProvider navigation={navigation} auth={auth}>
+        <ComplianceProvider navigation={navigation}>
           {customer.status === 'initiated' ? (
             <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
               <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
@@ -201,7 +195,7 @@ function MainStackScreen() {
               <Stack.Screen name="ProcessingScreen" component={ProcessingScreen} />
             </Stack.Navigator>
           )}
-        </ComplianceWorkflowProvider>
+        </ComplianceProvider>
       )}
     </>
   );

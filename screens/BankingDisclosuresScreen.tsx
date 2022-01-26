@@ -4,7 +4,7 @@ import { Heading3, Body, BodySmall } from '../components/Typography';
 import { View, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import cloneDeep from 'lodash/cloneDeep';
-import { ComplianceDocumentSelection, useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { ComplianceDocumentSelection, useCompliance } from '../contexts/ComplianceWorkflow';
 import * as Network from 'expo-network';
 import { ComplianceDocumentAcknowledgementRequest } from '@rizefinance/rize-js/lib/core/compliance-workflow';
 import { useAuth } from '../contexts/Auth';
@@ -17,7 +17,7 @@ export default function BankingDisclosuresScreen(): JSX.Element {
     setComplianceWorkflow,
     setBankingDisclosures,
     loadBankingDisclosures,
-  } = useComplianceWorkflow();
+  } = useCompliance();
 
   const navigation = useNavigation();
   const { accessToken } = useAuth();

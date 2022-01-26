@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Screen from '../components/Screen';
-import { useComplianceWorkflow, ComplianceDocumentSelection } from '../contexts/ComplianceWorkflow';
+import { useCompliance, ComplianceDocumentSelection } from '../contexts/ComplianceWorkflow';
 import TextLink from '../components/TextLink';
 import { Heading3, Heading4, Body } from '../components/Typography';
 import { isEmpty } from 'lodash';
@@ -12,7 +12,7 @@ interface AgreementInfoProps {
 }
 
 export default function AgreementScreen(): JSX.Element {
-  const { productAgreements, loadAgreements } = useComplianceWorkflow();
+  const { productAgreements, loadAgreements } = useCompliance();
 
   useEffect(() => {
     loadAgreements();

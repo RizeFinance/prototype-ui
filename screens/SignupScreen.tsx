@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import { useAuth } from '../contexts/Auth';
-import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { useCompliance } from '../contexts/ComplianceWorkflow';
 import CustomerService from '../services/CustomerService';
 
 const logo = require('../assets/images/logo.png');
@@ -25,7 +25,7 @@ interface SignupFields {
 export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Element {
   const { register, setCustomer } = useAuth();
 
-  const { setComplianceWorkflow } = useComplianceWorkflow();
+  const { setComplianceWorkflow } = useCompliance();
   const [commonError, setCommonError] = useState<string>('');
 
   const initialValues: SignupFields = {
