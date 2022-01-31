@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet } from 'react-native';
 import { Screen } from '../components';
 import { Heading3, Heading4 } from '../components/Typography';
 import { useAuth } from '../contexts/Auth';
-import {CustomerService} from '../services';
+import { CustomerService } from '../services';
 import config from '../config/config';
 
 export default function ProcessingApplicationScreen(): JSX.Element {

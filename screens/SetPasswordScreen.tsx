@@ -5,7 +5,7 @@ import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { Formik } from 'formik';
 import validator from 'validator';
 import { RootStackParamList } from '../types';
-import {CustomerService} from '../services';
+import { CustomerService } from '../services';
 import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../contexts/Auth';

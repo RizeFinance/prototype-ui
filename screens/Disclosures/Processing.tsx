@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { Screen, Heading3, Heading4 } from '../../components';
 import { useAuth } from '../../contexts';
-import {CustomerService} from '../../services';
+import { CustomerService } from '../../services';
 import config from '../../config/config';
 
 const Processing = () => {
@@ -53,6 +53,6 @@ const Processing = () => {
       <Heading4 textAlign="center">This should only take a few moments.</Heading4>
     </Screen>
   );
-}
+};
 
-export default Processing
+export default Processing;

@@ -8,7 +8,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useProducts } from '../../contexts/Products';
 import { useAuth } from '../../contexts/Auth';
 import { Heading3, Heading5 } from '../../components/Typography';
-import {CustomerService} from '../../services';
+import { CustomerService } from '../../services';
 import config from '../../config/config';
 import { get, find, map } from 'lodash';
 

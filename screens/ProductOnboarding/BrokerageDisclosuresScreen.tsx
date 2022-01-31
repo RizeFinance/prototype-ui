@@ -5,7 +5,7 @@ import { Screen, Checkbox, Button } from '../../components';
 import { Heading3, Body } from '../../components/Typography';
 import { useCompliance, ComplianceDocumentSelection } from '../../contexts/ComplianceWorkflow';
 import { ComplianceDocumentAcknowledgementRequest } from '@rizefinance/rize-js/lib/core/compliance-workflow';
-import {ComplianceWorkflowService} from '../../services';
+import { ComplianceWorkflowService } from '../../services';
 import { useAuth } from '../../contexts/Auth';
 import config from '../../config/config';
 import { find, get } from 'lodash';

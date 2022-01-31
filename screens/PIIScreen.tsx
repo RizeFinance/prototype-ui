@@ -11,8 +11,6 @@ import states from '../constants/States';
 import { useAuth } from '../contexts/Auth';
 import formatStringByPattern from 'format-string-by-pattern';
 
-
-
 function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
   const { refreshCustomer } = useAuth();
 
@@ -48,9 +46,6 @@ function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
   return <></>;
 }
 
-
-
-
 interface PIIScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'PII'>;
 }
@@ -58,4 +53,3 @@ interface PIIScreenProps {
 type PIIScreenFields = Omit<PIIFields, 'dob'> & {
   dob?: Date;
 };
-

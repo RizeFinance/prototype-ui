@@ -8,7 +8,7 @@ import { useCompliance } from '../contexts/ComplianceWorkflow';
 import { RootStackParamList } from '../types';
 import * as Network from 'expo-network';
 import { useAuth } from '../contexts/Auth';
-import {ComplianceWorkflowService} from '../services';
+import { ComplianceWorkflowService } from '../services';
 
 interface PatriotActScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'PatriotAct'>;

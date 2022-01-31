@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Formik, useFormikContext, Field } from 'formik';
-import { StyleSheet, View, Platform, Pressable } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { Formik } from 'formik';
+import { StyleSheet, View, Platform } from 'react-native';
 import {
   Button,
   DatePickerInput,
@@ -10,116 +10,112 @@ import {
   Body,
   MaskedInput,
   Heading3,
+  TextLink,
 } from '../../components';
 import * as Yup from 'yup';
 import { PIIFields, RootStackParamList } from '../../types';
-import moment from 'moment';
 import states from '../../constants/States';
 import { ProductType } from '../../contexts';
 import formatStringByPattern from 'format-string-by-pattern';
 import { defaultColors } from '../../constants/Colors';
 import { CustomerService } from '../../services';
 import MaskInput, { createNumberMask, formatWithMask, Mask } from 'react-native-mask-input';
+import { isEmpty } from 'lodash';
 
-// NOTE: Handle unauth state
 
-const PIIForm = ({ handlePIISubmit }) => {
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [creditCard, setCreditCard] = React.useState('');
-  const initialValues = {
-    first_name: '',
-    middle_name: '',
-    last_name: '',
-    suffix: '',
-    dob: undefined,
-    street1: '',
-    street2: '',
-    city: '',
-    state: '',
-    postal_code: '',
-    phone: '',
-    ssn: '',
-  };
 
- 
+const PIIForm = ({ handleSubmit, showConfirmInfo = false, customer }) => {
+  const [showConfirm, setShowConfirm] = useState(() => (customer.last_name ? true : false));
+  const [showPatAct, setShowPatAct] = useState(false)
+
+  console.log(customer, 'customer');
+  
+
   const ConfirmationInfo = ({ values }) => {
+    console.log(values, 'values');
+    
     return (
-      <>
+      <View>
         <Body>&nbsp;</Body>
         <Body>&nbsp;</Body>
         <Body fontWeight="semibold">First name</Body>
-        <Body style={{ color: defaultColors.gray }}>{values.first_name}</Body>
+        <Body style={{ color: defaultColors.gray }}>
+          {values.first_name || customer.first_name}
+        </Body>
         <Body>&nbsp;</Body>
-        {values.middle_name && (
+        {(values.middle_name || customer.middle_name) && (
           <>
             <Body fontWeight="semibold">Middle name</Body>
-            <Body style={{ color: defaultColors.gray }}>{values.middle_name}</Body>
+            <Body style={{ color: defaultColors.gray }}>
+              {values.middle_name || customer.middle_name}
+            </Body>
             <Body>&nbsp;</Body>
           </>
         )}
         <Body fontWeight="semibold">Last name</Body>
-        <Body style={{ color: defaultColors.gray }}>{values.last_name}</Body>
+        <Body style={{ color: defaultColors.gray }}>{values.last_name || customer.last_name}</Body>
         <Body>&nbsp;</Body>
         {values.suffix && (
           <>
             <Body fontWeight="semibold">Suffix</Body>
-            <Body style={{ color: defaultColors.gray }}>{values.suffix}</Body>
+            <Body style={{ color: defaultColors.gray }}>{values.suffix || customer.suffix}</Body>
             <Body>&nbsp;</Body>
           </>
         )}
         <Body fontWeight="semibold">Date of Birth</Body>
-        <Body style={{ color: defaultColors.gray }}>{values.dob}</Body>
+        <Body style={{ color: defaultColors.gray }}>{values.dob || customer.dob}</Body>
         <Body>&nbsp;</Body>
-        <Body fontWeight="semibold">Address</Body>
-        <Body style={{ color: defaultColors.gray }}>{values.street1}</Body>
-        {values.street2 && <Body style={{ color: defaultColors.gray }}>{values.street2}</Body>}
 
-        <Body
-          style={{ color: defaultColors.gray }}
-        >{`${values.city}, ${values.state} ${values.postal_code}`}</Body>
+        <Body fontWeight="semibold">Address</Body>
+        <Body style={{ color: defaultColors.gray }}>{values.street1 || customer.street1}</Body>
+
+        {(values.street2 || customer.street2) && (
+          <Body style={{ color: defaultColors.gray }}>{values.street2 || customer.street2}</Body>
+        )}
+
+        <Body style={{ color: defaultColors.gray }}>{`${values.city}, ${values.state} ${
+          values.postal_code || customer.postal_code
+        }`}</Body>
         <Body>&nbsp;</Body>
         <Body fontWeight="semibold">Phone Number</Body>
-        <Body style={{ color: defaultColors.gray }}>{values.phone}</Body>
+        <Body style={{ color: defaultColors.gray }}>{values.phone || customer.phone}</Body>
         <Body>&nbsp;</Body>
         <Body fontWeight="semibold">Social Security Number</Body>
-        <Body style={{ color: defaultColors.gray }}>{values.ssn ?? '*** ** ****'}</Body>
+        <Body style={{ color: defaultColors.gray }}>
+          {(values.ssn || customer.ssn) ?? '*** ** ****'}
+        </Body>
         <Body>&nbsp;</Body>
-        <Pressable onPress={() => setShowConfirm(false)}>
-          {/* {productType === ProductType.Checking && ( */}
-          <Body textAlign="center" fontWeight="semibold" style={styles.editButton}>
-            &#60; Edit Information
-          </Body>
-          {/* )} */}
-        </Pressable>
-      </>
+        {/* {productType === ProductType.Checking && ( */}
+        <TextLink style={{marginVertical: 50}} textAlign="center" onPress={() => setShowConfirm(false)}>
+          {customer.last_name ? 'Revise Information' : 'Edit Information'}
+        </TextLink>
+        {/* )} */}
+      </View>
     );
   };
 
-  const phoneMask = [
-    '(',
-    /\d/,
-    /\d/,
-    /\d/,
-    ')',
-    ' ',
-    /\d/,
-    /\d/,
-    /\d/,
-    '-',
-    /\d/,
-    /\d/,
-    /\d/,
-    /\d/,
-  ];
-  const ssMask = [[/\d/], [/\d/], [/\d/], '-', [/\d/], [/\d/], '-', /\d/, /\d/, /\d/, /\d/];
+  const initialValues = {
+    first_name: isEmpty(customer.first_name) ? '' : customer.first_name,
+    middle_name: isEmpty(customer.first_name) ? '' : customer.middle_name,
+    last_name: isEmpty(customer.last_name) ? '' : customer.last_name,
+    suffix: isEmpty(customer.suffix) ? '' : customer.suffix,
+    dob: undefined,
+    street1: isEmpty(customer.street1) ? '' : customer.street1,
+    street2: isEmpty(customer.street2) ? '' : customer.street2,
+    city: isEmpty(customer.city) ? '' : customer.city,
+    state: isEmpty(customer.state) ? '' : customer.state,
+    postal_code: isEmpty(customer.postal_code) ? '' : customer.postal_code,
+    phone: isEmpty(customer.phone) ? '' : customer.phone,
+    ssn: '',
+  };
 
   return (
-    <Screen useScrollView>
-       <Heading3 textAlign="center" style={styles.heading}>
-          {showConfirm ? 'Confirm Your Personal Information' : 'Enter Your Personal Information'}
-        </Heading3>
+    <>
+      <Heading3 textAlign="center" style={styles.heading}>
+        {showConfirm ? 'Confirm Your Personal Information' : 'Enter Your Personal Information'}
+      </Heading3>
 
-      <Formik initialValues={initialValues} onSubmit={handlePIISubmit} validationSchema={piiSchema}>
+      <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={piiSchema}>
         {({
           handleChange,
           handleBlur,
@@ -133,18 +129,16 @@ const PIIForm = ({ handlePIISubmit }) => {
           dirty,
           touched,
         }) => {
-         
           return (
             <>
               {showConfirm ? (
                 <ConfirmationInfo values={values} />
               ) : (
                 <>
-                  {/* <FetchPreviousValues navigation={navigation} /> */}
                   <View style={styles.formGroup}>
                     <Input
                       label="First Name"
-                      placeholder="First Name"
+                      placeholder={'First Name'}
                       onChangeText={handleChange('first_name')}
                       onBlur={handleBlur('first_name')}
                       value={values.first_name}
@@ -291,23 +285,22 @@ const PIIForm = ({ handlePIISubmit }) => {
                 </>
               )}
 
-              <Button
+              {/* <Button
                 title={showConfirm ? 'Submit Information' : 'Confirm Information'}
                 disabled={!dirty || !isValid || isSubmitting}
-                onPress={() => showConfirm ? handleSubmit() : setShowConfirm(true)}
+                onPress={() => (showConfirm ? handleSubmit() : setShowConfirm(true))}
                 style={styles.submitButton}
                 loading={isSubmitting}
-              />
+              /> */}
             </>
           );
         }}
       </Formik>
-    </Screen>
+    </>
   );
 };
 
 export default PIIForm;
-
 
 const maxDob = new Date();
 maxDob.setFullYear(maxDob.getFullYear() - 18);
@@ -352,5 +345,15 @@ const styles = StyleSheet.create({
     textDecorationColor: defaultColors.primary,
     color: defaultColors.primary,
     marginTop: 20,
+  },
+  content: {
+    paddingHorizontal: 16,
+    marginBottom: 25,
+    flex: 2,
+  },
+  title: {
+    textAlign: 'center',
+    marginTop: 50,
+    marginBottom: 25,
   },
 });

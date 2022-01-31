@@ -14,9 +14,9 @@ interface AgreementInfoProps {
 export default function AgreementScreen(): JSX.Element {
   const { productAgreements, loadAgreements } = useCompliance();
 
-  useEffect(() => {
-    loadAgreements();
-  }, []);
+  // useEffect(() => {
+  //   loadAgreements();
+  // }, []);
 
   const styles = StyleSheet.create({
     heading: {

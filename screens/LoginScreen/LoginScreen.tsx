@@ -5,7 +5,7 @@ import validator from 'validator';
 import { useAuth } from '../../contexts/Auth';
 import { Button, Input, Screen, TextLink } from '../../components';
 import { BodySmall, Heading3 } from '../../components/Typography';
-import {CustomerService} from '../../services';
+import { CustomerService } from '../../services';
 import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../../types';
 import { StackNavigationProp } from '@react-navigation/stack';

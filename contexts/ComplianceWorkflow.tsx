@@ -16,7 +16,7 @@ import {CustomerService, ProductService, ComplianceWorkflowService} from '../ser
 import config from '../config/config';
 import { find, isNil } from 'lodash';
 import { useAuth } from '../contexts';
-import * as Network from 'expo-network';
+import Network from 'expo-network';
 
 export const ComplianceContext = createContext({} as ComplianceProps);
 
@@ -30,79 +30,42 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
   const [error, setError] = useState(undefined)
 
   const { accessToken, customer, setCustomer } = useAuth();
-  console.log(complianceWorkflow, 'complianceWorkflow');
 
-console.log(customer, 'customer')
- 
 
-  const redirectToProductStep = async () => {
-    const brokerageProductUid = config.application.brokerageProductUid;
+  // const loadAgreements = async (): Promise<void> => {
+  //   setProductAgreements((prev) => ({
+  //     ...prev,
+  //     loadingAgreements: true,
+  //   }));
 
-    let currentScreen: keyof RootStackParamList = 'ProfileQuestions';
+  //   try {
+  //     const { data: customerProducts } = await CustomerService.getCustomerProducts(
+  //       accessToken,
+  //       customer.uid
+  //     );
+      
+  //     const workflows = await ComplianceWorkflowService.getComplianceWorkflows(
+  //       accessToken,
+  //       customer.uid
+  //     );
 
-    const routeParams = {
-      productType: ProductType.Brokerage,
-      productId: brokerageProductUid,
-    };
-
-    const { data: products } = await ProductService.getProducts(accessToken);
-
-    console.log(products, 'products');
-
-    const brokerageProduct = find(products, { uid: brokerageProductUid });
-
-    console.log(brokerageProduct, 'brokerageProduct');
-
-    if (brokerageProduct.profile_requirements.length >= 1) {
-      currentScreen = 'ProfileQuestions';
-    }
-
-    const steps: (keyof RootStackParamList)[] = ['ProfileQuestions', 'BrokerageDisclosures'];
-
-    if (currentScreen && steps.includes(currentScreen)) {
-      for (const step of steps) {
-        navigation.navigate(step, routeParams);
-
-        if (step === currentScreen) {
-          break;
-        }
-      }
-    }
-  };
-
-  const loadAgreements = async (): Promise<void> => {
-    setProductAgreements((prev) => ({
-      ...prev,
-      loadingAgreements: true,
-    }));
-
-    try {
-      const { data: customerProducts } = await CustomerService.getCustomerProducts(
-        accessToken,
-        customer.uid
-      );
-      const workflows = await ComplianceWorkflowService.getComplianceWorkflows(
-        accessToken,
-        customer.uid
-      );
-
-      const ourAgreements = workflows.data.map((workflow, i) => {
-        return {
-          productName:
-            customerProducts && customerProducts[i] ? customerProducts[i].product_name : '',
-          agreements: workflow ? workflow.accepted_documents : [],
-        };
-      }) as ProductAgreements[];
-      setProductAgreements((prev) => ({ ...prev, agreements: ourAgreements }));
-    } catch (err) {
-      throw new Error(err);
-    } finally {
-      setProductAgreements((prev) => ({
-        ...prev,
-        loadingAgreements: false,
-      }));
-    }
-  };
+  //     const ourAgreements = workflows.data.map((workflow, i) => {
+  //       return {
+  //         productName:
+  //           customerProducts && customerProducts[i] ? customerProducts[i].product_name : '',
+  //         agreements: workflow ? workflow.accepted_documents : [],
+  //       };
+  //     }) as ProductAgreements[];
+  //     setProductAgreements((prev) => ({ ...prev, agreements: ourAgreements }));
+  //   } catch (err) {
+  //     throw new Error(err);
+  //   } finally {
+  //     setProductAgreements((prev) => ({
+  //       ...prev,
+  //       loadingAgreements: false,
+  //     }));
+  //   }
+  // };
 
   const loadComplianceWorkflows = async (query: any = {}): Promise<any> => {
     try {
@@ -225,7 +188,7 @@ console.log(customer, 'customer')
       productAgreements,
       evaluateCurrentStep,
       setComplianceWorkflow,
-      loadAgreements,
+      // loadAgreements,
       loadComplianceWorkflows,
       totalSteps,
       submitAgreements,
@@ -236,7 +199,7 @@ console.log(customer, 'customer')
       productAgreements,
       evaluateCurrentStep,
       setComplianceWorkflow,
-      loadAgreements,
+      // loadAgreements,
       loadComplianceWorkflows,
       totalSteps,
       submitAgreements

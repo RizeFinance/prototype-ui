@@ -5,7 +5,7 @@ import { Screen } from '../../components';
 import { Heading3, Heading4 } from '../../components/Typography';
 import { useAuth } from '../../contexts/Auth';
 import { useAccounts, AccountType } from '../../contexts/Accounts';
-import {CustomerService} from '../../services';
+import { CustomerService } from '../../services';
 import config from '../../config/config';
 import { find } from 'lodash';
 
