@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
-import { Screen } from '../components';
-import { Heading3, Heading4 } from '../components/Typography';
-import { useAuth } from '../contexts/Auth';
-import {CustomerService} from '../services';
-import config from '../config/config';
+import { Screen, Heading3, Heading4 } from '../../components';
+import { useAuth } from '../../contexts';
+import {CustomerService} from '../../services';
+import config from '../../config/config';
 
-export default function ProcessingApplicationScreen(): JSX.Element {
+const Processing = () => {
   const { accessToken, refreshCustomer, customer } = useAuth();
 
   let timeout = null;
@@ -55,3 +54,5 @@ export default function ProcessingApplicationScreen(): JSX.Element {
     </Screen>
   );
 }
+
+export default Processing

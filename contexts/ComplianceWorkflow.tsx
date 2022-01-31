@@ -10,95 +10,30 @@ import React, {
 } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ComplianceWorkflow } from '@rizefinance/rize-js/types/lib/core/compliance-workflow';
-import { Customer } from '../models';
 import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 import { RootStackParamList } from '../types';
-import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
-import CustomerService from '../services/CustomerService';
-import { ProductService } from '../services';
+import {CustomerService, ProductService, ComplianceWorkflowService} from '../services';
 import config from '../config/config';
 import { find, isNil } from 'lodash';
 import { useAuth } from '../contexts';
-
-/*TODO
- * 1. Convert to func component
- * 2. Figure out page flow control
- * 3. Based on steps
- */
+import * as Network from 'expo-network';
 
 export const ComplianceContext = createContext({} as ComplianceProps);
 
 const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
-  const [complianceWorkflow, setComplianceWorkflow] = useState<ComplianceWorkflow | undefined>(
-    undefined
-  );
+  const [complianceWorkflow, setComplianceWorkflow] = useState<any>(undefined);
   const [productAgreements, setProductAgreements] = useState<ProductAgreements[]>([]);
   const [customerWorkflows, setCustomerWorkflows] = useState<ComplianceWorkflow[]>([]);
-  const [disclosures, setDisclosures] = useState<ComplianceDocumentSelection[]>([]);
-  const [bankingDisclosures, setBankingDisclosures] = useState<ComplianceDocumentSelection[]>([]);
+
+  const [totalSteps, setTotalSteps] = useState(1)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(undefined)
 
   const { accessToken, customer, setCustomer } = useAuth();
-
-  console.log(customer, 'customer');
   console.log(complianceWorkflow, 'complianceWorkflow');
 
-
-  const redirectToCurrentStep = () => {
-    // loadDisclosures();
-    let currentScreen: keyof RootStackParamList = 'Disclosures';
-    let routeParams = {};
-
-    if (complianceWorkflow.summary.current_step === 1) {
-      currentScreen = 'Disclosures';
-    } else if (complianceWorkflow.summary.current_step === 2) {
-      // Check if Patriot Act is not yet acknowledged
-      const isPatriotActAcknowledged = !!complianceWorkflow.accepted_documents.find(
-        (x) => x.external_storage_name === 'usa_ptrt_0'
-      );
-
-      if (!isPatriotActAcknowledged) {
-        currentScreen = 'PatriotAct';
-      } else {
-        // Check if there are no customer details yet
-        if (!customer.details?.first_name) {
-          currentScreen = 'PII';
-        } else {
-          currentScreen = 'BankingDisclosures';
-        }
-      }
-    }
-
-    if (customer.status === 'active') {
-      currentScreen = 'ConfirmPII';
-      routeParams = { hasChanged: false };
-    }
-
-    const steps: (keyof RootStackParamList)[] = [
-      'Disclosures',
-      'PatriotAct',
-      'PII',
-      'BankingDisclosures',
-      'ConfirmPII',
-    ];
-
-    if (currentScreen && steps.includes(currentScreen)) {
-      for (const step of steps) {
-        navigation.navigate(step, routeParams);
-
-        if (step === currentScreen) {
-          break;
-        }
-      }
-    }
-  };
-
-  const renewComplianceWorkflow = async () => {
-    const newComplianceWorkflow = await ComplianceWorkflowService.renewWorkflow(accessToken);
-    const customer = await CustomerService.getCustomer(accessToken);
-
-    setComplianceWorkflow(newComplianceWorkflow);
-    setCustomer(customer);
-  };
+console.log(customer, 'customer')
+ 
 
   const redirectToProductStep = async () => {
     const brokerageProductUid = config.application.brokerageProductUid;
@@ -112,7 +47,11 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
 
     const { data: products } = await ProductService.getProducts(accessToken);
 
+    console.log(products, 'products');
+
     const brokerageProduct = find(products, { uid: brokerageProductUid });
+
+    console.log(brokerageProduct, 'brokerageProduct');
 
     if (brokerageProduct.profile_requirements.length >= 1) {
       currentScreen = 'ProfileQuestions';
@@ -178,54 +117,11 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
     }
   };
 
-  const loadBankingDisclosures = async (): Promise<void> => {
-    if (complianceWorkflow === undefined) return;
-    const {
-      all_documents: all,
-      accepted_documents: accepted,
-      current_step_documents_pending: pending,
-    } = complianceWorkflow;
-
-    const acceptedBankingDisclosures = accepted.filter(
-      (x) => x.name === 'Deposit Agreement and Disclosures'
-    );
-    const pendingBankingDisclosures = pending.filter(
-      (x) => x.name === 'Deposit Agreement and Disclosures'
-    );
-    const allDisclosures = all
-      .filter((x) => x.name === 'Deposit Agreement and Disclosures')
-      .map((x) => {
-        const acceptedBankingDisc = acceptedBankingDisclosures.find((acc) => acc.name === x.name);
-        const pendingBankingDisc = pendingBankingDisclosures.find((acc) => acc.name === x.name);
-
-        return {
-          ...x,
-          selected: !!acceptedBankingDisc,
-          uid: acceptedBankingDisc?.uid ?? pendingBankingDisc.uid,
-          alreadyAccepted: !!acceptedBankingDisc,
-        } as ComplianceDocumentSelection;
-      });
-
-    setBankingDisclosures(allDisclosures);
-  };
-
-  const createComplianceWorkflow = async (productUid: string): Promise<ComplianceWorkflow> => {
-    const newComplianceWorkflow = await ComplianceWorkflowService.createWorkflow(
-      accessToken,
-      productUid
-    );
-
-    setComplianceWorkflow(newComplianceWorkflow);
-    return newComplianceWorkflow;
-  };
 
   const evaluateCurrentStep = async () => {
-  
-
     if (customer?.status === 'initiated') {
-
       if (complianceWorkflow.summary.status === 'expired') {
-        await renewComplianceWorkflow();
+        // await renewComplianceWorkflow();
       } else {
         const acceptedDisclosures = complianceWorkflow.accepted_documents.filter(
           (x) => x.step === 1
@@ -247,97 +143,103 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
             } as ComplianceDocumentSelection;
           });
 
-          console.log(allDisclosures, 'allDisclosures');
-          
-        setDisclosures(allDisclosures);
       }
 
       // redirectToCurrentStep();
     }
-  }
+  };
 
-  useEffect(() => {
-    const goToProductStep = async () => {
-      await redirectToProductStep();
-    }
-    if(customer.status === 'active' && complianceWorkflow) {
-      goToProductStep()
-    }
-  }, [customer, complianceWorkflow])
-
-  useEffect(() => {
-    const getRecentWorkflow = async () => {
-      try {
-        const pendingDisclosures = complianceWorkflow.current_step_documents_pending.filter(
-          (doc) => doc.step === 1
-        );
-        const acceptedDisclosures = complianceWorkflow.accepted_documents.filter(
-          (doc) => doc.step === 1
-        );
-       
-        const allDisclosures = complianceWorkflow.all_documents
-          .filter((doc) => doc.step === 1)
-          .map((doc) => {
-            const acceptedTerm = acceptedDisclosures.find((acc) => acc.name === doc.name);
-            const pendingTerm = pendingDisclosures.find((acc) => acc.name === doc.name);
-
-            return {
-              ...doc,
-              selected: !!acceptedTerm,
-              uid: acceptedTerm?.uid ?? pendingTerm.uid,
-              alreadyAccepted: !!acceptedTerm,
-            } as ComplianceDocumentSelection;
-          });
-
-        setDisclosures(allDisclosures);
-      } catch(error) {
-        console.log(error);
-        
-      }
-    }
-    if(customer.status === 'initiated') {
-      getRecentWorkflow()
-    }
-  }, [customer, complianceWorkflow])
 
   useEffect(() => {
     const getWorkflow = async () => {
-      const latestWorkflow = await ComplianceWorkflowService.viewLatestWorkflow(accessToken);
-      setComplianceWorkflow(latestWorkflow)
+      try {
+        const latestWorkflow = await ComplianceWorkflowService.viewLatestWorkflow(accessToken);
+        // NOTE: NEED THIS?
+        setComplianceWorkflow(latestWorkflow);
+        console.log(latestWorkflow, 'latestWorkflow');
+
+        let steps = 0;
+
+        latestWorkflow.all_documents.forEach((doc) => {
+          if (doc.step > steps) {
+            steps = doc.step;
+          }
+        });
+
+        setTotalSteps(steps)
+
+
+
+        if (latestWorkflow.summary.status === 'expired') {
+          const data = await ComplianceWorkflowService.createWorkflow({
+            accessToken,
+            customerUid: customer.uid,
+            productCompliancePlanUid: latestWorkflow.product_compliance_plan_uid,
+          });
+        }
+
+        // const parsedWorkflow = parseWorkflow(latestWorkflow);
+
+        // setComplianceWorkflow(parsedWorkflow);
+      } catch (err) {
+        console.log(err, 'err');
+      }
+    };
+    getWorkflow();
+  }, []);
+
+  const submitAgreements = async (values, actions) => {
+    setLoading(true)
+    const ip_address = await Network.getIpAddressAsync();
+
+    const documents = Object.keys(values).map((document_uid) => {
+      return {
+        accept: 'yes',
+        document_uid,
+        ip_address,
+        user_name: complianceWorkflow.customer.email,
+      };
+    });
+
+    try {
+      const updatedComplianceWorkflow = await ComplianceWorkflowService.acknowledgeDocuments(
+        accessToken,
+        documents
+      );
+      setComplianceWorkflow(updatedComplianceWorkflow);
+
+      setLoading(false);
+      actions.resetForm()
+    } catch (err) {
+      setError(err);
+      setLoading(false);
+
     }
-    getWorkflow()
-  }, [])
+  };
+
 
   const value = useMemo(
     () => ({
       complianceWorkflow,
       customerWorkflows,
-      disclosures,
       productAgreements,
-      bankingDisclosures,
       evaluateCurrentStep,
       setComplianceWorkflow,
-      setDisclosures,
-      setBankingDisclosures,
-      loadBankingDisclosures,
       loadAgreements,
       loadComplianceWorkflows,
-      createComplianceWorkflow,
+      totalSteps,
+      submitAgreements,
     }),
     [
       complianceWorkflow,
       customerWorkflows,
-      disclosures,
       productAgreements,
-      bankingDisclosures,
       evaluateCurrentStep,
       setComplianceWorkflow,
-      setDisclosures,
-      setBankingDisclosures,
-      loadBankingDisclosures,
       loadAgreements,
       loadComplianceWorkflows,
-      createComplianceWorkflow,
+      totalSteps,
+      submitAgreements
     ]
   );
 
@@ -380,16 +282,11 @@ export type ComplianceProps = {
   complianceWorkflow?: ComplianceWorkflow;
   productAgreements: ProductAgreements[];
   customerWorkflows?: ComplianceWorkflow[];
-  disclosures: ComplianceDocumentSelection[];
-  bankingDisclosures: ComplianceDocumentSelection[];
   setComplianceWorkflow: Dispatch<SetStateAction<ComplianceWorkflow>>;
   setDisclosures: Dispatch<SetStateAction<ComplianceDocumentSelection[]>>;
-  setBankingDisclosures: Dispatch<SetStateAction<ComplianceDocumentSelection[]>>;
   evaluateCurrentStep: () => Promise<void>;
-  loadBankingDisclosures: () => Promise<void>;
   loadAgreements: () => Promise<void>;
   loadComplianceWorkflows: (query: IComplanceWorkflowQuery) => Promise<void>;
-  createComplianceWorkflow: (product_uid: string) => Promise<any>;
 };
 
 export interface IComplianceProvider {
@@ -401,6 +298,4 @@ export type ComplianceWorkflowProviderState = {
   complianceWorkflow?: ComplianceWorkflow;
   productAgreements: ProductAgreements[];
   customerWorkflows?: ComplianceWorkflow[];
-  disclosures: ComplianceDocumentSelection[];
-  bankingDisclosures: ComplianceDocumentSelection[];
 };

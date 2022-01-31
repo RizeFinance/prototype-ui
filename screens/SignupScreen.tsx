@@ -8,7 +8,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import { useAuth } from '../contexts/Auth';
 import { useCompliance } from '../contexts/ComplianceWorkflow';
-import CustomerService from '../services/CustomerService';
+import {CustomerService} from '../services';
 
 const logo = require('../assets/images/logo.png');
 

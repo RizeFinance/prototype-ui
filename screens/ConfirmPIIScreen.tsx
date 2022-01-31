@@ -5,7 +5,7 @@ import { Pressable, StyleSheet } from 'react-native';
 import { Screen, Button, useThemeColor } from '../components';
 import { RootStackParamList } from '../types';
 import { Heading3, Body } from '../components/Typography';
-import CustomerService from '../services/CustomerService';
+import {CustomerService} from '../services';
 import { useCompliance, ProductType } from '../contexts/ComplianceWorkflow';
 import { useAuth } from '../contexts/Auth';
 import { get } from 'lodash';

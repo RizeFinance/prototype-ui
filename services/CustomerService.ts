@@ -79,7 +79,7 @@ const verifyCustomer = async (accessToken: string): Promise<Customer> => {
     });
 };
 
-export default {
+export {
   getCustomer,
   verifyCustomer,
   getCustomerProducts,

@@ -1,6 +1,6 @@
+import React, { useState } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik } from 'formik';
-import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Screen } from '../components';
 import { Body, BodySmall, Heading3 } from '../components/Typography';
@@ -8,7 +8,7 @@ import { useCompliance } from '../contexts/ComplianceWorkflow';
 import { RootStackParamList } from '../types';
 import * as Network from 'expo-network';
 import { useAuth } from '../contexts/Auth';
-import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
+import {ComplianceWorkflowService} from '../services';
 
 interface PatriotActScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'PatriotAct'>;
@@ -17,6 +17,7 @@ interface PatriotActScreenProps {
 export default function PatriotActScreen({ navigation }: PatriotActScreenProps): JSX.Element {
   const { complianceWorkflow, setComplianceWorkflow } = useCompliance();
   const { accessToken } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const styles = StyleSheet.create({
     heading: {
@@ -24,10 +25,13 @@ export default function PatriotActScreen({ navigation }: PatriotActScreenProps):
     },
     content: {
       paddingHorizontal: 16,
+      marginBottom: 25,
+      flex: 2,
     },
   });
 
   const onSubmit = async (): Promise<void> => {
+    setIsSubmitting(true);
     if (complianceWorkflow) {
       const externalStorageName = 'usa_ptrt_0';
 
@@ -51,7 +55,9 @@ export default function PatriotActScreen({ navigation }: PatriotActScreenProps):
         await setComplianceWorkflow(updatedComplianceWorkflow);
 
         navigation.navigate('PII');
+        setIsSubmitting(false);
       } else {
+        setIsSubmitting(false);
         // Check if already accepted
         patriotActDocument = complianceWorkflow.accepted_documents.find(
           (x) => x.external_storage_name === externalStorageName
@@ -66,51 +72,50 @@ export default function PatriotActScreen({ navigation }: PatriotActScreenProps):
   };
 
   return (
-    <Screen useScrollView>
-      <Heading3 textAlign="center" style={styles.heading}>
-        USA Patriot Act Notice
-      </Heading3>
-
-      <BodySmall textAlign="center">Scroll to the bottom of the document to accept.</BodySmall>
-
-      <Body>&nbsp;</Body>
-      <Body>&nbsp;</Body>
+    <Screen>
+      <View>
+        <Heading3 textAlign="center" style={styles.heading}>
+          USA Patriot Act Notice
+        </Heading3>
+      </View>
 
       <View style={styles.content}>
-        <Body>Important Information About Procedures for Opening a New Account</Body>
+        <Body
+          fontWeight="semibold"
+          style={{ textAlign: 'center', marginTop: 50, marginBottom: 25 }}
+        >
+          Important Information About Procedures for Opening a New Account
+        </Body>
 
-        <Body>&nbsp;</Body>
-
-        <Body>
+        <Body style={{ marginBottom: 25 }}>
           To help the government fight the funding of terrorism and money laundering activities,
           Federal law requires all financial institutions to obtain, verify, and record information
           that identifies each person who opens an account.
         </Body>
 
-        <Body>&nbsp;</Body>
-
+        <Body fontWeight="semibold" style={{ marginBottom: 5 }}>
+          What this means for you:
+        </Body>
         <Body>
-          What this means for you: When you open an account, we will ask for your name, address,
-          date of birth, and other information that will allow us to identify you. We may also ask
-          to see your driver&apos;s license or other identifying documents.
+          When you open an account, we will ask for your name, address, date of birth, and other
+          information that will allow us to identify you. We may also ask to see your driver&apos;s
+          license or other identifying documents.
         </Body>
       </View>
 
-      <Body>&nbsp;</Body>
-      <Body>&nbsp;</Body>
+      <View>
+        <BodySmall textAlign="center" style={{ marginBottom: 20 }}>
+          By clicking &quot;I Agree&quot; I am acknowledging that I have read and agree to the USA
+          Patriot Act.
+        </BodySmall>
 
-      <BodySmall textAlign="center">
-        By clicking &quot;I Agree&quot; I am acknowledging that I have read and agree to the USA
-        Patriot Act.
-      </BodySmall>
-
-      <BodySmall>&nbsp;</BodySmall>
-
-      <Formik initialValues={{}} onSubmit={onSubmit}>
-        {({ isSubmitting, handleSubmit }) => (
-          <Button title="I Agree" disabled={isSubmitting} onPress={(): void => handleSubmit()} />
-        )}
-      </Formik>
+        <Button
+          title="I Agree"
+          disabled={isSubmitting}
+          loading={isSubmitting}
+          onPress={() => onSubmit()}
+        />
+      </View>
     </Screen>
   );
 }

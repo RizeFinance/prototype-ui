@@ -37,16 +37,30 @@ const acknowledgeDocuments = async (
     .then((response) => response.data);
 };
 
-const createWorkflow = async (accessToken: string, productUid: string): Promise<any> => {
-  return await api
-    .post(
-      '/compliance_workflows',
-      { product_uid: productUid },
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    )
-    .then((response) => response.data);
+// const createWorkflow = async (accessToken: string, productUid: string): Promise<any> => {
+//   return await api
+//     .post(
+//       '/compliance_workflows',
+//       { product_uid: productUid },
+//       { headers: { Authorization: `Bearer ${accessToken}` } }
+//     )
+//     .then((response) => response.data);
+// };
+
+const createWorkflow = async ({
+  accessToken,
+  customerUid,
+  productCompliancePlanUid,
+}): Promise<ComplianceWorkflow> => {
+  const { data } = await api.post(
+    '/compliance_workflows',
+    { productCompliancePlanUid, customerUid },
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  return data;
 };
 
+// TODO: this needs to be updated in middleware. Data sent is failing and doesn't match API
 const renewWorkflow = async (accessToken: string): Promise<any> => {
   return await api
     .post(
@@ -68,7 +82,7 @@ const getComplianceWorkflows = async (
     .then((response) => response.data);
 };
 
-export default {
+export {
   getCustomerWorkflows,
   viewLatestWorkflow,
   acknowledgeDocuments,

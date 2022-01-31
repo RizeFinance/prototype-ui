@@ -8,7 +8,7 @@ import { ComplianceDocumentSelection, useCompliance } from '../contexts/Complian
 import * as Network from 'expo-network';
 import { ComplianceDocumentAcknowledgementRequest } from '@rizefinance/rize-js/lib/core/compliance-workflow';
 import { useAuth } from '../contexts/Auth';
-import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
+import {ComplianceWorkflowService} from '../services';
 
 export default function BankingDisclosuresScreen(): JSX.Element {
   const {

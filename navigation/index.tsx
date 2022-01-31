@@ -37,7 +37,7 @@ import {
   MenuScreen,
   PatriotActScreen,
   PDFReaderScreen,
-  PIIScreen,
+  // PIIScreen,
   ProcessingApplicationScreen,
   SignupScreen,
   SetPasswordScreen,
@@ -146,10 +146,13 @@ function MainStackScreen() {
         <ComplianceProvider navigation={navigation}>
           {customer.status === 'initiated' ? (
             <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+              {/* step 1 */}
               <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
               <Stack.Screen name="PatriotAct" component={PatriotActScreen} />
-              <Stack.Screen name="PII" component={PIIScreen} />
+
+              {/* <Stack.Screen name="PII" component={PIIScreen} /> */}
               <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} />
+              {/* step 2 */}
               <Stack.Screen name="BankingDisclosures" component={BankingDisclosuresScreen} />
               <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
               <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />

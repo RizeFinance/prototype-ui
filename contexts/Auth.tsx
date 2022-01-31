@@ -1,8 +1,32 @@
 import React, { useContext, useEffect, useState, createContext, useMemo, useCallback } from 'react';
 import AuthService, { IConfirmPW } from '../services/AuthService';
 import { storeData, getData, removeValue } from '../utils/asyncStorage';
-import CustomerService from '../services/CustomerService';
+import {CustomerService} from '../services';
 import { Customer } from '../models';
+export interface CustomerData {
+  uid: string;
+  external_uid: string;
+  program_uid: string;
+  email: string;
+  status: string;
+  kyc_status?: any;
+  total_balance: number;
+  created_at: Date;
+  locked_at?: any;
+  lock_reason?: any;
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  suffix: string;
+  phone: string;
+  dob: string;
+  street1: string;
+  street2: string;
+  city: string;
+  state: string;
+  postal_code: string;
+}
+
 
 export type AuthContextProps = {
   accessToken?: string;
@@ -15,7 +39,7 @@ export type AuthContextProps = {
   confirmPassword: (data: IConfirmPW) => Promise<any>;
   setPassword: (username: string, oldPassword: string, newPassword: string) => Promise<any>;
   refreshCustomer: () => Promise<Customer>;
-  customer?: Customer;
+  customer?: CustomerData;
   customerProducts?: any;
   setCustomer: React.Dispatch<React.SetStateAction<Customer>>;
 };

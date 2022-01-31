@@ -3,12 +3,9 @@ import { StyleSheet, View, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Screen, Checkbox, Button } from '../../components';
 import { Heading3, Body } from '../../components/Typography';
-import {
-  useCompliance,
-  ComplianceDocumentSelection,
-} from '../../contexts/ComplianceWorkflow';
+import { useCompliance, ComplianceDocumentSelection } from '../../contexts/ComplianceWorkflow';
 import { ComplianceDocumentAcknowledgementRequest } from '@rizefinance/rize-js/lib/core/compliance-workflow';
-import ComplianceWorkflowService from '../../services/ComplianceWorkflowService';
+import {ComplianceWorkflowService} from '../../services';
 import { useAuth } from '../../contexts/Auth';
 import config from '../../config/config';
 import { find, get } from 'lodash';
@@ -18,8 +15,7 @@ export default function BrokerageDisclosuresScreen(): JSX.Element {
   const navigation = useNavigation();
 
   const brokerageProductUid = config.application.brokerageProductUid;
-  const { customerWorkflows, loadComplianceWorkflows, setComplianceWorkflow } =
-    useCompliance();
+  const { customerWorkflows, loadComplianceWorkflows, setComplianceWorkflow } = useCompliance();
   const { accessToken } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checked, setChecked] = useState(false);
