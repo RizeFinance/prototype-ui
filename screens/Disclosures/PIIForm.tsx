@@ -21,78 +21,16 @@ import { defaultColors } from '../../constants/Colors';
 import { CustomerService } from '../../services';
 import MaskInput, { createNumberMask, formatWithMask, Mask } from 'react-native-mask-input';
 import { isEmpty } from 'lodash';
+import ConfirmationInfo from './ConfirmationInfo';
 
+interface IPIIForm {
+  handleSubmit: any;
+  customer: any;
+  isLoading?: boolean;
+}
 
-
-const PIIForm = ({ handleSubmit, showConfirmInfo = false, customer }) => {
-  const [showConfirm, setShowConfirm] = useState(() => (customer.last_name ? true : false));
-  const [showPatAct, setShowPatAct] = useState(false)
-
-  console.log(customer, 'customer');
-  
-
-  const ConfirmationInfo = ({ values }) => {
-    console.log(values, 'values');
-    
-    return (
-      <View>
-        <Body>&nbsp;</Body>
-        <Body>&nbsp;</Body>
-        <Body fontWeight="semibold">First name</Body>
-        <Body style={{ color: defaultColors.gray }}>
-          {values.first_name || customer.first_name}
-        </Body>
-        <Body>&nbsp;</Body>
-        {(values.middle_name || customer.middle_name) && (
-          <>
-            <Body fontWeight="semibold">Middle name</Body>
-            <Body style={{ color: defaultColors.gray }}>
-              {values.middle_name || customer.middle_name}
-            </Body>
-            <Body>&nbsp;</Body>
-          </>
-        )}
-        <Body fontWeight="semibold">Last name</Body>
-        <Body style={{ color: defaultColors.gray }}>{values.last_name || customer.last_name}</Body>
-        <Body>&nbsp;</Body>
-        {values.suffix && (
-          <>
-            <Body fontWeight="semibold">Suffix</Body>
-            <Body style={{ color: defaultColors.gray }}>{values.suffix || customer.suffix}</Body>
-            <Body>&nbsp;</Body>
-          </>
-        )}
-        <Body fontWeight="semibold">Date of Birth</Body>
-        <Body style={{ color: defaultColors.gray }}>{values.dob || customer.dob}</Body>
-        <Body>&nbsp;</Body>
-
-        <Body fontWeight="semibold">Address</Body>
-        <Body style={{ color: defaultColors.gray }}>{values.street1 || customer.street1}</Body>
-
-        {(values.street2 || customer.street2) && (
-          <Body style={{ color: defaultColors.gray }}>{values.street2 || customer.street2}</Body>
-        )}
-
-        <Body style={{ color: defaultColors.gray }}>{`${values.city}, ${values.state} ${
-          values.postal_code || customer.postal_code
-        }`}</Body>
-        <Body>&nbsp;</Body>
-        <Body fontWeight="semibold">Phone Number</Body>
-        <Body style={{ color: defaultColors.gray }}>{values.phone || customer.phone}</Body>
-        <Body>&nbsp;</Body>
-        <Body fontWeight="semibold">Social Security Number</Body>
-        <Body style={{ color: defaultColors.gray }}>
-          {(values.ssn || customer.ssn) ?? '*** ** ****'}
-        </Body>
-        <Body>&nbsp;</Body>
-        {/* {productType === ProductType.Checking && ( */}
-        <TextLink style={{marginVertical: 50}} textAlign="center" onPress={() => setShowConfirm(false)}>
-          {customer.last_name ? 'Revise Information' : 'Edit Information'}
-        </TextLink>
-        {/* )} */}
-      </View>
-    );
-  };
+const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
+  const [inEditMode, setInEditMode] = useState(false)
 
   const initialValues = {
     first_name: isEmpty(customer.first_name) ? '' : customer.first_name,
@@ -109,13 +47,19 @@ const PIIForm = ({ handleSubmit, showConfirmInfo = false, customer }) => {
     ssn: '',
   };
 
+  if (!isEmpty(customer.last_name) && !inEditMode) {
+    return <ConfirmationInfo customerInfo={customer} setInEditMode={setInEditMode}  />;
+  }
+
+
   return (
     <>
       <Heading3 textAlign="center" style={styles.heading}>
-        {showConfirm ? 'Confirm Your Personal Information' : 'Enter Your Personal Information'}
+        {inEditMode && 'Update Your Personal Information'}
+        {!isEmpty(customer.last_name) ? 'Confirm Your Personal Information' : 'Enter Your Personal Information'}
       </Heading3>
 
-      <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={piiSchema}>
+      <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={inEditMode ? editableInfoSchema : piiSchema}>
         {({
           handleChange,
           handleBlur,
@@ -131,10 +75,6 @@ const PIIForm = ({ handleSubmit, showConfirmInfo = false, customer }) => {
         }) => {
           return (
             <>
-              {showConfirm ? (
-                <ConfirmationInfo values={values} />
-              ) : (
-                <>
                   <View style={styles.formGroup}>
                     <Input
                       label="First Name"
@@ -186,7 +126,7 @@ const PIIForm = ({ handleSubmit, showConfirmInfo = false, customer }) => {
                         onBlur={handleBlur('dob')}
                         value={values.dob}
                         errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
-                        editable={!isSubmitting}
+                        editable={!inEditMode || isSubmitting && !isSubmitting}
                       />
                     ) : (
                       <DatePickerInput
@@ -194,6 +134,7 @@ const PIIForm = ({ handleSubmit, showConfirmInfo = false, customer }) => {
                         placeholder="Month/Date/Year"
                         errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
                         value={values.dob}
+                        disabled={!inEditMode || isSubmitting && !isSubmitting}
                         onChange={(date: Date) => {
                           setFieldValue('dob', date);
                           setFieldTouched('dob', true, false);
@@ -273,25 +214,15 @@ const PIIForm = ({ handleSubmit, showConfirmInfo = false, customer }) => {
                         const value = formatStringByPattern('999-99-9999', e);
                         setFieldValue('ssn', value);
                       }}
-                      multiline={true}
+                      // multiline={true}
                       onBlur={handleBlur('ssn')}
                       value={values.ssn}
                       errorText={!touched.ssn ? '' : errors.ssn}
-                      editable={!isSubmitting}
+                      editable={!inEditMode || isSubmitting && !isSubmitting}
                       maxLength={11}
                       autoCapitalize={'none'}
                     />
                   </View>
-                </>
-              )}
-
-              {/* <Button
-                title={showConfirm ? 'Submit Information' : 'Confirm Information'}
-                disabled={!dirty || !isValid || isSubmitting}
-                onPress={() => (showConfirm ? handleSubmit() : setShowConfirm(true))}
-                style={styles.submitButton}
-                loading={isSubmitting}
-              /> */}
             </>
           );
         }}
@@ -305,14 +236,16 @@ export default PIIForm;
 const maxDob = new Date();
 maxDob.setFullYear(maxDob.getFullYear() - 18);
 
-const piiSchema = Yup.object().shape({
+const editableInfoSchema = Yup.object().shape({
   first_name: Yup.string().required('First Name is required.'),
   last_name: Yup.string().required('Last Name is required.'),
-  dob: Yup.date()
-    .required('Date of Birth is required.')
-    .max(maxDob, 'You should be at least 18 years old.')
-    .typeError('You must enter a valid Date of Birth'),
-  street1: Yup.string().required('Address is required.'),
+  middle_name: Yup.string(),
+  suffix: Yup.string(),
+  phone: Yup.string()
+    .required('Phone Number is required.')
+    .max(14, 'Invalid Phone Number.')
+    .matches(/\(\d{3}\) \d{3}-\d{4}/, 'Invalid Phone Number.'),
+    street1: Yup.string().required('Address is required.'),
   city: Yup.string().required('City is required.'),
   state: Yup.string().required('State is required.'),
   postal_code: Yup.string()
@@ -320,14 +253,17 @@ const piiSchema = Yup.object().shape({
     .min(5, 'Invalid Zip Code.')
     .max(5, 'Invalid Zip Code.')
     .matches(/^\d+$/, 'Invalid Zip Code.'),
-  phone: Yup.string()
-    .required('Phone Number is required.')
-    .max(14, 'Invalid Phone Number.')
-    .matches(/\(\d{3}\) \d{3}-\d{4}/, 'Invalid Phone Number.'),
+})
+
+const piiSchema = editableInfoSchema.shape({
+  dob: Yup.date()
+    .required('Date of Birth is required.')
+    .max(maxDob, 'You should be at least 18 years old.')
+    .typeError('You must enter a valid Date of Birth'),
   ssn: Yup.string()
     .required('SSN is required.')
     .max(11, 'Invalid Social Security Number.')
-    .matches(/[A-Za-z0-9]{3}-[A-Za-z0-9]{2}-[A-Za-z0-9]{4}/, 'Invalid Social Security Number.'),
+    .matches(/[A-Za-z0-9]{3}-[A-Za-z0-9]{2}-[A-Za-z0-9]{4}/, 'Invalid Social Security Number.')
 });
 
 const styles = StyleSheet.create({

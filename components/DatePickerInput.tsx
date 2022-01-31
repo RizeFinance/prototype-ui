@@ -24,6 +24,7 @@ export type DatePickerInputProps = {
   placeholder?: string;
   containerStyle?: ViewStyle;
   onChange?: (date: Date) => void;
+  disabled?: boolean;
 };
 
 const DatePickerInput = (props: DatePickerInputProps): JSX.Element => {
@@ -101,6 +102,7 @@ const DatePickerInput = (props: DatePickerInputProps): JSX.Element => {
     return (
       <DateTimePicker
         value={temporaryDate ?? new Date()}
+        disabled={props.disabled}
         mode={'date'}
         display={Platform.OS === 'ios' ? 'inline' : 'default'}
         onChange={(e, d): void => {

@@ -11,9 +11,11 @@ const useComplianceWorkflow = (customerUid: string, accessToken: string) => {
   const [error, setError] = useState(undefined);
   const [checkboxData, setCheckboxData] = useState([])
 
-  const [trackingSteps, setTrackingSteps] = useState(0)
+  const [internalSteps, setInternalSteps] = useState([])
 
-  console.log(trackingSteps, 'trackingSteps')
+  const [currentInternalStep, setCurrentInternalStep] = useState(0)
+
+  console.log(currentInternalStep, 'currentInternalStep')
 
 
   const parseWorkflow = useCallback((workflow) => {
@@ -24,6 +26,16 @@ const useComplianceWorkflow = (customerUid: string, accessToken: string) => {
         steps = doc.step;
       }
     });
+
+    let i = 1
+    let test = []
+    while(i <= steps + 1) {
+      test.push(i)
+      i++
+    }
+
+    setInternalSteps(test)
+    
 
     const checkboxData = workflow.current_step_documents_pending.reduce(
       (acc, curr) => {
@@ -38,7 +50,7 @@ const useComplianceWorkflow = (customerUid: string, accessToken: string) => {
     setCurrentPendingDocs(workflow.current_step_documents_pending);
     setCurrentStep(workflow.summary.current_step);
     setTotalSteps(steps);
-    setTrackingSteps(steps + 1)
+    setCurrentInternalStep(workflow.summary.current_step + 1)
     setCustomer(workflow.customer);
   }, []);
 
@@ -105,6 +117,8 @@ const useComplianceWorkflow = (customerUid: string, accessToken: string) => {
     submitAgreements,
     checkboxData,
     isLoading,
+    currentInternalStep,
+    internalSteps
   };
 };
 

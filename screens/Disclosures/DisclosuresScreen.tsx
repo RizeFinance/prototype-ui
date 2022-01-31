@@ -12,6 +12,7 @@ import PIIForm from './PIIForm';
 import Processing from './Processing';
 import moment from 'moment';
 import AgreementCheckbox from './AgreementCheckbox';
+import ConfirmationInfo from './ConfirmationInfo';
 
 import useComplianceWorkflow from '../../hooks/useComplianceWorkflow';
 
@@ -54,20 +55,20 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
           <Body fontWeight="semibold" style={styles.title}>
             Important Information About Procedures for Opening a New Account
           </Body>
-  
+
           <Body style={{ marginBottom: 25 }}>
             To help the government fight the funding of terrorism and money laundering activities,
-            Federal law requires all financial institutions to obtain, verify, and record information
-            that identifies each person who opens an account.
+            Federal law requires all financial institutions to obtain, verify, and record
+            information that identifies each person who opens an account.
           </Body>
-  
+
           <Body fontWeight="semibold" style={{ marginBottom: 5 }}>
             What this means for you:
           </Body>
           <Body>
             When you open an account, we will ask for your name, address, date of birth, and other
-            information that will allow us to identify you. We may also ask to see your driver&apos;s
-            license or other identifying documents.
+            information that will allow us to identify you. We may also ask to see your
+            driver&apos;s license or other identifying documents.
           </Body>
         </View>
         <AgreementCheckbox currentDocs={currentPendingDocs} />
@@ -85,12 +86,24 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
       case 2:
         return {
           title: null,
-          component: <PatriotAct />,
+          component: customer.last_name ? (
+            <PatriotAct />
+          ) : (
+            <PIIForm
+              isLoading={isLoading}
+              handleSubmit={handlePIISubmit}
+              customer={customer}
+            />
+          ),
         };
       case 3:
         return {
           title: customer.last_name ? null : 'Banking Disclosures',
-          component: customer.last_name ? <PIIForm handleSubmit={handlePIISubmit} customer={customer} /> : <AgreementCheckbox currentDocs={currentPendingDocs} />,
+          component: customer.last_name ? (
+            <PIIForm handleSubmit={handlePIISubmit} customer={customer} />
+          ) : (
+            <AgreementCheckbox currentDocs={currentPendingDocs} />
+          ),
         };
       default:
         return { title: '', component: null };
@@ -98,16 +111,16 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
   };
 
   const renderAgreement = () => {
-    const agreementNames = currentPendingDocs.map(doc => doc.name)
-    const numNames = agreementNames.length
+    const agreementNames = currentPendingDocs.map((doc) => doc.name);
+    const numNames = agreementNames.length;
 
-    if(numNames === 1) return agreementNames[0]
-    if(numNames === 2) return `${agreementNames[0]} and ${agreementNames[1]}`
-    if(numNames >= 3) {
-      agreementNames[numNames -1] = `and ${agreementNames[numNames -1]} `
-      return agreementNames.join(', ')
+    if (numNames === 1) return agreementNames[0];
+    if (numNames === 2) return `${agreementNames[0]} and ${agreementNames[1]}`;
+    if (numNames >= 3) {
+      agreementNames[numNames - 1] = `and ${agreementNames[numNames - 1]} `;
+      return agreementNames.join(', ');
     }
-  }
+  };
 
   if (!isEmpty(checkboxData)) {
     return (
@@ -126,17 +139,20 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
             <>
               {renderTitle().component}
 
-                <View>
-                  <BodySmall textAlign="center" style={{ marginBottom: 20, maxWidth: '40ch', alignSelf: 'center' }}>
-                    {`By clicking "I Agree" I have read and agreed to the ${renderAgreement()} `}
-                  </BodySmall>
-                  <Button
-                    title="I Agree"
-                    disabled={!formik.isValid || isLoading}
-                    onPress={formik.submitForm}
-                    loading={isLoading}
-                  />
-                </View>
+              <View>
+                <BodySmall
+                  textAlign="center"
+                  style={{ marginBottom: 20, maxWidth: '40ch', alignSelf: 'center' }}
+                >
+                  {`By clicking "I Agree" I have read and agreed to the ${renderAgreement()} `}
+                </BodySmall>
+                <Button
+                  title="I Agree"
+                  disabled={!formik.isValid || isLoading}
+                  onPress={formik.submitForm}
+                  loading={isLoading}
+                />
+              </View>
             </>
           )}
         </Formik>

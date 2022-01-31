@@ -10,11 +10,20 @@ export type InputProps = Omit<TextInput['props'], 'style'> & {
   labelStyle?: TextStyle;
   inputStyle?: StyleProp<TextStyle>;
   containerStyle?: ViewStyle;
+  editable?: boolean;
 };
 
 const Input = (props: InputProps): JSX.Element => {
-  const { label, errorState, errorText, labelStyle, inputStyle, containerStyle, ...otherProps } =
-    props;
+  const {
+    label,
+    errorState,
+    errorText,
+    labelStyle,
+    inputStyle,
+    editable,
+    containerStyle,
+    ...otherProps
+  } = props;
 
   const border = useThemeColor('border');
   const error = useThemeColor('error');
@@ -51,6 +60,7 @@ const Input = (props: InputProps): JSX.Element => {
         </Body>
       )}
       <TextInput
+        editable={editable}
         style={[
           fontStyles.body,
           defaultStyles.textInput,
