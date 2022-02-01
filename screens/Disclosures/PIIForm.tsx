@@ -1,24 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Formik } from 'formik';
 import { StyleSheet, View, Platform } from 'react-native';
 import {
   Button,
   DatePickerInput,
   Input,
-  Screen,
   Dropdown,
-  Body,
   MaskedInput,
   Heading3,
-  TextLink,
 } from '../../components';
 import * as Yup from 'yup';
-import { PIIFields, RootStackParamList } from '../../types';
 import states from '../../constants/States';
-import { ProductType } from '../../contexts';
 import formatStringByPattern from 'format-string-by-pattern';
-import { defaultColors } from '../../constants/Colors';
-import { CustomerService } from '../../services';
 import MaskInput, { createNumberMask, formatWithMask, Mask } from 'react-native-mask-input';
 import { isEmpty } from 'lodash';
 import ConfirmationInfo from './ConfirmationInfo';
@@ -30,7 +23,8 @@ interface IPIIForm {
 }
 
 const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
-  const [inEditMode, setInEditMode] = useState(false)
+  const [inEditMode, setInEditMode] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const initialValues = {
     first_name: isEmpty(customer.first_name) ? '' : customer.first_name,
@@ -48,22 +42,23 @@ const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
   };
 
   if (!isEmpty(customer.last_name) && !inEditMode) {
-    return <ConfirmationInfo customerInfo={customer} setInEditMode={setInEditMode}  />;
+    return <ConfirmationInfo customerInfo={customer} setInEditMode={setInEditMode} />;
   }
-
 
   return (
     <>
       <Heading3 textAlign="center" style={styles.heading}>
-        {inEditMode && 'Update Your Personal Information'}
-        {!isEmpty(customer.last_name) ? 'Confirm Your Personal Information' : 'Enter Your Personal Information'}
+        {inEditMode ? 'Update Your Personal Information' : 'Enter Your Personal Information'}
       </Heading3>
 
-      <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={inEditMode ? editableInfoSchema : piiSchema}>
+      <Formik
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+        validationSchema={inEditMode ? editableInfoSchema : piiSchema}
+      >
         {({
           handleChange,
           handleBlur,
-          handleSubmit,
           setFieldValue,
           setFieldTouched,
           values,
@@ -75,6 +70,10 @@ const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
         }) => {
           return (
             <>
+              {showConfirm ? (
+                <ConfirmationInfo customerInfo={values} setInEditMode={setShowConfirm} />
+              ) : (
+                <>
                   <View style={styles.formGroup}>
                     <Input
                       label="First Name"
@@ -126,7 +125,7 @@ const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
                         onBlur={handleBlur('dob')}
                         value={values.dob}
                         errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
-                        editable={!inEditMode || isSubmitting && !isSubmitting}
+                        editable={!inEditMode || (isSubmitting && !isSubmitting)}
                       />
                     ) : (
                       <DatePickerInput
@@ -134,7 +133,7 @@ const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
                         placeholder="Month/Date/Year"
                         errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
                         value={values.dob}
-                        disabled={!inEditMode || isSubmitting && !isSubmitting}
+                        disabled={!inEditMode || (isSubmitting && !isSubmitting)}
                         onChange={(date: Date) => {
                           setFieldValue('dob', date);
                           setFieldTouched('dob', true, false);
@@ -214,15 +213,22 @@ const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
                         const value = formatStringByPattern('999-99-9999', e);
                         setFieldValue('ssn', value);
                       }}
-                      // multiline={true}
                       onBlur={handleBlur('ssn')}
                       value={values.ssn}
                       errorText={!touched.ssn ? '' : errors.ssn}
-                      editable={!inEditMode || isSubmitting && !isSubmitting}
+                      editable={!inEditMode || (isSubmitting && !isSubmitting)}
                       maxLength={11}
                       autoCapitalize={'none'}
                     />
                   </View>
+                  <Button
+                    style={{ marginTop: 30 }}
+                    title="Submit Information"
+                    disabled={!isValid}
+                    onPress={() => setShowConfirm(true)}
+                  />
+                </>
+              )}
             </>
           );
         }}
@@ -245,7 +251,7 @@ const editableInfoSchema = Yup.object().shape({
     .required('Phone Number is required.')
     .max(14, 'Invalid Phone Number.')
     .matches(/\(\d{3}\) \d{3}-\d{4}/, 'Invalid Phone Number.'),
-    street1: Yup.string().required('Address is required.'),
+  street1: Yup.string().required('Address is required.'),
   city: Yup.string().required('City is required.'),
   state: Yup.string().required('State is required.'),
   postal_code: Yup.string()
@@ -253,7 +259,7 @@ const editableInfoSchema = Yup.object().shape({
     .min(5, 'Invalid Zip Code.')
     .max(5, 'Invalid Zip Code.')
     .matches(/^\d+$/, 'Invalid Zip Code.'),
-})
+});
 
 const piiSchema = editableInfoSchema.shape({
   dob: Yup.date()
@@ -263,7 +269,7 @@ const piiSchema = editableInfoSchema.shape({
   ssn: Yup.string()
     .required('SSN is required.')
     .max(11, 'Invalid Social Security Number.')
-    .matches(/[A-Za-z0-9]{3}-[A-Za-z0-9]{2}-[A-Za-z0-9]{4}/, 'Invalid Social Security Number.')
+    .matches(/[A-Za-z0-9]{3}-[A-Za-z0-9]{2}-[A-Za-z0-9]{4}/, 'Invalid Social Security Number.'),
 });
 
 const styles = StyleSheet.create({
@@ -272,24 +278,5 @@ const styles = StyleSheet.create({
   },
   formGroup: {
     marginVertical: 10,
-  },
-  submitButton: {
-    marginTop: 30,
-  },
-  editButton: {
-    textDecorationLine: 'underline',
-    textDecorationColor: defaultColors.primary,
-    color: defaultColors.primary,
-    marginTop: 20,
-  },
-  content: {
-    paddingHorizontal: 16,
-    marginBottom: 25,
-    flex: 2,
-  },
-  title: {
-    textAlign: 'center',
-    marginTop: 50,
-    marginBottom: 25,
   },
 });

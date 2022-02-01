@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { Body, TextLink, Heading3 } from '../../components';
+import { Body, TextLink, Heading3, Button } from '../../components';
 import { defaultColors } from '../../constants/Colors';
 import { isEmpty } from 'lodash';
 
 const ConfirmationInfo = ({ customerInfo, setInEditMode }) => {
+
+  
   if (isEmpty(customerInfo)) {
     return <ActivityIndicator size="large" />;
   } else {
@@ -61,13 +63,11 @@ const ConfirmationInfo = ({ customerInfo, setInEditMode }) => {
           {customerInfo.last_name ? 'Revise Information' : 'Edit Information'}
         </TextLink>
 
-        {/* <Button
+        <Button
           title='Confirm Information'
           onPress={() => (showConfirm ? handleSubmit() : setShowConfirm(true))}
           style={styles.submitButton}
-          loading={isSubmitting}
-            /> */}
-        {/* )} */}
+        />
       </View>
     );
   }
@@ -78,6 +78,7 @@ export default ConfirmationInfo;
 const styles = StyleSheet.create({
   heading: {
     marginBottom: 10,
+    flex: 0,
   },
   formGroup: {
     marginVertical: 10,

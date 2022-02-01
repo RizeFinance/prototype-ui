@@ -1,25 +1,23 @@
 import React from 'react';
 import { isEmpty, mapValues } from 'lodash';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { Screen, Button, Heading3, BodySmall, Body } from '../../components';
-import { useCompliance, useAuth } from '../../contexts';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../types';
-import { ComplianceWorkflowService, CustomerService } from '../../services';
+import { Screen, Heading3, BodySmall, Body } from '../../components';
+import { useAuth } from '../../contexts';
+import { CustomerService } from '../../services';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import PIIForm from './PIIForm';
 import Processing from './Processing';
 import moment from 'moment';
 import AgreementCheckbox from './AgreementCheckbox';
-import ConfirmationInfo from './ConfirmationInfo';
+import { defaultColors } from '../../constants/Colors';
 
 import useComplianceWorkflow from '../../hooks/useComplianceWorkflow';
 
-export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps): JSX.Element {
+const DisclosuresScreen = () => {
   const { accessToken, customer } = useAuth();
 
-  const { currentStep, totalSteps, currentPendingDocs, submitAgreements, checkboxData, isLoading } =
+  const { currentStep, error, currentPendingDocs, submitAgreements, checkboxData, isLoading } =
     useComplianceWorkflow(customer.uid, accessToken);
 
   const handlePIISubmit = async (values) => {
@@ -47,7 +45,7 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
 
   const PatriotAct = () => {
     return (
-      <>
+      <View style={{ flex: 1 }}>
         <Heading3 textAlign="center" style={styles.heading}>
           USA Patriot Act Notice
         </Heading3>
@@ -71,17 +69,17 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
             driver&apos;s license or other identifying documents.
           </Body>
         </View>
-        <AgreementCheckbox currentDocs={currentPendingDocs} />
-      </>
+        <AgreementCheckbox currentDocs={currentPendingDocs} isLoading={isLoading} />
+      </View>
     );
   };
 
-  const renderTitle = () => {
+  const renderScreen = () => {
     switch (currentStep) {
       case 1:
         return {
           title: 'Rize Disclosures',
-          component: <AgreementCheckbox currentDocs={currentPendingDocs} />,
+          component: <AgreementCheckbox currentDocs={currentPendingDocs} isLoading={isLoading} />,
         };
       case 2:
         return {
@@ -89,45 +87,47 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
           component: customer.last_name ? (
             <PatriotAct />
           ) : (
-            <PIIForm
-              isLoading={isLoading}
-              handleSubmit={handlePIISubmit}
-              customer={customer}
-            />
+            <PIIForm isLoading={isLoading} handleSubmit={handlePIISubmit} customer={customer} />
           ),
         };
       case 3:
         return {
-          title: customer.last_name ? null : 'Banking Disclosures',
-          component: customer.last_name ? (
-            <PIIForm handleSubmit={handlePIISubmit} customer={customer} />
-          ) : (
-            <AgreementCheckbox currentDocs={currentPendingDocs} />
-          ),
+          title: 'Banking Disclosures',
+          component: <AgreementCheckbox currentDocs={currentPendingDocs} isLoading={isLoading} />,
         };
       default:
         return { title: '', component: null };
     }
   };
 
-  const renderAgreement = () => {
-    const agreementNames = currentPendingDocs.map((doc) => doc.name);
-    const numNames = agreementNames.length;
+  const processing = ['queued', 'identity_verified', 'under_review'];
+  const unapproved = ['manual_review', 'rejected'];
 
-    if (numNames === 1) return agreementNames[0];
-    if (numNames === 2) return `${agreementNames[0]} and ${agreementNames[1]}`;
-    if (numNames >= 3) {
-      agreementNames[numNames - 1] = `and ${agreementNames[numNames - 1]} `;
-      return agreementNames.join(', ');
-    }
-  };
+  if (processing.includes(customer.status)) {
+    return <Processing />;
+  }
 
-  if (!isEmpty(checkboxData)) {
+  if (unapproved.includes(customer.status)) {
     return (
-      <Screen>
-        <Heading3 textAlign="center" style={styles.heading}>
-          {renderTitle().title}
+      <Screen withoutHeader>
+        <Heading3 textAlign="center" style={{ marginTop: 100 }}>
+          {`We're having issues with your account.`}
         </Heading3>
+        <Body textAlign="center" style={{ marginTop: 20 }}>
+          {`Please contact customer support for additional help.`}
+        </Body>
+      </Screen>
+    );
+  }
+
+  if (!isEmpty(checkboxData) && customer.status === 'initiated') {
+    return (
+      <Screen withoutHeader>
+        {!isEmpty(renderScreen().title) && (
+          <Heading3 textAlign="center" style={styles.heading}>
+            {renderScreen().title}
+          </Heading3>
+        )}
 
         <Formik
           initialValues={checkboxData}
@@ -135,24 +135,14 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
           validationSchema={optionalRequiredSchema}
           validateOnMount
         >
-          {(formik) => (
+          {() => (
             <>
-              {renderTitle().component}
-
-              <View>
-                <BodySmall
-                  textAlign="center"
-                  style={{ marginBottom: 20, maxWidth: '40ch', alignSelf: 'center' }}
-                >
-                  {`By clicking "I Agree" I have read and agreed to the ${renderAgreement()} `}
+              {renderScreen().component}
+              {!isEmpty(error) && (
+                <BodySmall fontWeight="semibold" style={styles.errorText}>
+                  {error}
                 </BodySmall>
-                <Button
-                  title="I Agree"
-                  disabled={!formik.isValid || isLoading}
-                  onPress={formik.submitForm}
-                  loading={isLoading}
-                />
-              </View>
+              )}
             </>
           )}
         </Formik>
@@ -161,15 +151,14 @@ export default function DisclosuresScreen({ navigation }: DisclosuresScreenProps
   } else {
     return <ActivityIndicator size="large" />;
   }
-}
+};
+
+export default DisclosuresScreen;
 
 const styles = StyleSheet.create({
-  footer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
   heading: {
-    marginBottom: 25,
+    // marginBottom: 25,
+    // flex: 1,
   },
   content: {
     paddingHorizontal: 16,
@@ -181,6 +170,11 @@ const styles = StyleSheet.create({
     marginTop: 50,
     marginBottom: 25,
   },
+  errorText: {
+    color: defaultColors.error,
+    marginHorizontal: 8,
+    marginTop: 4,
+  },
 });
 
 const optionalRequiredSchema = yup.lazy((obj) => {
@@ -190,7 +184,3 @@ const optionalRequiredSchema = yup.lazy((obj) => {
     })
   );
 });
-
-interface DisclosuresScreenProps {
-  navigation: StackNavigationProp<RootStackParamList, 'Disclosures'>;
-}

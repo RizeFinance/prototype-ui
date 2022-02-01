@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState, createContext, useMemo, useCallback } from 'react';
 import AuthService, { IConfirmPW } from '../services/AuthService';
 import { storeData, getData, removeValue } from '../utils/asyncStorage';
-import {CustomerService} from '../services';
+import { CustomerService } from '../services';
 import { Customer } from '../models';
 export interface CustomerData {
   uid: string;
@@ -26,7 +26,6 @@ export interface CustomerData {
   state: string;
   postal_code: string;
 }
-
 
 export type AuthContextProps = {
   accessToken?: string;

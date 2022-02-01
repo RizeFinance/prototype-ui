@@ -26,19 +26,13 @@ import { RootStackParamList } from '../types';
 import {
   AccountDetailsScreen,
   AccountsScreen,
-  ApplicationUnapprovedScreen,
-  BankingDisclosuresScreen,
-  ConfirmPIIScreen,
   DisclosuresScreen,
   ExternalAccountScreen,
   ForgotPasswordScreen,
   InitTransferScreen,
   LoginScreen,
   MenuScreen,
-  PatriotActScreen,
-  PDFReaderScreen,
   // PIIScreen,
-  ProcessingApplicationScreen,
   SignupScreen,
   SetPasswordScreen,
   DebitCardScreen,
@@ -53,7 +47,7 @@ import {
   AccountsSetupScreen,
 } from '../screens';
 
-import { ComplianceProvider, useAuth } from '../contexts';
+import { useAuth } from '../contexts';
 import { useThemeColor, Body, TextLink } from '../components';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
@@ -133,75 +127,48 @@ function MainStackScreen() {
     } as StackNavigationOptions,
   };
 
-  return (
-    <>
-      {!customer ? (
-        <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Signup" component={SignupScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
-        </Stack.Navigator>
-      ) : (
-        <ComplianceProvider navigation={navigation}>
-          {customer.status === 'initiated' ? (
-            <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
-              {/* step 1 */}
-              <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
-              {/* <Stack.Screen name="PatriotAct" component={PatriotActScreen} /> */}
+  if(!customer) {
+    return (
+      <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Signup" component={SignupScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
+    </Stack.Navigator>
+    )
+  }
 
-              {/* <Stack.Screen name="PII" component={PIIScreen} /> */}
-              {/* <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} /> */}
-              {/* step 2 */}
-              {/* <Stack.Screen name="BankingDisclosures" component={BankingDisclosuresScreen} /> */}
-              <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
-              {/* <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} /> */}
-            </Stack.Navigator>
-          ) : customer.status === 'queued' || customer.status === 'identity_verified' ? (
-            <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
-              <Stack.Screen name="ProcessingApplication" component={ProcessingApplicationScreen} />
-            </Stack.Navigator>
-          ) : customer.status === 'manual_review' ||
-            customer.status === 'under_review' ||
-            customer.status === 'rejected' ? (
-            <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
-              <Stack.Screen
-                name="ApplicationUnapproved"
-                component={ApplicationUnapprovedScreen}
-                initialParams={{ status: customer.status }}
-              />
-            </Stack.Navigator>
-          ) : customer.locked_at ? (
-            <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
-              <Stack.Screen name="LockedScreen" component={LockedScreen} />
-            </Stack.Navigator>
-          ) : (
-            <Stack.Navigator screenOptions={screenOptions.withHeader}>
-              <Stack.Screen name="Accounts" component={AccountsScreen} />
-              <Stack.Screen name="AccountsSetup" component={AccountsSetupScreen} />
+  if (customer.status !== 'active') {
+    return (
+      <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+        <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
+      </Stack.Navigator>
+    );
+  }
 
-              <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
-              <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
-              <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
-              <Stack.Screen name="DebitCard" component={DebitCardScreen} />
-              <Stack.Screen name="DebitCardActivation" component={DebitCardActivationScreen} />
-              <Stack.Screen name="PinSet" component={PinSetScreen} />
-              <Stack.Screen name="Statements" component={StatementScreen} />
-              <Stack.Screen name="Agreements" component={AgreementScreen} />
+  if (customer.locked_at) {
+    return (
+      <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
+        <Stack.Screen name="LockedScreen" component={LockedScreen} />
+      </Stack.Navigator>
+    );
+  }
 
-              {/* Product Onboarding */}
-              <Stack.Screen name="PII" component={PIIScreen} />
-              <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
-              <Stack.Screen name="ProfileQuestions" component={ProfileQuestionsScreen} />
-              <Stack.Screen name="BrokerageDisclosures" component={BrokerageDisclosuresScreen} />
-              <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} />
-              <Stack.Screen name="ProcessingScreen" component={ProcessingScreen} />
-            </Stack.Navigator>
-          )}
-        </ComplianceProvider>
-      )}
-    </>
-  );
+  if (customer) {
+    <Stack.Navigator screenOptions={screenOptions.withHeader}>
+      <Stack.Screen name="Accounts" component={AccountsScreen} />
+      <Stack.Screen name="AccountsSetup" component={AccountsSetupScreen} />
+
+      <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
+      <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
+      <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
+      <Stack.Screen name="DebitCard" component={DebitCardScreen} />
+      <Stack.Screen name="DebitCardActivation" component={DebitCardActivationScreen} />
+      <Stack.Screen name="PinSet" component={PinSetScreen} />
+      <Stack.Screen name="Statements" component={StatementScreen} />
+      <Stack.Screen name="Agreements" component={AgreementScreen} />
+    </Stack.Navigator>;
+  }
 }
 
 function RootNavigator() {

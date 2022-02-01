@@ -37,15 +37,6 @@ const acknowledgeDocuments = async (
     .then((response) => response.data);
 };
 
-// const createWorkflow = async (accessToken: string, productUid: string): Promise<any> => {
-//   return await api
-//     .post(
-//       '/compliance_workflows',
-//       { product_uid: productUid },
-//       { headers: { Authorization: `Bearer ${accessToken}` } }
-//     )
-//     .then((response) => response.data);
-// };
 
 const createWorkflow = async ({
   accessToken,
