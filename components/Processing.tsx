@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
-import { Screen, Heading3, Heading4 } from '../../components';
-import { useAuth } from '../../contexts';
-import { CustomerService } from '../../services';
-import config from '../../config/config';
+import { Screen, Heading3, Heading4 } from '.';
+import { useAuth } from '../contexts';
+import { CustomerService } from '../services';
+import config from '../config/config';
 
 const Processing = () => {
   const { accessToken, refreshCustomer, customer } = useAuth();
-
   let timeout = null;
 
   const styles = StyleSheet.create({

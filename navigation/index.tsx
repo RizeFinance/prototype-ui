@@ -41,9 +41,8 @@ import {
   AgreementScreen,
   LockedScreen,
   PinSetScreen,
-  ProfileQuestionsScreen,
-  BrokerageDisclosuresScreen,
-  ProcessingScreen,
+  // ProfileQuestionsScreen,
+  // BrokerageDisclosuresScreen,
   AccountsSetupScreen,
 } from '../screens';
 
@@ -96,8 +95,9 @@ const MenuButton = (): JSX.Element => {
 };
 
 function MainStackScreen() {
-  const { customer, ...auth } = useAuth();
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const { customer } = useAuth();
+
+  // const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const background = useThemeColor('background');
 
   const screenCardStyle: StyleProp<ViewStyle> = {
@@ -126,16 +126,17 @@ function MainStackScreen() {
       backgroundColor: background,
     } as StackNavigationOptions,
   };
-
-  if(!customer) {
+  // const processing = ['queued', 'identity_verified', 'under_review', 'initiated'];
+  // console.log(customer, 'customer in nav');
+  if (!customer) {
     return (
       <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Signup" component={SignupScreen} />
-      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-      <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
-    </Stack.Navigator>
-    )
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
+      </Stack.Navigator>
+    );
   }
 
   if (customer.status !== 'active') {
@@ -154,20 +155,22 @@ function MainStackScreen() {
     );
   }
 
-  if (customer) {
-    <Stack.Navigator screenOptions={screenOptions.withHeader}>
-      <Stack.Screen name="Accounts" component={AccountsScreen} />
-      <Stack.Screen name="AccountsSetup" component={AccountsSetupScreen} />
+  if (customer.status === 'active') {
+    return (
+      <Stack.Navigator screenOptions={screenOptions.withHeader}>
+        <Stack.Screen name="Accounts" component={AccountsScreen} />
+        <Stack.Screen name="AccountsSetup" component={AccountsSetupScreen} />
 
-      <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
-      <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
-      <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
-      <Stack.Screen name="DebitCard" component={DebitCardScreen} />
-      <Stack.Screen name="DebitCardActivation" component={DebitCardActivationScreen} />
-      <Stack.Screen name="PinSet" component={PinSetScreen} />
-      <Stack.Screen name="Statements" component={StatementScreen} />
-      <Stack.Screen name="Agreements" component={AgreementScreen} />
-    </Stack.Navigator>;
+        <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
+        <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
+        <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
+        <Stack.Screen name="DebitCard" component={DebitCardScreen} />
+        <Stack.Screen name="DebitCardActivation" component={DebitCardActivationScreen} />
+        <Stack.Screen name="PinSet" component={PinSetScreen} />
+        <Stack.Screen name="Statements" component={StatementScreen} />
+        <Stack.Screen name="Agreements" component={AgreementScreen} />
+      </Stack.Navigator>
+    );
   }
 }
 

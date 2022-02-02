@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import { useAuth } from '../contexts/Auth';
-import { useCompliance } from '../contexts/ComplianceWorkflow';
+// import { useCompliance } from '../contexts/ComplianceWorkflow';
 import { CustomerService } from '../services';
 
 const logo = require('../assets/images/logo.png');
@@ -25,7 +25,7 @@ interface SignupFields {
 export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Element {
   const { register, setCustomer } = useAuth();
 
-  const { setComplianceWorkflow } = useCompliance();
+  // const { setComplianceWorkflow } = useCompliance();
   const [commonError, setCommonError] = useState<string>('');
 
   const initialValues: SignupFields = {
@@ -131,7 +131,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
             'A verification link has been sent to your email address. Please verify before you log in.',
         });
       } else {
-        await setComplianceWorkflow(result.data.workflow);
+        // await setComplianceWorkflow(result.data.workflow);
 
         const customer = await CustomerService.getCustomer(result.data.accessToken);
 

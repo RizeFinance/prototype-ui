@@ -1,9 +1,10 @@
 import React from 'react';
 import { View } from 'react-native';
-import { BodySmall, Button } from '../../components';
+import { BodySmall, Button } from '..';
 import { useFormikContext } from 'formik';
+import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 
-const AgreementButton = ({ currentPendingDocs, isLoading }) => {
+const AgreementButton = ({ currentPendingDocs, isLoading }: IAgreementButton) => {
   const { isValid, submitForm } = useFormikContext();
 
   const renderAgreement = () => {
@@ -35,5 +36,10 @@ const AgreementButton = ({ currentPendingDocs, isLoading }) => {
     </View>
   );
 };
+
+interface IAgreementButton {
+  currentPendingDocs: ComplianceDocument[];
+  isLoading: boolean;
+}
 
 export default AgreementButton;

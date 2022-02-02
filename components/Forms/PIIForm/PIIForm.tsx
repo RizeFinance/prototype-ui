@@ -1,60 +1,54 @@
 import React, { useState } from 'react';
 import { Formik } from 'formik';
 import { StyleSheet, View, Platform } from 'react-native';
-import {
-  Button,
-  DatePickerInput,
-  Input,
-  Dropdown,
-  MaskedInput,
-  Heading3,
-} from '../../components';
+import { Button, DatePickerInput, Input, Dropdown, Heading3 } from '../../../components';
 import * as Yup from 'yup';
-import states from '../../constants/States';
+import states from '../../../constants/States';
 import formatStringByPattern from 'format-string-by-pattern';
-import MaskInput, { createNumberMask, formatWithMask, Mask } from 'react-native-mask-input';
-import { isEmpty } from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 import ConfirmationInfo from './ConfirmationInfo';
 
 interface IPIIForm {
   handleSubmit: any;
   customer: any;
-  isLoading?: boolean;
 }
 
-const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
-  const [inEditMode, setInEditMode] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+const PIIForm = ({ handleSubmit, customer }: IPIIForm) => {
+  const [showConfirm, setShowConfirm] = useState(() => !isEmpty(customer.last_name));
 
-  const initialValues = {
+  const initValues = {
     first_name: isEmpty(customer.first_name) ? '' : customer.first_name,
-    middle_name: isEmpty(customer.first_name) ? '' : customer.middle_name,
+    middle_name: isEmpty(customer.middle_name) ? '' : customer.middle_name,
     last_name: isEmpty(customer.last_name) ? '' : customer.last_name,
     suffix: isEmpty(customer.suffix) ? '' : customer.suffix,
-    dob: undefined,
+    dob: isEmpty(customer.dob) ? '' : customer.dob,
     street1: isEmpty(customer.street1) ? '' : customer.street1,
     street2: isEmpty(customer.street2) ? '' : customer.street2,
     city: isEmpty(customer.city) ? '' : customer.city,
     state: isEmpty(customer.state) ? '' : customer.state,
     postal_code: isEmpty(customer.postal_code) ? '' : customer.postal_code,
-    phone: isEmpty(customer.phone) ? '' : customer.phone,
-    ssn: '',
+    phone: isEmpty(customer.phone) ? '' : formatStringByPattern('(999) 999-9999', customer.phone),
+    ssn: undefined,
   };
 
-  if (!isEmpty(customer.last_name) && !inEditMode) {
-    return <ConfirmationInfo customerInfo={customer} setInEditMode={setInEditMode} />;
-  }
+  const { ssn, ...valuesToUpdate } = initValues;
+
+  const updatedValues = { ...valuesToUpdate, ssn_last_four: `***-**-${customer.ssn_last_four}` };
 
   return (
     <>
-      <Heading3 textAlign="center" style={styles.heading}>
-        {inEditMode ? 'Update Your Personal Information' : 'Enter Your Personal Information'}
-      </Heading3>
+      {!showConfirm && (
+        <Heading3 textAlign="center" style={styles.heading}>
+          {isEmpty(customer.last_name)
+            ? 'Enter Your Personal Information'
+            : 'Update Your Personal Information'}
+        </Heading3>
+      )}
 
       <Formik
-        initialValues={initialValues}
+        initialValues={isEmpty(customer.last_name) ? initValues : updatedValues}
         onSubmit={handleSubmit}
-        validationSchema={inEditMode ? editableInfoSchema : piiSchema}
+        validationSchema={isEmpty(customer.last_name) ? piiSchema : editableInfoSchema}
       >
         {({
           handleChange,
@@ -67,11 +61,18 @@ const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
           isSubmitting,
           dirty,
           touched,
+          initialValues,
         }) => {
+          const hasBeenUpdated = !isEqual(initialValues, values);
+
           return (
             <>
               {showConfirm ? (
-                <ConfirmationInfo customerInfo={values} setInEditMode={setShowConfirm} />
+                <ConfirmationInfo
+                  customerInfo={values}
+                  setShowConfirm={setShowConfirm}
+                  hasBeenUpdated={hasBeenUpdated}
+                />
               ) : (
                 <>
                   <View style={styles.formGroup}>
@@ -125,7 +126,7 @@ const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
                         onBlur={handleBlur('dob')}
                         value={values.dob}
                         errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
-                        editable={!inEditMode || (isSubmitting && !isSubmitting)}
+                        editable={!isSubmitting}
                       />
                     ) : (
                       <DatePickerInput
@@ -133,7 +134,7 @@ const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
                         placeholder="Month/Date/Year"
                         errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
                         value={values.dob}
-                        disabled={!inEditMode || (isSubmitting && !isSubmitting)}
+                        disabled={!isSubmitting}
                         onChange={(date: Date) => {
                           setFieldValue('dob', date);
                           setFieldTouched('dob', true, false);
@@ -205,22 +206,24 @@ const PIIForm = ({ handleSubmit, customer, isLoading }: IPIIForm) => {
                     />
                   </View>
 
-                  <View style={styles.formGroup}>
-                    <Input
-                      label="Social Security Number"
-                      placeholder="xxx-xx-xxxx"
-                      onChangeText={(e) => {
-                        const value = formatStringByPattern('999-99-9999', e);
-                        setFieldValue('ssn', value);
-                      }}
-                      onBlur={handleBlur('ssn')}
-                      value={values.ssn}
-                      errorText={!touched.ssn ? '' : errors.ssn}
-                      editable={!inEditMode || (isSubmitting && !isSubmitting)}
-                      maxLength={11}
-                      autoCapitalize={'none'}
-                    />
-                  </View>
+                  {values.ssn && (
+                    <View style={styles.formGroup}>
+                      <Input
+                        label="Social Security Number"
+                        placeholder="xxx-xx-xxxx"
+                        onChangeText={(e) => {
+                          const value = formatStringByPattern('999-99-9999', e);
+                          setFieldValue('ssn', value);
+                        }}
+                        onBlur={handleBlur('ssn')}
+                        value={values.ssn}
+                        errorText={!touched.ssn ? '' : errors.ssn}
+                        editable={!isSubmitting}
+                        maxLength={11}
+                        autoCapitalize={'none'}
+                      />
+                    </View>
+                  )}
                   <Button
                     style={{ marginTop: 30 }}
                     title="Submit Information"

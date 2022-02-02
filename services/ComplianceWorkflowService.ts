@@ -37,7 +37,6 @@ const acknowledgeDocuments = async (
     .then((response) => response.data);
 };
 
-
 const createWorkflow = async ({
   accessToken,
   customerUid,

@@ -1,20 +1,19 @@
 import React, { PropsWithChildren } from 'react';
 import { Pressable, PressableProps, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import { useThemeColor } from '../components';
 import { Body, Heading5, Heading4 } from './Typography';
+import { defaultColors } from '../constants/Colors';
 
 type BaseTextLinkProps = Omit<PressableProps, 'style'> & {
   style?: StyleProp<ViewStyle>;
   textAlign?: 'center' | 'auto' | 'left' | 'right' | 'justify';
   fontType?: typeof Body | typeof Heading5 | typeof Heading4;
+  disabled?: boolean;
 };
 
 export type TextLinkProps = PropsWithChildren<BaseTextLinkProps>;
 
 const TextLink = (props: TextLinkProps): JSX.Element => {
-  const { children, style, textAlign, fontType, ...otherProps } = props;
-
-  const primary = useThemeColor('primary');
+  const { children, style, textAlign, fontType, disabled, ...otherProps } = props;
 
   let justifyContent:
     | 'center'
@@ -40,22 +39,22 @@ const TextLink = (props: TextLinkProps): JSX.Element => {
       cursor: 'pointer',
     },
     underline: {
-      borderColor: primary,
+      borderColor: disabled ? defaultColors.gray : defaultColors.primary,
       flex: 1,
       borderBottomWidth: 2,
       opacity: 0.5,
       cursor: 'pointer',
     },
     editButton: {
-      color: primary,
-      cursor: 'pointer',
+      color: disabled ? defaultColors.gray : defaultColors.primary,
+      cursor: disabled ? 'not-allowed' : 'pointer',
     },
   });
 
   const Text = fontType ?? Body;
 
   return (
-    <Pressable {...otherProps} style={[styles.pressable, style]}>
+    <Pressable {...otherProps} style={[styles.pressable, style]} disabled={disabled}>
       <View>
         <Text textAlign="center" fontWeight="semibold" style={styles.editButton}>
           {children}

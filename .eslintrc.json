@@ -23,7 +23,7 @@
   "plugins": ["react", "react-hooks", "@typescript-eslint", "prettier"],
   "rules": {
     "prettier/prettier": "error",
-    "quotes": ["error", "single"],
+    // "quotes": ["error", "single"],
     "semi": ["error", "always"],
     "eqeqeq": ["warn", "smart"],
     "no-var": "error",

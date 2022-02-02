@@ -1,58 +1,15 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
-import Screen from '../components/Screen';
-import { useCompliance, ComplianceDocumentSelection } from '../contexts/ComplianceWorkflow';
-import TextLink from '../components/TextLink';
-import { Heading3, Heading4, Body } from '../components/Typography';
-import { isEmpty } from 'lodash';
+import React from 'react';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
+import { Heading3, Heading4, Body, TextLink, Screen } from '../components';
 import utils from '../utils/utils';
-
-interface AgreementInfoProps {
-  agreement: ComplianceDocumentSelection;
-}
+import useComplianceWorkflow from '../hooks/useComplianceWorkflow';
+import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 
 export default function AgreementScreen(): JSX.Element {
-  const { productAgreements, loadAgreements } = useCompliance();
+  const { acceptedDocuments } = useComplianceWorkflow();
 
-  // useEffect(() => {
-  //   loadAgreements();
-  // }, []);
-
-  const styles = StyleSheet.create({
-    heading: {
-      marginBottom: 25,
-    },
-    container: {
-      marginTop: 25,
-    },
-    agreementInfo: {
-      marginVertical: 16,
-    },
-    agreementName: {
-      marginBottom: 8,
-    },
-  });
-
-  const onPressAgreementName = async (agreement: ComplianceDocumentSelection) => {
-    window.open(agreement.compliance_document_url, '_blank');
-  };
-
-  const AgreementInfo = ({ agreement }: AgreementInfoProps): JSX.Element => {
-    return (
-      <View style={styles.agreementInfo}>
-        <TextLink
-          textAlign="center"
-          style={styles.agreementName}
-          onPress={() => onPressAgreementName(agreement)}
-          fontType={Heading4}
-        >
-          {agreement.name}
-        </TextLink>
-        <Body fontWeight="semibold" textAlign="center">
-          Acknowledged {utils.formatDate(agreement.accepted_at)}
-        </Body>
-      </View>
-    );
+  const onPressAgreementName = async (document: ComplianceDocument) => {
+    window.open(document.compliance_document_url, '_blank');
   };
 
   return (
@@ -61,22 +18,50 @@ export default function AgreementScreen(): JSX.Element {
         Agreements
       </Heading3>
 
-      {!isEmpty(productAgreements) && (
+      {acceptedDocuments.length > 1 ? (
         <View style={styles.container}>
-          {productAgreements.map((productAgreement) => {
+          {acceptedDocuments.map((document: ComplianceDocument) => {
             return (
-              <>
-                {productAgreement.productName && (
-                  <Heading4 textAlign="center">{productAgreement.productName}</Heading4>
-                )}
-                {productAgreement.agreements.map((agreement, i) => {
-                  return <AgreementInfo key={i} agreement={agreement} />;
-                })}
-              </>
+              <View style={styles.agreementInfo} key={document.uid}>
+                <TextLink
+                  textAlign="center"
+                  style={styles.agreementName}
+                  onPress={() => onPressAgreementName(document)}
+                  fontType={Heading4}
+                >
+                  {document.name}
+                </TextLink>
+                <Body fontWeight="semibold" textAlign="center">
+                  Acknowledged {utils.formatDate(document.accepted_at)}
+                </Body>
+              </View>
             );
           })}
+        </View>
+      ) : (
+        <View style={styles.spinner}>
+          <ActivityIndicator size="large" />
         </View>
       )}
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  heading: {
+    marginBottom: 25,
+  },
+  container: {
+    marginTop: 25,
+  },
+  agreementInfo: {
+    marginVertical: 16,
+  },
+  agreementName: {
+    marginBottom: 8,
+  },
+  spinner: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+});

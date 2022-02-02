@@ -2,15 +2,10 @@ import React from 'react';
 import { View, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { defaultColors } from '../../constants/Colors';
 import { useFormikContext } from 'formik';
-import { Checkbox, Body } from '../../components';
+import { Checkbox, Body } from '..';
 import { useNavigation } from '@react-navigation/native';
 import AgreementButton from './AgreementButton';
-import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs'
-
-interface IAgreementCheckbox {
-  currentDocs: ComplianceDocument[],
-  isLoading: boolean
-}
+import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 
 const AgreementCheckbox = ({ currentDocs, isLoading }: IAgreementCheckbox) => {
   const { values, setFieldValue } = useFormikContext();
@@ -42,13 +37,13 @@ const AgreementCheckbox = ({ currentDocs, isLoading }: IAgreementCheckbox) => {
             );
           })}
         </View>
-        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+        <View>
           <AgreementButton currentPendingDocs={currentDocs} isLoading={isLoading} />
         </View>
       </>
     );
   } else {
-    <ActivityIndicator size="large" />;
+    <ActivityIndicator style={{ flex: 1 }} size="large" />;
   }
 };
 
@@ -61,8 +56,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   checkboxesContainer: {
-    // marginBottom: 40,
-    // flex: 9,
+    flex: 1,
   },
   underline: {
     textDecorationLine: 'underline',
@@ -70,3 +64,8 @@ const styles = StyleSheet.create({
     cursor: 'pointer',
   },
 });
+
+interface IAgreementCheckbox {
+  currentDocs: ComplianceDocument[];
+  isLoading: boolean;
+}

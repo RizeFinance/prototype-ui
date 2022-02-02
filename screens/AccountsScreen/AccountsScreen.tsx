@@ -3,11 +3,12 @@ import { View, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Screen, Button, Body, Heading3, Heading4, TextLink } from '../../components';
 import { RootStackParamList } from '../../types';
-import { useAccounts } from '../../contexts/Accounts';
+import { useAccounts, useAuth } from '../../contexts';
 import { SyntheticAccount } from '../../models';
 import utils from '../../utils/utils';
 import styles from './styles';
 import { isEmpty } from 'lodash';
+import { AccountService } from '../../services';
 
 interface AccountsScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'Accounts'>;
@@ -23,11 +24,23 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
 
   let accountTimeout;
 
+  const { accessToken } = useAuth();
+
   const onPressAccountName = (account: SyntheticAccount): void => {
     navigation.navigate('AccountDetails', {
       accountUid: account.uid,
     });
   };
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const response = await AccountService.getSyntheticAccounts(accessToken);
+      console.log(response, 'response');
+    };
+    if (accessToken !== '') {
+      fetchData();
+    }
+  }, [accessToken]);
 
   useEffect(() => {
     refreshAccountsPeriodically();
@@ -98,13 +111,15 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
           </View>
         )}
       </Screen>
-      <View style={styles.btnContainer}>
-        <Button
-          style={styles.button}
-          title="Open Additional Account"
-          onPress={() => navigation.navigate('AccountsSetup')}
-        />
-      </View>
+      {liabilityAccounts.length > 1 && (
+        <View style={styles.btnContainer}>
+          <Button
+            style={styles.button}
+            title="Open Additional Account"
+            onPress={() => navigation.navigate('AccountsSetup')}
+          />
+        </View>
+      )}
     </>
   );
 }

@@ -2,26 +2,35 @@ import { useState, useEffect, useCallback } from 'react';
 import { ComplianceWorkflowService } from '../services';
 import * as Network from 'expo-network';
 import { Customer } from '../models';
-import { ComplianceWorkflow } from '@rizefinance/rize-js/types/lib/core/compliance-workflow';
-import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs'
+import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
+import { useAuth } from '../contexts';
 
-
-const useComplianceWorkflow = (customerUid: string, accessToken: string) => {
+const useComplianceWorkflow = () => {
   const [currentStep, setCurrentStep] = useState<number | undefined>(undefined);
   const [currentPendingDocs, setCurrentPendingDocs] = useState<ComplianceDocument[] | []>([]);
+  const [acceptedDocuments, setAcceptedDocuments] = useState<ComplianceDocument[] | []>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [customer, setCustomer] = useState<Customer | Record<string, never>>({});
   const [error, setError] = useState('');
   const [checkboxData, setCheckboxData] = useState([]);
+  const [patriotAccepted, setPatriotAccepted] = useState(undefined);
+  const { customer: authCustomer, accessToken } = useAuth();
 
   const parseWorkflow = useCallback((workflow) => {
-  
+    const step2Doc = workflow.all_documents.find((doc: ComplianceDocument) => doc.step === 2);
+
+    const isPatriotAccepted = workflow.accepted_documents.find(
+      (doc: ComplianceDocument) => doc.external_storage_name === step2Doc.external_storage_name
+    );
+
     const checkboxData = workflow.current_step_documents_pending.reduce((acc, curr) => {
       const key = curr['uid'];
       acc[key] = false;
       return acc;
     }, {});
 
+    setAcceptedDocuments(workflow.accepted_documents);
+    setPatriotAccepted(isPatriotAccepted ? true : false);
     setCheckboxData(checkboxData);
     setCurrentPendingDocs(workflow.current_step_documents_pending);
     setCurrentStep(workflow.summary.current_step);
@@ -36,20 +45,21 @@ const useComplianceWorkflow = (customerUid: string, accessToken: string) => {
         if (compliance.summary.status === 'expired') {
           const workflow = await ComplianceWorkflowService.createWorkflow({
             accessToken,
-            customerUid,
+            customerUid: authCustomer.uid,
             productCompliancePlanUid: compliance.product_compliance_plan_uid,
           });
-          parseWorkflow(workflow)
+          parseWorkflow(workflow);
           return;
         }
 
         parseWorkflow(compliance);
       } catch (err) {
-        setError(err[0].title)
+        setError(err[0].title);
       }
     };
+
     getWorkflow();
-  }, [accessToken, customerUid]);
+  }, [accessToken, authCustomer, parseWorkflow]);
 
   const submitAgreements = async (values, actions) => {
     setIsLoading(true);
@@ -85,7 +95,10 @@ const useComplianceWorkflow = (customerUid: string, accessToken: string) => {
     submitAgreements,
     checkboxData,
     isLoading,
-    error
+    error,
+    patriotAccepted,
+    setError,
+    acceptedDocuments,
   };
 };
 

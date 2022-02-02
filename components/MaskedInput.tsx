@@ -1,9 +1,18 @@
 import React from 'react';
-import { StyleProp, StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
+import {
+  StyleProp,
+  StyleSheet,
+  TextStyle,
+  View,
+  ViewStyle,
+  NativeSyntheticEvent,
+  TargetedEvent,
+} from 'react-native';
 import { useThemeColor } from '.';
 import { Body, BodySmall, fontStyles } from './Typography';
 import {
   TextInputMask,
+  TextInputMaskProps,
   TextInputMaskOptionProp,
   TextInputMaskTypeProp,
 } from 'react-native-masked-text';
@@ -16,16 +25,15 @@ export type InputProps = {
   inputStyle?: StyleProp<TextStyle>;
   containerStyle?: ViewStyle;
   value: string;
-  onChangeText: any;
+  onChangeText: TextInputMaskProps['onChangeText'];
   placeholder?: string;
+  onBlur: (e: NativeSyntheticEvent<TargetedEvent>) => void;
   type: TextInputMaskTypeProp;
   options: TextInputMaskOptionProp;
-  onBlur: any;
 };
 
 const MaskedInput = (props: InputProps): JSX.Element => {
   const {
-    type,
     label,
     errorState,
     errorText,
@@ -35,8 +43,9 @@ const MaskedInput = (props: InputProps): JSX.Element => {
     inputStyle,
     containerStyle,
     placeholder,
-    options,
     onBlur,
+    options,
+    type,
   } = props;
 
   const border = useThemeColor('border');
@@ -74,12 +83,11 @@ const MaskedInput = (props: InputProps): JSX.Element => {
         </Body>
       )}
       <TextInputMask
-        value={value}
         type={type}
-        onChangeText={onChangeText}
-        includeRawValueInChangeText={true}
-        placeholder={placeholder}
         options={options}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
         onBlur={onBlur}
         style={[
           fontStyles.body,

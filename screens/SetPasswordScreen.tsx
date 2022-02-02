@@ -5,10 +5,10 @@ import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { Formik } from 'formik';
 import validator from 'validator';
 import { RootStackParamList } from '../types';
-import { ComplianceWorkflowService, CustomerService } from '../services';
+import { CustomerService } from '../services';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../contexts/Auth';
-import { useCompliance } from '../contexts/ComplianceWorkflow';
+// import { useCompliance } from '../contexts/ComplianceWorkflow';
 
 const logo = require('../assets/images/logo.png');
 
@@ -24,7 +24,7 @@ interface SetPasswordFields {
 
 export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps): JSX.Element {
   const { setCustomer, ...auth } = useAuth();
-  const { setComplianceWorkflow, evaluateCurrentStep } = useCompliance();
+  // const { setComplianceWorkflow, evaluateCurrentStep } = useCompliance();
 
   const [message, setMesage] = useState<string>('');
 
@@ -86,13 +86,13 @@ export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps
 
       if (result.success) {
         const customer = await CustomerService.getCustomer(result.data.accessToken);
-        const workflow = await ComplianceWorkflowService.viewLatestWorkflow(
-          result.data.accessToken
-        );
+        // const workflow = await ComplianceWorkflowService.viewLatestWorkflow(
+        //   result.data.accessToken
+        // );
 
         await setCustomer(customer);
-        await setComplianceWorkflow(workflow);
-        await evaluateCurrentStep();
+        // await setComplianceWorkflow(workflow);
+        // await evaluateCurrentStep();
       } else {
         setMesage('Failed reset password.');
       }

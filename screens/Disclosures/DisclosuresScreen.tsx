@@ -1,15 +1,21 @@
 import React from 'react';
 import { isEmpty, mapValues } from 'lodash';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { Screen, Heading3, BodySmall, Body } from '../../components';
+import { StyleSheet, ActivityIndicator } from 'react-native';
+import {
+  Screen,
+  Heading3,
+  BodySmall,
+  Body,
+  PIIForm,
+  PatriotAct,
+  AgreementCheckbox,
+  Processing,
+} from '../../components';
 import { useAuth } from '../../contexts';
 import { CustomerService } from '../../services';
 import { Formik } from 'formik';
 import * as yup from 'yup';
-import PIIForm from './PIIForm';
-import Processing from './Processing';
 import moment from 'moment';
-import AgreementCheckbox from './AgreementCheckbox';
 import { defaultColors } from '../../constants/Colors';
 
 import useComplianceWorkflow from '../../hooks/useComplianceWorkflow';
@@ -17,8 +23,16 @@ import useComplianceWorkflow from '../../hooks/useComplianceWorkflow';
 const DisclosuresScreen = () => {
   const { accessToken, customer } = useAuth();
 
-  const { currentStep, error, currentPendingDocs, submitAgreements, checkboxData, isLoading } =
-    useComplianceWorkflow(customer.uid, accessToken);
+  const {
+    patriotAccepted,
+    currentStep,
+    error,
+    setError,
+    currentPendingDocs,
+    submitAgreements,
+    checkboxData,
+    isLoading,
+  } = useComplianceWorkflow();
 
   const handlePIISubmit = async (values) => {
     try {
@@ -39,39 +53,8 @@ const DisclosuresScreen = () => {
         },
       });
     } catch (err) {
-      console.log(err, 'err in handlePIISubmit');
+      setError(err[0].title);
     }
-  };
-
-  const PatriotAct = () => {
-    return (
-      <View style={{ flex: 1 }}>
-        <Heading3 textAlign="center" style={styles.heading}>
-          USA Patriot Act Notice
-        </Heading3>
-        <View style={styles.content}>
-          <Body fontWeight="semibold" style={styles.title}>
-            Important Information About Procedures for Opening a New Account
-          </Body>
-
-          <Body style={{ marginBottom: 25 }}>
-            To help the government fight the funding of terrorism and money laundering activities,
-            Federal law requires all financial institutions to obtain, verify, and record
-            information that identifies each person who opens an account.
-          </Body>
-
-          <Body fontWeight="semibold" style={{ marginBottom: 5 }}>
-            What this means for you:
-          </Body>
-          <Body>
-            When you open an account, we will ask for your name, address, date of birth, and other
-            information that will allow us to identify you. We may also ask to see your
-            driver&apos;s license or other identifying documents.
-          </Body>
-        </View>
-        <AgreementCheckbox currentDocs={currentPendingDocs} isLoading={isLoading} />
-      </View>
-    );
   };
 
   const renderScreen = () => {
@@ -84,10 +67,10 @@ const DisclosuresScreen = () => {
       case 2:
         return {
           title: null,
-          component: customer.last_name ? (
-            <PatriotAct />
+          component: patriotAccepted ? (
+            <PIIForm handleSubmit={handlePIISubmit} customer={customer} />
           ) : (
-            <PIIForm isLoading={isLoading} handleSubmit={handlePIISubmit} customer={customer} />
+            <PatriotAct currentPendingDocs={currentPendingDocs} />
           ),
         };
       case 3:
@@ -100,8 +83,9 @@ const DisclosuresScreen = () => {
     }
   };
 
-  const processing = ['queued', 'identity_verified', 'under_review'];
+  const processing = ['queued', 'identity_verified', 'under_review', 'initiated'];
   const unapproved = ['manual_review', 'rejected'];
+  const newCustomer = ['initiated', 'in_progress'];
 
   if (processing.includes(customer.status)) {
     return <Processing />;
@@ -111,20 +95,20 @@ const DisclosuresScreen = () => {
     return (
       <Screen withoutHeader>
         <Heading3 textAlign="center" style={{ marginTop: 100 }}>
-          {`We're having issues with your account.`}
+          {"We're having issues with your account."}
         </Heading3>
         <Body textAlign="center" style={{ marginTop: 20 }}>
-          {`Please contact customer support for additional help.`}
+          {'Please contact customer support for additional help.'}
         </Body>
       </Screen>
     );
   }
 
-  if (!isEmpty(checkboxData) && customer.status === 'initiated') {
+  if (!isEmpty(checkboxData) && newCustomer.includes(customer.status)) {
     return (
-      <Screen withoutHeader>
+      <Screen style={{ justifyContent: 'space-between' }}>
         {!isEmpty(renderScreen().title) && (
-          <Heading3 textAlign="center" style={styles.heading}>
+          <Heading3 textAlign="center" style={{ marginBottom: 50 }}>
             {renderScreen().title}
           </Heading3>
         )}
@@ -156,18 +140,12 @@ const DisclosuresScreen = () => {
 export default DisclosuresScreen;
 
 const styles = StyleSheet.create({
-  heading: {
-    // marginBottom: 25,
-    // flex: 1,
-  },
   content: {
     paddingHorizontal: 16,
     marginBottom: 25,
-    flex: 2,
   },
   title: {
     textAlign: 'center',
-    marginTop: 50,
     marginBottom: 25,
   },
   errorText: {

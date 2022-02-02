@@ -6,7 +6,7 @@ import { Heading4, Heading5 } from '../components/Typography';
 import { RootStackParamList } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useAuth } from '../contexts/Auth';
+import { useAuth, useAccounts } from '../contexts';
 const logo = require('../assets/images/logo.png');
 
 interface MenuScreenProps {
@@ -15,6 +15,8 @@ interface MenuScreenProps {
 
 export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element {
   const { ...auth } = useAuth();
+  const { liabilityAccounts } = useAccounts();
+  const disabled = liabilityAccounts.length < 1;
 
   const styles = StyleSheet.create({
     logo: {
@@ -89,6 +91,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
           style={styles.menuStyle}
           onPress={onPressTransfer}
           fontType={Heading4}
+          disabled={disabled}
         >
           Transfer
         </TextLink>
@@ -97,6 +100,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
           style={styles.menuStyle}
           onPress={onPressDebitCard}
           fontType={Heading4}
+          disabled={disabled}
         >
           Debit Card
         </TextLink>
@@ -105,6 +109,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
           style={styles.menuStyle}
           onPress={onPressStatments}
           fontType={Heading4}
+          disabled={disabled}
         >
           Statements
         </TextLink>

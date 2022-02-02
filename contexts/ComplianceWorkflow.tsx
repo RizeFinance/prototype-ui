@@ -12,9 +12,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { ComplianceWorkflow } from '@rizefinance/rize-js/types/lib/core/compliance-workflow';
 import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 import { RootStackParamList } from '../types';
-import {CustomerService, ProductService, ComplianceWorkflowService} from '../services';
+// import { CustomerService, ProductService, ComplianceWorkflowService } from '../services';
 import config from '../config/config';
-import { find, isNil } from 'lodash';
+// import { find, isNil } from 'lodash';
 import { useAuth } from '../contexts';
 import Network from 'expo-network';
 
@@ -25,12 +25,11 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
   const [productAgreements, setProductAgreements] = useState<ProductAgreements[]>([]);
   const [customerWorkflows, setCustomerWorkflows] = useState<ComplianceWorkflow[]>([]);
 
-  const [totalSteps, setTotalSteps] = useState(1)
+  const [totalSteps, setTotalSteps] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(undefined)
+  const [error, setError] = useState(undefined);
 
   const { accessToken, customer, setCustomer } = useAuth();
-
 
   // const loadAgreements = async (): Promise<void> => {
   //   setProductAgreements((prev) => ({
@@ -43,7 +42,7 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
   //       accessToken,
   //       customer.uid
   //     );
-      
+
   //     const workflows = await ComplianceWorkflowService.getComplianceWorkflows(
   //       accessToken,
   //       customer.uid
@@ -80,7 +79,6 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
     }
   };
 
-
   const evaluateCurrentStep = async () => {
     if (customer?.status === 'initiated') {
       if (complianceWorkflow.summary.status === 'expired') {
@@ -105,13 +103,11 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
               alreadyAccepted: !!acceptedTerm,
             } as ComplianceDocumentSelection;
           });
-
       }
 
       // redirectToCurrentStep();
     }
   };
-
 
   useEffect(() => {
     const getWorkflow = async () => {
@@ -129,9 +125,7 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
           }
         });
 
-        setTotalSteps(steps)
-
-
+        setTotalSteps(steps);
 
         if (latestWorkflow.summary.status === 'expired') {
           const data = await ComplianceWorkflowService.createWorkflow({
@@ -152,7 +146,7 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
   }, []);
 
   const submitAgreements = async (values, actions) => {
-    setLoading(true)
+    setLoading(true);
     const ip_address = await Network.getIpAddressAsync();
 
     const documents = Object.keys(values).map((document_uid) => {
@@ -172,14 +166,12 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
       setComplianceWorkflow(updatedComplianceWorkflow);
 
       setLoading(false);
-      actions.resetForm()
+      actions.resetForm();
     } catch (err) {
       setError(err);
       setLoading(false);
-
     }
   };
-
 
   const value = useMemo(
     () => ({
@@ -202,7 +194,7 @@ const ComplianceProvider = ({ navigation, children }: IComplianceProvider) => {
       // loadAgreements,
       loadComplianceWorkflows,
       totalSteps,
-      submitAgreements
+      submitAgreements,
     ]
   );
 
