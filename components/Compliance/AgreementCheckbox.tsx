@@ -24,15 +24,15 @@ const AgreementCheckbox = ({ currentDocs, isLoading }: IAgreementCheckbox) => {
           {currentDocs?.map((agreement) => {
             return (
               <View style={styles.checkboxHolder} key={agreement.external_storage_name}>
+                <Checkbox
+                  checked={values[agreement.uid]}
+                  onChange={(value) => setFieldValue(agreement.uid, value)}
+                />
                 <Pressable onPress={() => onPressButton(agreement.compliance_document_url)}>
-                  <Checkbox
-                    checked={values[agreement.uid]}
-                    onChange={(value) => setFieldValue(agreement.uid, value)}
-                  />
+                  <Body style={styles.text}>
+                    I agree to the <Body style={styles.underline}>{agreement.name}.</Body>
+                  </Body>
                 </Pressable>
-                <Body>
-                  I agree to the <Body style={styles.underline}>{agreement.name}.</Body>
-                </Body>
               </View>
             );
           })}
@@ -43,7 +43,9 @@ const AgreementCheckbox = ({ currentDocs, isLoading }: IAgreementCheckbox) => {
       </>
     );
   } else {
-    <ActivityIndicator style={{ flex: 1 }} size="large" />;
+    <View style={{justifyContent: 'center', flex: 1}}>
+      <ActivityIndicator size="large" />;
+    </View>
   }
 };
 
@@ -53,10 +55,13 @@ const styles = StyleSheet.create({
   checkboxHolder: {
     marginBottom: 15,
     flexDirection: 'row',
-    flex: 1,
+  },
+  text: {
+    width: 350, 
   },
   checkboxesContainer: {
     flex: 1,
+    flexWrap: 'wrap',
   },
   underline: {
     textDecorationLine: 'underline',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { isEmpty, mapValues } from 'lodash';
-import { StyleSheet, ActivityIndicator } from 'react-native';
+import { StyleSheet, ActivityIndicator, View } from 'react-native';
 import {
   Screen,
   Heading3,
@@ -20,19 +20,21 @@ import { defaultColors } from '../../constants/Colors';
 
 import useComplianceWorkflow from '../../hooks/useComplianceWorkflow';
 
-const DisclosuresScreen = () => {
+const DisclosuresScreen = ({ navigation }) => {
   const { accessToken, customer } = useAuth();
 
   const {
     patriotAccepted,
-    currentStep,
     error,
     setError,
     currentPendingDocs,
     submitAgreements,
     checkboxData,
     isLoading,
+    workflow,
   } = useComplianceWorkflow();
+
+
 
   const handlePIISubmit = async (values) => {
     try {
@@ -53,12 +55,12 @@ const DisclosuresScreen = () => {
         },
       });
     } catch (err) {
-      setError(err[0].title);
+      setError(err[0].title || 'An error has occured. Please try again later.');
     }
   };
 
   const renderScreen = () => {
-    switch (currentStep) {
+    switch (workflow.summary.current_step) {
       case 1:
         return {
           title: 'Rize Disclosures',
@@ -70,41 +72,40 @@ const DisclosuresScreen = () => {
           component: patriotAccepted ? (
             <PIIForm handleSubmit={handlePIISubmit} customer={customer} />
           ) : (
-            <PatriotAct currentPendingDocs={currentPendingDocs} />
+            <PatriotAct currentPendingDocs={currentPendingDocs} isLoading={isLoading} />
           ),
         };
       case 3:
         return {
-          title: 'Banking Disclosures',
-          component: <AgreementCheckbox currentDocs={currentPendingDocs} isLoading={isLoading} />,
+          title: customer.dob ? 'Banking Disclosures' : null,
+          component: customer.dob ? (
+            <AgreementCheckbox currentDocs={currentPendingDocs} isLoading={isLoading} />
+          ) : (
+            <PIIForm handleSubmit={handlePIISubmit} customer={customer} />
+          ),
         };
       default:
         return { title: '', component: null };
     }
   };
 
-  const processing = ['queued', 'identity_verified', 'under_review', 'initiated'];
+  const processing = ['queued', 'identity_verified', 'under_review'];
   const unapproved = ['manual_review', 'rejected'];
   const newCustomer = ['initiated', 'in_progress'];
 
-  if (processing.includes(customer.status)) {
-    return <Processing />;
+  const KYCStatus = {
+    notApproved: ['manual_review', 'denied'],
+    processing: ['under_review']
+  };
+
+  const CustomerStatus = {
+    newCustomer: ['initiated'],
+    notApproved: ['manual_review', 'rejected'],
+    processing: ['queued', 'identity_verified', 'under_review']
   }
 
-  if (unapproved.includes(customer.status)) {
-    return (
-      <Screen withoutHeader>
-        <Heading3 textAlign="center" style={{ marginTop: 100 }}>
-          {"We're having issues with your account."}
-        </Heading3>
-        <Body textAlign="center" style={{ marginTop: 20 }}>
-          {'Please contact customer support for additional help.'}
-        </Body>
-      </Screen>
-    );
-  }
 
-  if (!isEmpty(checkboxData) && newCustomer.includes(customer.status)) {
+  if (!isEmpty(checkboxData)) {
     return (
       <Screen style={{ justifyContent: 'space-between' }}>
         {!isEmpty(renderScreen().title) && (
@@ -132,9 +133,37 @@ const DisclosuresScreen = () => {
         </Formik>
       </Screen>
     );
-  } else {
-    return <ActivityIndicator size="large" />;
-  }
+  } 
+
+  console.log(checkboxData, 'checkboxData')
+    if (
+      processing.includes(customer.status) ||
+      (customer.status === 'initiated' && workflow?.summary?.status === 'accepted')
+    ) {
+      return <Processing />;
+    }
+
+    if (unapproved.includes(customer.status)) {
+      return (
+        <Screen withoutHeader>
+          <Heading3 textAlign="center" style={{ marginTop: 100 }}>
+            {"We're having issues with your account."}
+          </Heading3>
+          <Body textAlign="center" style={{ marginTop: 20 }}>
+            {'Please contact customer support for additional help.'}
+          </Body>
+        </Screen>
+      );
+    }
+
+    // if(isLoading) {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <ActivityIndicator size="large" />
+        </View>
+      );
+
+    // }
 };
 
 export default DisclosuresScreen;

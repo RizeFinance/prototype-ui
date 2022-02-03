@@ -38,16 +38,13 @@ const TextLink = (props: TextLinkProps): JSX.Element => {
       justifyContent: justifyContent,
       cursor: 'pointer',
     },
-    underline: {
-      borderColor: disabled ? defaultColors.gray : defaultColors.primary,
-      flex: 1,
-      borderBottomWidth: 2,
-      opacity: 0.5,
-      cursor: 'pointer',
-    },
     editButton: {
       color: disabled ? defaultColors.gray : defaultColors.primary,
       cursor: disabled ? 'not-allowed' : 'pointer',
+      textDecorationLine: 'underline',
+      textDecorationColor: defaultColors.primary,
+      display: 'flex',
+      flexWrap: 'wrap',
     },
   });
 
@@ -55,11 +52,10 @@ const TextLink = (props: TextLinkProps): JSX.Element => {
 
   return (
     <Pressable {...otherProps} style={[styles.pressable, style]} disabled={disabled}>
-      <View>
+      <View style={{maxWidth: 350}}>
         <Text textAlign="center" fontWeight="semibold" style={styles.editButton}>
           {children}
         </Text>
-        <View style={styles.underline}></View>
       </View>
     </Pressable>
   );

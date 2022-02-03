@@ -37,7 +37,7 @@ const Screen = (props: ScreenProps): JSX.Element => {
     },
     content: {
       flex: 1,
-      paddingHorizontal: 32,
+      paddingHorizontal: 30,
       paddingBottom: 50,
       paddingTop: props.withoutHeader ? 0 : 50,
     },

@@ -41,6 +41,7 @@ import {
   AgreementScreen,
   LockedScreen,
   PinSetScreen,
+  PDFReaderScreen,
   // ProfileQuestionsScreen,
   // BrokerageDisclosuresScreen,
   AccountsSetupScreen,
@@ -48,6 +49,7 @@ import {
 
 import { useAuth } from '../contexts';
 import { useThemeColor, Body, TextLink } from '../components';
+import useComplianceWorkflow from '../hooks/useComplianceWorkflow';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
   return (
@@ -96,6 +98,7 @@ const MenuButton = (): JSX.Element => {
 
 function MainStackScreen() {
   const { customer } = useAuth();
+  const { workflow } = useComplianceWorkflow();
 
   // const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const background = useThemeColor('background');
@@ -126,8 +129,7 @@ function MainStackScreen() {
       backgroundColor: background,
     } as StackNavigationOptions,
   };
-  // const processing = ['queued', 'identity_verified', 'under_review', 'initiated'];
-  // console.log(customer, 'customer in nav');
+
   if (!customer) {
     return (
       <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
@@ -139,10 +141,11 @@ function MainStackScreen() {
     );
   }
 
-  if (customer.status !== 'active') {
+  if (customer.status === 'active' && workflow.summary.status !== 'accepted') {
     return (
       <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
         <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
+        <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
       </Stack.Navigator>
     );
   }
@@ -155,23 +158,22 @@ function MainStackScreen() {
     );
   }
 
-  if (customer.status === 'active') {
-    return (
-      <Stack.Navigator screenOptions={screenOptions.withHeader}>
-        <Stack.Screen name="Accounts" component={AccountsScreen} />
-        <Stack.Screen name="AccountsSetup" component={AccountsSetupScreen} />
+  return (
+    <Stack.Navigator screenOptions={screenOptions.withHeader}>
+      <Stack.Screen name="Accounts" component={AccountsScreen} />
+      <Stack.Screen name="AccountsSetup" component={AccountsSetupScreen} />
 
-        <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
-        <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
-        <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
-        <Stack.Screen name="DebitCard" component={DebitCardScreen} />
-        <Stack.Screen name="DebitCardActivation" component={DebitCardActivationScreen} />
-        <Stack.Screen name="PinSet" component={PinSetScreen} />
-        <Stack.Screen name="Statements" component={StatementScreen} />
-        <Stack.Screen name="Agreements" component={AgreementScreen} />
-      </Stack.Navigator>
-    );
-  }
+      <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
+      <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
+      <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
+      <Stack.Screen name="DebitCard" component={DebitCardScreen} />
+      <Stack.Screen name="DebitCardActivation" component={DebitCardActivationScreen} />
+      <Stack.Screen name="PinSet" component={PinSetScreen} />
+      <Stack.Screen name="Statements" component={StatementScreen} />
+      <Stack.Screen name="Agreements" component={AgreementScreen} />
+      <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
+    </Stack.Navigator>
+  );
 }
 
 function RootNavigator() {

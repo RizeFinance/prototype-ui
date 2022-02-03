@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, ActivityIndicator, Text } from 'react-native';
 import { Heading3, Heading4, Body, TextLink, Screen } from '../components';
 import utils from '../utils/utils';
 import useComplianceWorkflow from '../hooks/useComplianceWorkflow';
@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
   },
   container: {
     marginTop: 25,
+    alignItems: "center"
   },
   agreementInfo: {
     marginVertical: 16,

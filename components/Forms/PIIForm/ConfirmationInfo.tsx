@@ -7,7 +7,7 @@ import { useFormikContext } from 'formik';
 import moment from 'moment';
 
 interface IConfirmationInfo {
-  customerInfo: CustomerDetails;
+  customerInfo: CustomerDetails | NewCustomerDetails;
   setShowConfirm: React.Dispatch<React.SetStateAction<boolean>>;
   hasBeenUpdated: boolean;
 }
@@ -67,7 +67,7 @@ const ConfirmationInfo = ({ customerInfo, setShowConfirm, hasBeenUpdated }: ICon
           <Body style={{ color: defaultColors.gray }}>{customerInfo.phone}</Body>
           <Body>&nbsp;</Body>
           <Body fontWeight="semibold">Social Security Number</Body>
-          <Body style={{ color: defaultColors.gray }}>{customerInfo.ssn_last_four}</Body>
+          <Body style={{ color: defaultColors.gray }}>{customerInfo.ssn_last_four || customerInfo.ssn}</Body>
           <Body>&nbsp;</Body>
           {/* {productType === ProductType.Checking && ( */}
           <TextLink textAlign="center" onPress={() => setShowConfirm(false)}>
@@ -101,6 +101,8 @@ export interface CustomerDetails {
   state: string;
   postal_code: string;
 }
+
+export type NewCustomerDetails = Exclude<CustomerDetails, 'ssn_last_four'> & {ssn: string}
 
 const styles = StyleSheet.create({
   heading: {

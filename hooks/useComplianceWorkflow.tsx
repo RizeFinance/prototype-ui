@@ -1,27 +1,35 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ComplianceWorkflowService } from '../services';
 import * as Network from 'expo-network';
-import { Customer } from '../models';
-import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
+import { ComplianceDocument, ComplianceWorkflow } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 import { useAuth } from '../contexts';
 
 const useComplianceWorkflow = () => {
-  const [currentStep, setCurrentStep] = useState<number | undefined>(undefined);
   const [currentPendingDocs, setCurrentPendingDocs] = useState<ComplianceDocument[] | []>([]);
   const [acceptedDocuments, setAcceptedDocuments] = useState<ComplianceDocument[] | []>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [customer, setCustomer] = useState<Customer | Record<string, never>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [workflow, setWorkflow] = useState<ComplianceWorkflow | Record<string, any>>({});
   const [error, setError] = useState('');
-  const [checkboxData, setCheckboxData] = useState([]);
+  const [checkboxData, setCheckboxData] = useState({});
   const [patriotAccepted, setPatriotAccepted] = useState(undefined);
   const { customer: authCustomer, accessToken } = useAuth();
+
+  useEffect(() => {
+    if(workflow?.uid !== '' && authCustomer) {
+      setIsLoading(false)
+    }
+  }, [workflow, authCustomer])
 
   const parseWorkflow = useCallback((workflow) => {
     const step2Doc = workflow.all_documents.find((doc: ComplianceDocument) => doc.step === 2);
 
+    console.log(workflow, 'workflow');
+    
     const isPatriotAccepted = workflow.accepted_documents.find(
       (doc: ComplianceDocument) => doc.external_storage_name === step2Doc.external_storage_name
     );
+
+    console.log(isPatriotAccepted, 'isPatriotAccepted')
 
     const checkboxData = workflow.current_step_documents_pending.reduce((acc, curr) => {
       const key = curr['uid'];
@@ -33,8 +41,7 @@ const useComplianceWorkflow = () => {
     setPatriotAccepted(isPatriotAccepted ? true : false);
     setCheckboxData(checkboxData);
     setCurrentPendingDocs(workflow.current_step_documents_pending);
-    setCurrentStep(workflow.summary.current_step);
-    setCustomer(workflow.customer);
+    setWorkflow(workflow.customer);
   }, []);
 
   useEffect(() => {
@@ -54,11 +61,13 @@ const useComplianceWorkflow = () => {
 
         parseWorkflow(compliance);
       } catch (err) {
-        setError(err[0].title);
+        setError(err[0].title || "Something went wrong. Please try again later.");
       }
     };
+    if(authCustomer) {
+      getWorkflow();
 
-    getWorkflow();
+    }
   }, [accessToken, authCustomer, parseWorkflow]);
 
   const submitAgreements = async (values, actions) => {
@@ -70,7 +79,7 @@ const useComplianceWorkflow = () => {
         accept: 'yes',
         document_uid,
         ip_address,
-        user_name: customer.email,
+        user_name: authCustomer.email,
       };
     });
 
@@ -90,7 +99,6 @@ const useComplianceWorkflow = () => {
   };
 
   return {
-    currentStep,
     currentPendingDocs,
     submitAgreements,
     checkboxData,
@@ -99,6 +107,7 @@ const useComplianceWorkflow = () => {
     patriotAccepted,
     setError,
     acceptedDocuments,
+    workflow,
   };
 };
 

@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Heading3, Body, AgreementCheckbox } from '../..';
 import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 
-const PatriotAct = ({ currentPendingDocs }: IPatroitAct) => {
+const PatriotAct = ({ currentPendingDocs, isLoading }: IPatroitAct) => {
   return (
     <View style={{ flex: 1 }}>
       <Heading3 textAlign="center" style={{ marginBottom: 50 }}>
@@ -36,6 +36,7 @@ const PatriotAct = ({ currentPendingDocs }: IPatroitAct) => {
 
 interface IPatroitAct {
   currentPendingDocs: ComplianceDocument[];
+  isLoading: boolean;
 }
 
 const styles = StyleSheet.create({

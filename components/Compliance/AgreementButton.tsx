@@ -14,7 +14,7 @@ const AgreementButton = ({ currentPendingDocs, isLoading }: IAgreementButton) =>
     if (numNames === 1) return agreementNames[0];
     if (numNames === 2) return `${agreementNames[0]} and ${agreementNames[1]}`;
     if (numNames >= 3) {
-      agreementNames[numNames - 1] = `and ${agreementNames[numNames - 1]} `;
+      agreementNames[numNames - 1] = `and the ${agreementNames[numNames - 1]}`;
       return agreementNames.join(', ');
     }
   };
@@ -23,9 +23,9 @@ const AgreementButton = ({ currentPendingDocs, isLoading }: IAgreementButton) =>
     <View>
       <BodySmall
         textAlign="center"
-        style={{ marginBottom: 20, maxWidth: '40ch', alignSelf: 'center' }}
+        style={{ marginBottom: 20, alignSelf: 'center' }}
       >
-        {`By clicking "I Agree" I have read and agreed to the ${renderAgreement()} `}
+        {`By clicking "I Agree" I have read and agreed to the ${renderAgreement()}.`}
       </BodySmall>
       <Button
         title="I Agree"

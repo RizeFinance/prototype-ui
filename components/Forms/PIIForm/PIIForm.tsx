@@ -1,17 +1,34 @@
 import React, { useState } from 'react';
 import { Formik } from 'formik';
 import { StyleSheet, View, Platform } from 'react-native';
-import { Button, DatePickerInput, Input, Dropdown, Heading3 } from '../../../components';
+import { Button, DatePickerInput, Input, Dropdown, Heading3, ConfirmationInfo } from '../../../components';
 import * as Yup from 'yup';
 import states from '../../../constants/States';
 import formatStringByPattern from 'format-string-by-pattern';
 import { isEmpty, isEqual } from 'lodash';
-import ConfirmationInfo from './ConfirmationInfo';
 
 interface IPIIForm {
   handleSubmit: any;
-  customer: any;
+  customer: CustomerDetails | NewCustomerDetails;
 }
+
+export interface CustomerDetails {
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  suffix: string;
+  phone: string;
+  ssn_last_four: string;
+  dob: string;
+  street1: string;
+  street2: string;
+  city: string;
+  state: string;
+  postal_code: string;
+}
+
+export type NewCustomerDetails = Exclude<CustomerDetails, 'ssn_last_four'> & {ssn: string}
+
 
 const PIIForm = ({ handleSubmit, customer }: IPIIForm) => {
   const [showConfirm, setShowConfirm] = useState(() => !isEmpty(customer.last_name));
@@ -206,7 +223,7 @@ const PIIForm = ({ handleSubmit, customer }: IPIIForm) => {
                     />
                   </View>
 
-                  {values.ssn && (
+                  {!customer.dob && (
                     <View style={styles.formGroup}>
                       <Input
                         label="Social Security Number"
@@ -227,7 +244,7 @@ const PIIForm = ({ handleSubmit, customer }: IPIIForm) => {
                   <Button
                     style={{ marginTop: 30 }}
                     title="Submit Information"
-                    disabled={!isValid}
+                    disabled={!dirty || !isValid || isSubmitting}
                     onPress={() => setShowConfirm(true)}
                   />
                 </>
