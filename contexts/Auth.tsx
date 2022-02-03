@@ -3,69 +3,6 @@ import AuthService, { IConfirmPW } from '../services/AuthService';
 import { storeData, getData, removeValue } from '../utils/asyncStorage';
 import { CustomerService } from '../services';
 import { Customer } from '../models';
-export interface CustomerData {
-  uid: string;
-  external_uid: string;
-  program_uid: string;
-  email: string;
-  status: string;
-  kyc_status?: any;
-  total_balance: number;
-  created_at: Date;
-  locked_at?: any;
-  lock_reason?: any;
-  first_name: string;
-  middle_name: string;
-  last_name: string;
-  suffix: string;
-  phone: string;
-  dob: string;
-  street1: string;
-  street2: string;
-  city: string;
-  state: string;
-  postal_code: string;
-}
-
-export type AuthContextProps = {
-  accessToken?: string;
-  refreshToken?: string;
-  userName?: string;
-  login: (userName: string, password: string) => Promise<any>;
-  logout: () => void;
-  register: (username: string, password: string) => Promise<any>;
-  forgotPassword: (email: string) => Promise<any>;
-  confirmPassword: (data: IConfirmPW) => Promise<any>;
-  setPassword: (username: string, oldPassword: string, newPassword: string) => Promise<any>;
-  refreshCustomer: () => Promise<Customer>;
-  customer?: CustomerData;
-  customerProducts?: any;
-  setCustomer: React.Dispatch<React.SetStateAction<Customer>>;
-};
-
-export const AuthContext = createContext<AuthContextProps>({
-  accessToken: '',
-  refreshToken: '',
-  userName: '',
-  login: () => Promise.resolve(),
-  logout: () => null,
-  register: () => Promise.resolve(null),
-  forgotPassword: () => Promise.resolve(null),
-  setPassword: () => Promise.resolve(null),
-  refreshCustomer: () => Promise.resolve(null),
-  confirmPassword: () => Promise.resolve(null),
-  customer: undefined,
-  customerProducts: [],
-  setCustomer: () => null,
-});
-
-export type AuthProviderState = {
-  accessToken?: string;
-  refreshToken?: string;
-  userName?: string;
-  customer: Customer;
-  customerProducts?: any;
-};
 
 const initialState = {
   accessToken: '',
@@ -81,10 +18,12 @@ export interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps => {
   const [authData, setAuthData] = useState<AuthProviderState>(initialState);
+  const [authIsLoading, setAuthIsLoading] = useState(true);
 
   useEffect(() => {
     const getTokens = async () => {
       try {
+        setAuthIsLoading(true);
         const { accessToken, refreshToken } = await getData({ storageKey: '@tokens' });
 
         if (accessToken) {
@@ -101,8 +40,10 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
             customerProducts,
           });
         }
+        setAuthIsLoading(false);
       } catch (err) {
         setAuthData(initialState);
+        setAuthIsLoading(false);
       }
     };
     if (!authData.customer) {
@@ -119,6 +60,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     setAuthData((initialState) => ({ ...initialState, userName }));
 
     try {
+      setAuthIsLoading(true);
       const response = await AuthService.authorize(userName, password);
       const { data } = response;
 
@@ -141,9 +83,11 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
 
         storeData({ storageKey: '@tokens', data: tokens });
       }
+      setAuthIsLoading(false);
 
       return response;
     } catch (err) {
+      setAuthIsLoading(false);
       if (err.status === 403) {
         return {
           success: false,
@@ -277,6 +221,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       refreshCustomer,
       setCustomer,
       confirmPassword,
+      authIsLoading,
     }),
     [
       accessToken,
@@ -292,6 +237,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       refreshCustomer,
       setCustomer,
       confirmPassword,
+      authIsLoading,
     ]
   );
 
@@ -299,3 +245,69 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
 };
 
 export const useAuth = (): AuthContextProps => useContext(AuthContext);
+
+export interface CustomerData {
+  uid: string;
+  external_uid: string;
+  program_uid: string;
+  email: string;
+  status: string;
+  kyc_status?: any;
+  total_balance: number;
+  created_at: Date;
+  locked_at?: any;
+  lock_reason?: any;
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  suffix: string;
+  phone: string;
+  dob: string;
+  street1: string;
+  street2: string;
+  city: string;
+  state: string;
+  postal_code: string;
+}
+
+export type AuthContextProps = {
+  accessToken?: string;
+  refreshToken?: string;
+  userName?: string;
+  login: (userName: string, password: string) => Promise<any>;
+  logout: () => void;
+  register: (username: string, password: string) => Promise<any>;
+  forgotPassword: (email: string) => Promise<any>;
+  confirmPassword: (data: IConfirmPW) => Promise<any>;
+  setPassword: (username: string, oldPassword: string, newPassword: string) => Promise<any>;
+  refreshCustomer: () => Promise<Customer>;
+  customer?: CustomerData;
+  customerProducts?: any;
+  setCustomer: React.Dispatch<React.SetStateAction<Customer>>;
+  authIsLoading: boolean;
+};
+
+export const AuthContext = createContext<AuthContextProps>({
+  accessToken: '',
+  refreshToken: '',
+  userName: '',
+  login: () => Promise.resolve(),
+  logout: () => null,
+  register: () => Promise.resolve(null),
+  forgotPassword: () => Promise.resolve(null),
+  setPassword: () => Promise.resolve(null),
+  refreshCustomer: () => Promise.resolve(null),
+  confirmPassword: () => Promise.resolve(null),
+  customer: undefined,
+  customerProducts: [],
+  setCustomer: () => null,
+  authIsLoading: true,
+});
+
+export type AuthProviderState = {
+  accessToken?: string;
+  refreshToken?: string;
+  userName?: string;
+  customer: Customer;
+  customerProducts?: any;
+};

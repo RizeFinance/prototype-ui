@@ -1,12 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, ActivityIndicator, Text } from 'react-native';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { Heading3, Heading4, Body, TextLink, Screen } from '../components';
 import utils from '../utils/utils';
-import useComplianceWorkflow from '../hooks/useComplianceWorkflow';
+import { useCompliance } from '../contexts';
 import { ComplianceDocument } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 
 export default function AgreementScreen(): JSX.Element {
-  const { acceptedDocuments } = useComplianceWorkflow();
+  const { acceptedDocuments } = useCompliance();
 
   const onPressAgreementName = async (document: ComplianceDocument) => {
     window.open(document.compliance_document_url, '_blank');
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   container: {
     marginTop: 25,
-    alignItems: "center"
+    alignItems: 'center',
   },
   agreementInfo: {
     marginVertical: 16,

@@ -1,11 +1,23 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useContext, useEffect, useState, createContext, useMemo, useCallback } from 'react';
 import { ComplianceWorkflowService } from '../services';
-import * as Network from 'expo-network';
 import {
   ComplianceDocument,
   ComplianceWorkflow,
 } from '@rizefinance/rize-js/types/lib/core/typedefs/compliance-workflow.typedefs';
 import { useAuth } from '../contexts';
+import * as Network from 'expo-network';
+
+interface ICompliance {
+  currentPendingDocs: ComplianceDocument[] | [];
+  acceptedDocuments: ComplianceDocument[] | [];
+  complianceIsLoading: boolean;
+  workflow: ComplianceWorkflow | Record<string, any>;
+  error: string;
+  checkboxData: any;
+  patriotAccepted: boolean | undefined;
+  submitAgreements: any;
+  setError: any;
+}
 
 const initWorkflow = {
   uid: '',
@@ -14,32 +26,24 @@ const initWorkflow = {
   },
 };
 
-const useComplianceWorkflow = () => {
+export const ComplianceContext = createContext({} as ICompliance);
+
+const ComplianceProvider = ({ children }) => {
   const [currentPendingDocs, setCurrentPendingDocs] = useState<ComplianceDocument[] | []>([]);
   const [acceptedDocuments, setAcceptedDocuments] = useState<ComplianceDocument[] | []>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [complianceIsLoading, setComplianceIsLoading] = useState(false);
   const [workflow, setWorkflow] = useState<ComplianceWorkflow | Record<string, any>>(initWorkflow);
   const [error, setError] = useState('');
   const [checkboxData, setCheckboxData] = useState({});
   const [patriotAccepted, setPatriotAccepted] = useState(undefined);
   const { customer: authCustomer, accessToken } = useAuth();
 
-  useEffect(() => {
-    if (workflow?.uid !== '' && authCustomer) {
-      setIsLoading(false);
-    }
-  }, [workflow, authCustomer]);
-
   const parseWorkflow = useCallback((workflow) => {
     const step2Doc = workflow.all_documents.find((doc: ComplianceDocument) => doc.step === 2);
-
-    console.log(workflow, 'workflow');
 
     const isPatriotAccepted = workflow.accepted_documents.find(
       (doc: ComplianceDocument) => doc.external_storage_name === step2Doc.external_storage_name
     );
-
-    console.log(isPatriotAccepted, 'isPatriotAccepted');
 
     const checkboxData = workflow.current_step_documents_pending.reduce((acc, curr) => {
       const key = curr['uid'];
@@ -51,7 +55,7 @@ const useComplianceWorkflow = () => {
     setPatriotAccepted(isPatriotAccepted ? true : false);
     setCheckboxData(checkboxData);
     setCurrentPendingDocs(workflow.current_step_documents_pending);
-    setWorkflow(workflow.customer);
+    setWorkflow(workflow);
   }, []);
 
   useEffect(() => {
@@ -70,6 +74,7 @@ const useComplianceWorkflow = () => {
         }
 
         parseWorkflow(compliance);
+
       } catch (err) {
         setError(err[0].title || 'Something went wrong. Please try again later.');
       }
@@ -80,7 +85,7 @@ const useComplianceWorkflow = () => {
   }, [accessToken, authCustomer, parseWorkflow]);
 
   const submitAgreements = async (values, actions) => {
-    setIsLoading(true);
+    setComplianceIsLoading(true);
     const ip_address = await Network.getIpAddressAsync();
 
     const documents = Object.keys(values).map((document_uid) => {
@@ -99,25 +104,48 @@ const useComplianceWorkflow = () => {
       );
       parseWorkflow(updatedComplianceWorkflow);
 
-      setIsLoading(false);
+      setComplianceIsLoading(false);
       actions.resetForm();
     } catch (err) {
       setError(err[0].title);
-      setIsLoading(false);
+      setComplianceIsLoading(false);
     }
   };
 
-  return {
-    currentPendingDocs,
-    submitAgreements,
-    checkboxData,
-    isLoading,
-    error,
-    patriotAccepted,
-    setError,
-    acceptedDocuments,
-    workflow,
-  };
+  const value = useMemo(
+    () => ({
+      currentPendingDocs,
+      acceptedDocuments,
+      complianceIsLoading,
+      workflow,
+      error,
+      checkboxData,
+      patriotAccepted,
+      submitAgreements,
+      setError,
+    }),
+    [
+      currentPendingDocs,
+      acceptedDocuments,
+      complianceIsLoading,
+      workflow,
+      error,
+      checkboxData,
+      patriotAccepted,
+      submitAgreements,
+      setError,
+    ]
+  );
+
+  return <ComplianceContext.Provider value={value}>{children}</ComplianceContext.Provider>;
 };
 
-export default useComplianceWorkflow;
+const useCompliance = () => {
+  const context = useContext(ComplianceContext);
+  if (context === undefined) {
+    throw new Error('useCompliance must be used within a Compliance Provider');
+  }
+  return context;
+};
+
+export { ComplianceProvider, useCompliance };

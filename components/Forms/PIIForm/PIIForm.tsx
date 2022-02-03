@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { Formik } from 'formik';
 import { StyleSheet, View, Platform } from 'react-native';
-import { Button, DatePickerInput, Input, Dropdown, Heading3, ConfirmationInfo } from '../../../components';
+import {
+  Button,
+  DatePickerInput,
+  Input,
+  Dropdown,
+  Heading3,
+  ConfirmationInfo,
+} from '../../../components';
 import * as Yup from 'yup';
 import states from '../../../constants/States';
 import formatStringByPattern from 'format-string-by-pattern';
@@ -27,8 +34,7 @@ export interface CustomerDetails {
   postal_code: string;
 }
 
-export type NewCustomerDetails = Exclude<CustomerDetails, 'ssn_last_four'> & {ssn: string}
-
+export type NewCustomerDetails = Exclude<CustomerDetails, 'ssn_last_four'> & { ssn: string };
 
 const PIIForm = ({ handleSubmit, customer }: IPIIForm) => {
   const [showConfirm, setShowConfirm] = useState(() => !isEmpty(customer.last_name));

@@ -11,16 +11,14 @@ import {
   AgreementCheckbox,
   Processing,
 } from '../../components';
-import { useAuth } from '../../contexts';
+import { useAuth, useCompliance } from '../../contexts';
 import { CustomerService } from '../../services';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import moment from 'moment';
 import { defaultColors } from '../../constants/Colors';
 
-import useComplianceWorkflow from '../../hooks/useComplianceWorkflow';
-
-const DisclosuresScreen = ({ navigation }) => {
+const DisclosuresScreen = () => {
   const { accessToken, customer } = useAuth();
 
   const {
@@ -30,11 +28,9 @@ const DisclosuresScreen = ({ navigation }) => {
     currentPendingDocs,
     submitAgreements,
     checkboxData,
-    isLoading,
+    complianceIsLoading,
     workflow,
-  } = useComplianceWorkflow();
-
-
+  } = useCompliance();
 
   const handlePIISubmit = async (values) => {
     try {
@@ -64,7 +60,9 @@ const DisclosuresScreen = ({ navigation }) => {
       case 1:
         return {
           title: 'Rize Disclosures',
-          component: <AgreementCheckbox currentDocs={currentPendingDocs} isLoading={isLoading} />,
+          component: (
+            <AgreementCheckbox currentDocs={currentPendingDocs} isLoading={complianceIsLoading} />
+          ),
         };
       case 2:
         return {
@@ -72,14 +70,14 @@ const DisclosuresScreen = ({ navigation }) => {
           component: patriotAccepted ? (
             <PIIForm handleSubmit={handlePIISubmit} customer={customer} />
           ) : (
-            <PatriotAct currentPendingDocs={currentPendingDocs} isLoading={isLoading} />
+            <PatriotAct currentPendingDocs={currentPendingDocs} isLoading={complianceIsLoading} />
           ),
         };
       case 3:
         return {
           title: customer.dob ? 'Banking Disclosures' : null,
           component: customer.dob ? (
-            <AgreementCheckbox currentDocs={currentPendingDocs} isLoading={isLoading} />
+            <AgreementCheckbox currentDocs={currentPendingDocs} isLoading={complianceIsLoading} />
           ) : (
             <PIIForm handleSubmit={handlePIISubmit} customer={customer} />
           ),
@@ -95,15 +93,14 @@ const DisclosuresScreen = ({ navigation }) => {
 
   const KYCStatus = {
     notApproved: ['manual_review', 'denied'],
-    processing: ['under_review']
+    processing: ['under_review'],
   };
 
   const CustomerStatus = {
     newCustomer: ['initiated'],
     notApproved: ['manual_review', 'rejected'],
-    processing: ['queued', 'identity_verified', 'under_review']
-  }
-
+    processing: ['queued', 'identity_verified', 'under_review'],
+  };
 
   if (!isEmpty(checkboxData)) {
     return (
@@ -133,37 +130,33 @@ const DisclosuresScreen = ({ navigation }) => {
         </Formik>
       </Screen>
     );
-  } 
+  }
 
-  console.log(checkboxData, 'checkboxData')
-    if (
-      processing.includes(customer.status) ||
-      (customer.status === 'initiated' && workflow?.summary?.status === 'accepted')
-    ) {
-      return <Processing />;
-    }
+  if (
+    processing.includes(customer.status) ||
+    (customer.status === 'initiated' && workflow?.summary?.status === 'accepted')
+  ) {
+    return <Processing />;
+  }
 
-    if (unapproved.includes(customer.status)) {
-      return (
-        <Screen withoutHeader>
-          <Heading3 textAlign="center" style={{ marginTop: 100 }}>
-            {"We're having issues with your account."}
-          </Heading3>
-          <Body textAlign="center" style={{ marginTop: 20 }}>
-            {'Please contact customer support for additional help.'}
-          </Body>
-        </Screen>
-      );
-    }
+  if (unapproved.includes(customer.status)) {
+    return (
+      <Screen withoutHeader>
+        <Heading3 textAlign="center" style={{ marginTop: 100 }}>
+          {"We're having issues with your account."}
+        </Heading3>
+        <Body textAlign="center" style={{ marginTop: 20 }}>
+          {'Please contact customer support for additional help.'}
+        </Body>
+      </Screen>
+    );
+  }
 
-    // if(isLoading) {
-      return (
-        <View style={{ flex: 1, justifyContent: 'center' }}>
-          <ActivityIndicator size="large" />
-        </View>
-      );
-
-    // }
+  return (
+    <View style={{ flex: 1, justifyContent: 'center' }}>
+      <ActivityIndicator size="large" />
+    </View>
+  );
 };
 
 export default DisclosuresScreen;

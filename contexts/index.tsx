@@ -5,22 +5,26 @@ import { AuthProvider, useAuth } from './Auth';
 import { AccountsProvider, useAccounts, AccountType } from './Accounts';
 import { ProductsProvider } from './Products';
 import {
-  useCompliance,
+  // useCompliance,
   ProductType,
-  ComplianceProvider,
+  // ComplianceProvider,
   ComplianceDocumentSelection,
 } from './ComplianceWorkflow';
+
+import { ComplianceProvider, useCompliance } from './Compliance';
 
 const ApplicationProviders = ({ children }: { children: JSX.Element }): JSX.Element => {
   return (
     <AuthProvider>
-      <AccountsProvider>
-        <ProductsProvider>
-          <DebitCardsProvider>
-            <DocumentsProvider>{children}</DocumentsProvider>
-          </DebitCardsProvider>
-        </ProductsProvider>
-      </AccountsProvider>
+      <ComplianceProvider>
+        <AccountsProvider>
+          <ProductsProvider>
+            <DebitCardsProvider>
+              <DocumentsProvider>{children}</DocumentsProvider>
+            </DebitCardsProvider>
+          </ProductsProvider>
+        </AccountsProvider>
+      </ComplianceProvider>
     </AuthProvider>
   );
 };

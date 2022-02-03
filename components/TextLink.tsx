@@ -52,7 +52,7 @@ const TextLink = (props: TextLinkProps): JSX.Element => {
 
   return (
     <Pressable {...otherProps} style={[styles.pressable, style]} disabled={disabled}>
-      <View style={{maxWidth: 350}}>
+      <View style={{ maxWidth: 350 }}>
         <Text textAlign="center" fontWeight="semibold" style={styles.editButton}>
           {children}
         </Text>

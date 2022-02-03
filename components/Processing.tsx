@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { Screen, Heading3, Heading4 } from '.';
 import { useAuth } from '../contexts';
@@ -7,7 +7,8 @@ import config from '../config/config';
 
 const Processing = () => {
   const { accessToken, refreshCustomer, customer } = useAuth();
-  let timeout = null;
+
+  const timeout = useRef<NodeJS.Timeout | null>(null);
 
   const styles = StyleSheet.create({
     container: {
@@ -18,13 +19,13 @@ const Processing = () => {
     },
   });
 
-  const refreshCustomerPeriodically = async (): Promise<void> => {
+  const refreshCustomerPeriodically = useCallback(async (): Promise<void> => {
     if (customer.status === 'active') return;
     await refreshCustomer();
-    timeout = setTimeout(() => {
+    timeout.current = setTimeout(() => {
       refreshCustomerPeriodically();
     }, 15000);
-  };
+  }, [customer, refreshCustomer]);
 
   useEffect(() => {
     const verificationCheck = async (): Promise<void> => {
@@ -40,8 +41,8 @@ const Processing = () => {
 
     verificationCheck();
 
-    return (): void => clearTimeout(timeout);
-  }, [customer]);
+    return (): void => clearTimeout(timeout.current);
+  }, [customer, accessToken, refreshCustomerPeriodically, timeout]);
 
   return (
     <Screen style={styles.container}>

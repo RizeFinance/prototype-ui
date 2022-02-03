@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import {
   NavigationContainer,
   DefaultTheme,
@@ -17,6 +17,8 @@ import {
   StyleProp,
   StyleSheet,
   ViewStyle,
+  ActivityIndicator,
+  View,
 } from 'react-native';
 
 import LinkingConfiguration from './LinkingConfiguration';
@@ -47,9 +49,8 @@ import {
   AccountsSetupScreen,
 } from '../screens';
 
-import { useAuth } from '../contexts';
+import { useAuth, useCompliance } from '../contexts';
 import { useThemeColor, Body, TextLink } from '../components';
-import useComplianceWorkflow from '../hooks/useComplianceWorkflow';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }): JSX.Element {
   return (
@@ -97,10 +98,18 @@ const MenuButton = (): JSX.Element => {
 };
 
 function MainStackScreen() {
-  const { customer } = useAuth();
-  const { workflow } = useComplianceWorkflow();
+  const { customer, authIsLoading } = useAuth();
+  const { workflow, complianceIsLoading } = useCompliance();
 
-  // const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  // TODO: Race condition between customer and workflow
+
+  const showDisclosuresCustStatus = ['active', 'initiated'];
+  const showDisclosuresWFStatuses = ['initiated', 'in_progress'];
+
+  const showDisclosures =
+    showDisclosuresCustStatus.includes(customer?.status) &&
+    workflow?.summary?.status.includes(showDisclosuresWFStatuses);
+
   const background = useThemeColor('background');
 
   const screenCardStyle: StyleProp<ViewStyle> = {
@@ -130,6 +139,14 @@ function MainStackScreen() {
     } as StackNavigationOptions,
   };
 
+  if (authIsLoading && complianceIsLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   if (!customer) {
     return (
       <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
@@ -141,7 +158,7 @@ function MainStackScreen() {
     );
   }
 
-  if (customer.status === 'active' && workflow.summary.status !== 'accepted') {
+  if (workflow.summary.status !== 'accepted') {
     return (
       <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
         <Stack.Screen name="Disclosures" component={DisclosuresScreen} />
@@ -150,7 +167,7 @@ function MainStackScreen() {
     );
   }
 
-  if (customer.locked_at) {
+  if (customer.status === 'locked') {
     return (
       <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
         <Stack.Screen name="LockedScreen" component={LockedScreen} />
