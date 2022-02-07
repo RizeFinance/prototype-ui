@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Formik } from 'formik';
+import { useFormik } from 'formik';
 import { StyleSheet, View, Platform } from 'react-native';
 import {
   Button,
@@ -15,7 +15,7 @@ import formatStringByPattern from 'format-string-by-pattern';
 import { isEmpty, isEqual } from 'lodash';
 
 interface IPIIForm {
-  handleSubmit: any;
+  handleFormSubmit: (values: CustomerDetails) => void;
   customer: CustomerDetails | NewCustomerDetails;
 }
 
@@ -25,7 +25,7 @@ export interface CustomerDetails {
   last_name: string;
   suffix: string;
   phone: string;
-  ssn_last_four: string;
+  ssn: string;
   dob: string;
   street1: string;
   street2: string;
@@ -36,7 +36,7 @@ export interface CustomerDetails {
 
 export type NewCustomerDetails = Exclude<CustomerDetails, 'ssn_last_four'> & { ssn: string };
 
-const PIIForm = ({ handleSubmit, customer }: IPIIForm) => {
+const PIIForm = ({ handleFormSubmit, customer }: IPIIForm) => {
   const [showConfirm, setShowConfirm] = useState(() => !isEmpty(customer.last_name));
 
   const initValues = {
@@ -51,12 +51,35 @@ const PIIForm = ({ handleSubmit, customer }: IPIIForm) => {
     state: isEmpty(customer.state) ? '' : customer.state,
     postal_code: isEmpty(customer.postal_code) ? '' : customer.postal_code,
     phone: isEmpty(customer.phone) ? '' : formatStringByPattern('(999) 999-9999', customer.phone),
-    ssn: undefined,
+    ssn: '',
   };
 
-  const { ssn, ...valuesToUpdate } = initValues;
+  // const { ssn, ...valuesToUpdate } = initValues;
 
-  const updatedValues = { ...valuesToUpdate, ssn_last_four: `***-**-${customer.ssn_last_four}` };
+  // const updatedValues = { ...valuesToUpdate, ssn_last_four: `***-**-${customer.ssn_last_four}` };
+
+  const formik = useFormik({
+    initialValues: initValues,
+    onSubmit: (values) => handleFormSubmit(values),
+    validationSchema: isEmpty(customer.last_name) ? piiSchema : editableInfoSchema,
+  });
+
+  const {
+    handleChange,
+    handleBlur,
+    setFieldValue,
+    setFieldTouched,
+    values,
+    errors,
+    isValid,
+    isSubmitting,
+    dirty,
+    touched,
+    initialValues,
+    handleSubmit,
+  } = formik;
+
+  const hasBeenUpdated = !isEqual(initialValues, values);
 
   return (
     <>
@@ -67,198 +90,174 @@ const PIIForm = ({ handleSubmit, customer }: IPIIForm) => {
             : 'Update Your Personal Information'}
         </Heading3>
       )}
+      <>
+        {showConfirm ? (
+          <ConfirmationInfo
+            customerInfo={values}
+            setShowConfirm={setShowConfirm}
+            hasBeenUpdated={hasBeenUpdated}
+            handleSubmit={handleSubmit}
+          />
+        ) : (
+          <>
+            <View style={styles.formGroup}>
+              <Input
+                label="First Name"
+                placeholder={'First Name'}
+                onChangeText={handleChange('first_name')}
+                onBlur={handleBlur('first_name')}
+                value={values.first_name}
+                errorText={!touched.first_name ? '' : errors.first_name}
+                editable={!isSubmitting}
+              />
+              <Input
+                label="Middle Name (optional)"
+                placeholder="Middle Name"
+                onChangeText={handleChange('middle_name')}
+                onBlur={handleBlur('middle_name')}
+                value={values.middle_name}
+                errorText={!touched.middle_name ? '' : errors.middle_name}
+                editable={!isSubmitting}
+              />
+              <Input
+                label="Last Name"
+                placeholder="Last Name"
+                onChangeText={handleChange('last_name')}
+                onBlur={handleBlur('last_name')}
+                value={values.last_name}
+                errorText={!touched.last_name ? '' : errors.last_name}
+                editable={!isSubmitting}
+              />
+              <Input
+                label="Suffix (optional)"
+                placeholder="Suffix"
+                onChangeText={handleChange('suffix')}
+                onBlur={handleBlur('suffix')}
+                value={values.suffix}
+                errorText={!touched.suffix ? '' : errors.suffix}
+                editable={!isSubmitting}
+              />
+            </View>
 
-      <Formik
-        initialValues={isEmpty(customer.last_name) ? initValues : updatedValues}
-        onSubmit={handleSubmit}
-        validationSchema={isEmpty(customer.last_name) ? piiSchema : editableInfoSchema}
-      >
-        {({
-          handleChange,
-          handleBlur,
-          setFieldValue,
-          setFieldTouched,
-          values,
-          errors,
-          isValid,
-          isSubmitting,
-          dirty,
-          touched,
-          initialValues,
-        }) => {
-          const hasBeenUpdated = !isEqual(initialValues, values);
-
-          return (
-            <>
-              {showConfirm ? (
-                <ConfirmationInfo
-                  customerInfo={values}
-                  setShowConfirm={setShowConfirm}
-                  hasBeenUpdated={hasBeenUpdated}
+            <View style={styles.formGroup}>
+              {Platform.OS === 'web' ? (
+                <Input
+                  label="Date of Birth"
+                  placeholder="MM/DD/YYYY"
+                  onChangeText={(e) => {
+                    const value = formatStringByPattern('MM/DD/YYYY', e);
+                    setFieldValue('dob', value);
+                  }}
+                  onBlur={handleBlur('dob')}
+                  value={values.dob}
+                  errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
+                  editable={!isSubmitting}
                 />
               ) : (
-                <>
-                  <View style={styles.formGroup}>
-                    <Input
-                      label="First Name"
-                      placeholder={'First Name'}
-                      onChangeText={handleChange('first_name')}
-                      onBlur={handleBlur('first_name')}
-                      value={values.first_name}
-                      errorText={!touched.first_name ? '' : errors.first_name}
-                      editable={!isSubmitting}
-                    />
-                    <Input
-                      label="Middle Name (optional)"
-                      placeholder="Middle Name"
-                      onChangeText={handleChange('middle_name')}
-                      onBlur={handleBlur('middle_name')}
-                      value={values.middle_name}
-                      errorText={!touched.middle_name ? '' : errors.middle_name}
-                      editable={!isSubmitting}
-                    />
-                    <Input
-                      label="Last Name"
-                      placeholder="Last Name"
-                      onChangeText={handleChange('last_name')}
-                      onBlur={handleBlur('last_name')}
-                      value={values.last_name}
-                      errorText={!touched.last_name ? '' : errors.last_name}
-                      editable={!isSubmitting}
-                    />
-                    <Input
-                      label="Suffix (optional)"
-                      placeholder="Suffix"
-                      onChangeText={handleChange('suffix')}
-                      onBlur={handleBlur('suffix')}
-                      value={values.suffix}
-                      errorText={!touched.suffix ? '' : errors.suffix}
-                      editable={!isSubmitting}
-                    />
-                  </View>
-
-                  <View style={styles.formGroup}>
-                    {Platform.OS === 'web' ? (
-                      <Input
-                        label="Date of Birth"
-                        placeholder="MM/DD/YYYY"
-                        onChangeText={(e) => {
-                          const value = formatStringByPattern('MM/DD/YYYY', e);
-                          setFieldValue('dob', value);
-                        }}
-                        onBlur={handleBlur('dob')}
-                        value={values.dob}
-                        errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
-                        editable={!isSubmitting}
-                      />
-                    ) : (
-                      <DatePickerInput
-                        label="Date of Birth"
-                        placeholder="Month/Date/Year"
-                        errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
-                        value={values.dob}
-                        disabled={!isSubmitting}
-                        onChange={(date: Date) => {
-                          setFieldValue('dob', date);
-                          setFieldTouched('dob', true, false);
-                        }}
-                      />
-                    )}
-                  </View>
-
-                  <View style={styles.formGroup}>
-                    <Input
-                      label="Physical Address"
-                      placeholder="Address"
-                      onChangeText={handleChange('street1')}
-                      onBlur={handleBlur('street1')}
-                      value={values.street1}
-                      errorText={!touched.street1 ? '' : errors.street1}
-                      editable={!isSubmitting}
-                    />
-                    <Input
-                      placeholder="Apt, Unit, ETC"
-                      onChangeText={handleChange('street2')}
-                      onBlur={handleBlur('street2')}
-                      value={values.street2}
-                      errorText={!touched.street2 ? '' : errors.street2}
-                      editable={!isSubmitting}
-                    />
-                    <Input
-                      placeholder="City"
-                      onChangeText={handleChange('city')}
-                      onBlur={handleBlur('city')}
-                      value={values.city}
-                      errorText={!touched.city ? '' : errors.city}
-                      editable={!isSubmitting}
-                    />
-                    <Dropdown
-                      items={states}
-                      value={values.state}
-                      placeholder="State"
-                      onChange={handleChange('state')}
-                      inputStyle={{ fontSize: 16 }}
-                    />
-                    <Input
-                      placeholder="Zip Code"
-                      onChangeText={handleChange('postal_code')}
-                      onBlur={handleBlur('postal_code')}
-                      value={values.postal_code}
-                      errorText={!touched.postal_code ? '' : errors.postal_code}
-                      editable={!isSubmitting}
-                      maxLength={5}
-                      keyboardType="number-pad"
-                    />
-                  </View>
-
-                  <View style={styles.formGroup}>
-                    <Input
-                      label="Phone Number"
-                      placeholder="(xxx) xxx-xxxx"
-                      onChangeText={(text) => {
-                        const value = formatStringByPattern('(999) 999-9999', text);
-                        setFieldValue('phone', value);
-                      }}
-                      multiline={true}
-                      onBlur={handleBlur('phone')}
-                      value={formatStringByPattern('(999) 999-9999', values.phone)}
-                      errorText={!touched.phone ? '' : errors.phone}
-                      editable={!isSubmitting}
-                      maxLength={14}
-                      keyboardType="number-pad"
-                    />
-                  </View>
-
-                  {!customer.dob && (
-                    <View style={styles.formGroup}>
-                      <Input
-                        label="Social Security Number"
-                        placeholder="xxx-xx-xxxx"
-                        onChangeText={(e) => {
-                          const value = formatStringByPattern('999-99-9999', e);
-                          setFieldValue('ssn', value);
-                        }}
-                        onBlur={handleBlur('ssn')}
-                        value={values.ssn}
-                        errorText={!touched.ssn ? '' : errors.ssn}
-                        editable={!isSubmitting}
-                        maxLength={11}
-                        autoCapitalize={'none'}
-                      />
-                    </View>
-                  )}
-                  <Button
-                    style={{ marginTop: 30 }}
-                    title="Submit Information"
-                    disabled={!dirty || !isValid || isSubmitting}
-                    onPress={() => setShowConfirm(true)}
-                  />
-                </>
+                <DatePickerInput
+                  label="Date of Birth"
+                  placeholder="Month/Date/Year"
+                  errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
+                  value={values.dob}
+                  disabled={!isSubmitting}
+                  onChange={(date: Date) => {
+                    setFieldValue('dob', date);
+                    setFieldTouched('dob', true, false);
+                  }}
+                />
               )}
-            </>
-          );
-        }}
-      </Formik>
+            </View>
+
+            <View style={styles.formGroup}>
+              <Input
+                label="Physical Address"
+                placeholder="Address"
+                onChangeText={handleChange('street1')}
+                onBlur={handleBlur('street1')}
+                value={values.street1}
+                errorText={!touched.street1 ? '' : errors.street1}
+                editable={!isSubmitting}
+              />
+              <Input
+                placeholder="Apt, Unit, ETC"
+                onChangeText={handleChange('street2')}
+                onBlur={handleBlur('street2')}
+                value={values.street2}
+                errorText={!touched.street2 ? '' : errors.street2}
+                editable={!isSubmitting}
+              />
+              <Input
+                placeholder="City"
+                onChangeText={handleChange('city')}
+                onBlur={handleBlur('city')}
+                value={values.city}
+                errorText={!touched.city ? '' : errors.city}
+                editable={!isSubmitting}
+              />
+              <Dropdown
+                items={states}
+                value={values.state}
+                placeholder="State"
+                onChange={handleChange('state')}
+                inputStyle={{ fontSize: 16 }}
+              />
+              <Input
+                placeholder="Zip Code"
+                onChangeText={handleChange('postal_code')}
+                onBlur={handleBlur('postal_code')}
+                value={values.postal_code}
+                errorText={!touched.postal_code ? '' : errors.postal_code}
+                editable={!isSubmitting}
+                maxLength={5}
+                keyboardType="number-pad"
+              />
+            </View>
+
+            <View style={styles.formGroup}>
+              <Input
+                label="Phone Number"
+                placeholder="(xxx) xxx-xxxx"
+                onChangeText={(text) => {
+                  const value = formatStringByPattern('(999) 999-9999', text);
+                  setFieldValue('phone', value);
+                }}
+                multiline={true}
+                onBlur={handleBlur('phone')}
+                value={formatStringByPattern('(999) 999-9999', values.phone)}
+                errorText={!touched.phone ? '' : errors.phone}
+                editable={!isSubmitting}
+                maxLength={14}
+                keyboardType="number-pad"
+              />
+            </View>
+
+            {!customer.dob && (
+              <View style={styles.formGroup}>
+                <Input
+                  label="Social Security Number"
+                  placeholder="xxx-xx-xxxx"
+                  onChangeText={(e) => {
+                    const value = formatStringByPattern('999-99-9999', e);
+                    setFieldValue('ssn', value);
+                  }}
+                  onBlur={handleBlur('ssn')}
+                  value={values.ssn}
+                  errorText={!touched.ssn ? '' : errors.ssn}
+                  editable={!isSubmitting}
+                  maxLength={11}
+                  autoCapitalize={'none'}
+                />
+              </View>
+            )}
+            <Button
+              style={{ marginTop: 30 }}
+              title="Submit Information"
+              disabled={!dirty || !isValid || isSubmitting}
+              onPress={() => setShowConfirm(true)}
+            />
+          </>
+        )}
+      </>
     </>
   );
 };
@@ -295,7 +294,7 @@ const piiSchema = editableInfoSchema.shape({
   ssn: Yup.string()
     .required('SSN is required.')
     .max(11, 'Invalid Social Security Number.')
-    .matches(/[A-Za-z0-9]{3}-[A-Za-z0-9]{2}-[A-Za-z0-9]{4}/, 'Invalid Social Security Number.'),
+    .matches(/[0-9]{3}-[0-9]{2}-[0-9]{4}/, 'Invalid Social Security Number.'),
 });
 
 const styles = StyleSheet.create({

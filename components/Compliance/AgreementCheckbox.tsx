@@ -43,9 +43,9 @@ const AgreementCheckbox = ({ currentDocs, isLoading }: IAgreementCheckbox) => {
       </>
     );
   } else {
-    <View style={{justifyContent: 'center', flex: 1}}>
+    <View style={styles.loading}>
       <ActivityIndicator size="large" />;
-    </View>
+    </View>;
   }
 };
 
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   text: {
-    width: 350, 
+    width: 350,
   },
   checkboxesContainer: {
     flex: 1,
@@ -67,6 +67,10 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     textDecorationColor: defaultColors.primary,
     cursor: 'pointer',
+  },
+  loading: {
+    justifyContent: 'center',
+    flex: 1,
   },
 });
 

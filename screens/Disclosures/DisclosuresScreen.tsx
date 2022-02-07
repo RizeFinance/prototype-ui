@@ -9,7 +9,6 @@ import {
   PIIForm,
   PatriotAct,
   AgreementCheckbox,
-  Processing,
 } from '../../components';
 import { useAuth, useCompliance } from '../../contexts';
 import { CustomerService } from '../../services';
@@ -19,7 +18,7 @@ import moment from 'moment';
 import { defaultColors } from '../../constants/Colors';
 
 const DisclosuresScreen = () => {
-  const { accessToken, customer } = useAuth();
+  const { accessToken, customer, setCustomer } = useAuth();
 
   const {
     patriotAccepted,
@@ -32,9 +31,10 @@ const DisclosuresScreen = () => {
     workflow,
   } = useCompliance();
 
+
   const handlePIISubmit = async (values) => {
     try {
-      await CustomerService.updateCustomer(accessToken, customer.email, {
+      const response = await CustomerService.updateCustomer(accessToken, customer.email, {
         first_name: values.first_name,
         middle_name: values.middle_name,
         last_name: values.last_name,
@@ -50,10 +50,13 @@ const DisclosuresScreen = () => {
           postal_code: values.postal_code,
         },
       });
+
+      setCustomer(response)
     } catch (err) {
       setError(err[0].title || 'An error has occured. Please try again later.');
     }
   };
+
 
   const renderScreen = () => {
     switch (workflow.summary.current_step) {
@@ -68,7 +71,7 @@ const DisclosuresScreen = () => {
         return {
           title: null,
           component: patriotAccepted ? (
-            <PIIForm handleSubmit={handlePIISubmit} customer={customer} />
+            <PIIForm handleFormSubmit={handlePIISubmit} customer={customer} />
           ) : (
             <PatriotAct currentPendingDocs={currentPendingDocs} isLoading={complianceIsLoading} />
           ),
@@ -79,11 +82,18 @@ const DisclosuresScreen = () => {
           component: customer.dob ? (
             <AgreementCheckbox currentDocs={currentPendingDocs} isLoading={complianceIsLoading} />
           ) : (
-            <PIIForm handleSubmit={handlePIISubmit} customer={customer} />
+            <PIIForm handleFormSubmit={handlePIISubmit} customer={customer} />
           ),
         };
       default:
-        return { title: '', component: null };
+        return {
+          title: null,
+          component: (
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <ActivityIndicator size="large" />
+            </View>
+          ),
+        };
     }
   };
 
@@ -116,6 +126,7 @@ const DisclosuresScreen = () => {
           onSubmit={submitAgreements}
           validationSchema={optionalRequiredSchema}
           validateOnMount
+          enableReinitialize
         >
           {() => (
             <>
@@ -130,13 +141,6 @@ const DisclosuresScreen = () => {
         </Formik>
       </Screen>
     );
-  }
-
-  if (
-    processing.includes(customer.status) ||
-    (customer.status === 'initiated' && workflow?.summary?.status === 'accepted')
-  ) {
-    return <Processing />;
   }
 
   if (unapproved.includes(customer.status)) {

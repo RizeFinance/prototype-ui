@@ -3,17 +3,16 @@ import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { Body, TextLink, Heading3, Button } from '../..';
 import { defaultColors } from '../../../constants/Colors';
 import { isEmpty } from 'lodash';
-import { useFormikContext } from 'formik';
 import moment from 'moment';
 
 interface IConfirmationInfo {
   customerInfo: CustomerDetails | NewCustomerDetails;
   setShowConfirm: React.Dispatch<React.SetStateAction<boolean>>;
   hasBeenUpdated: boolean;
+  handleSubmit: any;
 }
 
-const ConfirmationInfo = ({ customerInfo, setShowConfirm, hasBeenUpdated }: IConfirmationInfo) => {
-  const { handleSubmit } = useFormikContext();
+const ConfirmationInfo = ({ customerInfo, setShowConfirm, hasBeenUpdated, handleSubmit }: IConfirmationInfo) => {
 
   if (isEmpty(customerInfo)) {
     return <ActivityIndicator size="large" />;

@@ -44,6 +44,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       } catch (err) {
         setAuthData(initialState);
         setAuthIsLoading(false);
+        return err
       }
     };
     if (!authData.customer) {
