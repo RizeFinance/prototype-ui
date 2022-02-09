@@ -6,7 +6,8 @@ import { Screen, Button, useThemeColor } from '../components';
 import { RootStackParamList } from '../types';
 import { Heading3, Body } from '../components/Typography';
 import CustomerService from '../services/CustomerService';
-import { useComplianceWorkflow, ProductType } from '../contexts/ComplianceWorkflow';
+import { ProductType } from '../contexts/ComplianceWorkflow';
+import { useBrokerageWorkflow, BrokerageProductType } from '../contexts/BrokerageWorkflow';
 import { useAuth } from '../contexts/Auth';
 import { get } from 'lodash';
 
@@ -19,7 +20,7 @@ export default function ConfirmPIIScreen({
   route,
   navigation,
 }: ConfirmPIIScreenProps): JSX.Element {
-  const { evaluateCurrentStep } = useComplianceWorkflow();
+  const { evaluateCurrentStep: evaluateCurrentBrokerageStep } = useBrokerageWorkflow();
   const { accessToken, customer } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string>('');
@@ -48,8 +49,8 @@ export default function ConfirmPIIScreen({
     setIsSubmitting(true);
 
     try {
-      if (productType === ProductType.Brokerage) {
-        await evaluateCurrentStep();
+      if (productType === BrokerageProductType) {
+        await evaluateCurrentBrokerageStep();
         return;
       }
 

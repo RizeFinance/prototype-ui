@@ -7,4 +7,10 @@ const getProducts = async (accessToken: string): Promise<RizeList<Product>> => {
     .then((response) => response.data);
 };
 
-export { getProducts };
+const getProduct = async (accessToken: string, productUid: string): Promise<RizeList<Product>> => {
+  return await api
+    .get(`/products/${productUid}`, { headers: { Authorization: `Bearer ${accessToken}` } })
+    .then((response) => response.data);
+};
+
+export { getProducts, getProduct };

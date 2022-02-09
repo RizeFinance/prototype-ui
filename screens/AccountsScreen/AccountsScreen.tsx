@@ -7,6 +7,7 @@ import { useAccounts } from '../../contexts/Accounts';
 import { SyntheticAccount } from '../../models';
 import utils from '../../utils/utils';
 import styles from './styles';
+import OpenBrokerageButton from '../BrokerageOnboarding/OpenBrokerageButton';
 import { isEmpty } from 'lodash';
 
 interface AccountsScreenProps {
@@ -98,7 +99,9 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
           </View>
         )}
       </Screen>
+
       <View style={styles.btnContainer}>
+        <OpenBrokerageButton />
         <Button
           style={styles.button}
           title="Open Additional Account"

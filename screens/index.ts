@@ -25,3 +25,5 @@ export { default as PinSetScreen } from './DebitCard/PinSetScreen';
 export { default as ProfileQuestionsScreen } from './ProductOnboarding/ProfileQuestionsScreen';
 export { default as BrokerageDisclosuresScreen } from './ProductOnboarding/BrokerageDisclosuresScreen';
 export { default as ProcessingScreen } from './ProductOnboarding/ProcessingScreen';
+export { default as BrokerageOverviewScreen } from './BrokerageOnboarding/BrokerageOverviewScreen';
+export { default as BrokerageProductQuestionsScreen } from './BrokerageOnboarding/BrokerageProductQuestionsScreen';
