@@ -2,6 +2,23 @@ import { StyleSheet } from 'react-native';
 import { defaultColors } from '../../constants/Colors';
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eee',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 16,
+    height: 80,
+    flex: 1,
+    marginTop: 7,
+    marginBottom: 12,
+    borderRadius: 4,
+  },
   button: {
     maxWidth: 500,
     marginBottom: 25,
@@ -30,7 +47,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   input: {
-    marginTop: 10,
+    marginTop: 2,
   },
   questionLabel: {
     fontSize: 16,
@@ -44,7 +61,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 21,
     marginTop: 15,
-    marginBottom: 10,
+    marginBottom: 15,
+    fontStyle: 'italic'
   },
 });
 

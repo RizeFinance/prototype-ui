@@ -84,7 +84,6 @@ export class BrokerageWorkflowProvider extends React.Component<
   async componentDidMount(): Promise<void> {
     await this.loadBrokerageProduct();
     await this.refreshWorkflow();
-    console.log(this.state.brokerageWorkflow);
   }
 
   findOrCreateBrokerageWorkflow = async (): Promise<void> => {
@@ -119,8 +118,6 @@ export class BrokerageWorkflowProvider extends React.Component<
 
     if (activeWorkflow) {
       await this.setBrokerageWorkflow(activeWorkflow);
-    } else {
-      console.log('Unable to find activeWorkflow');
     }
   };
 

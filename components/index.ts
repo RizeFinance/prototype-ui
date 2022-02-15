@@ -11,6 +11,7 @@ export { default as PlaidLink } from './PlaidLink';
 export { default as Webview } from './Webview';
 export { default as useThemeColor } from './Themed';
 export { default as MaskedInput } from './MaskedInput';
+export { default as OrderedCheckboxGroup } from './OrderedCheckboxGroup';
 
 export type { DropdownItem } from './Dropdown';
 

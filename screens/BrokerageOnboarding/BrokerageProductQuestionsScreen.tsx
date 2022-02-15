@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Text } from 'react-native';
 import { Formik, useFormikContext } from 'formik';
-import { Button, Screen, Input, Dropdown, Checkbox } from '../../components';
+import { Button, Screen, Input, Dropdown, Checkbox, OrderedCheckboxGroup } from '../../components';
 import { Body, Heading3, Heading5 } from '../../components/Typography';
 import { useBrokerageWorkflow } from '../../contexts/BrokerageWorkflow';
 import { RootStackParamList } from '../../types';
@@ -57,7 +57,21 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
     const responses = get(question, 'response_values', []);
     const { setFieldValue } = useFormikContext<any>();
 
-    if (responses && responses.includes('yes')) {
+    if (question?.context?.includes('order')) {
+      const data = responses.map((response) => ({ value: response }))
+
+      const handleOnChange = (data) => {
+        !isEmpty(data) && setFieldValue(question.profile_requirement_uid, data);
+  console.log(data)        
+      }
+
+      return (
+        <>
+          <InputLabel question={question} />
+          <OrderedCheckboxGroup data={responses} onChange={handleOnChange} />
+        </>
+      )
+    } else if (responses && responses.includes('yes')) {
       if (!value) setFieldValue(question.profile_requirement_uid, 'no');
       const checked = value === 'yes';
       return (
@@ -128,8 +142,8 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
       const newObj = {};
       for (const stepQuestion of currentStep.questions) {
         newObj[stepQuestion.profile_requirement_uid] = stepQuestion.required
-          ? Yup.string().required()
-          : Yup.string();
+          ? Yup.mixed().required()
+          : Yup.mixed();
       }
 
       return Yup.object().shape(newObj);
