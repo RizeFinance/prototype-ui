@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Dropdown, Screen, Input, Button, Body, Heading3, TextLink } from '../../components';
-import { useAuth, useAccounts, useComplianceWorkflow, ProductType } from '../../contexts';
+import { useAuth, useAccounts } from '../../contexts';
 import { AccountService } from '../../services';
 import styles from './styles';
-import config from '../../config/config';
-import { get, find } from 'lodash';
+import { SyntheticAccountType } from '../../models';
 
 export interface ITypes {
   uid: string;
@@ -27,75 +26,19 @@ const AccountsSetupScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [typeSelected, setTypeSelected] = useState('');
   const [disabled, setDisabled] = useState(true);
-  const { accessToken, customerProducts } = useAuth();
+  const { accessToken } = useAuth();
   const { liabilityAccounts, refetchAccounts } = useAccounts();
 
-  const brokerageProductUid = config.application.brokerageProductUid;
-
-  const {
-    loadComplianceWorkflows,
-    setComplianceWorkflow,
-    customerWorkflows,
-    createComplianceWorkflow,
-  } = useComplianceWorkflow();
-
-  useEffect(() => {
-    const loadComplianceWorflows = async () => {
-      await loadComplianceWorkflows({ product_uid: [brokerageProductUid] });
-    };
-
-    if (brokerageProductUid) {
-      loadComplianceWorflows();
-    }
-  }, [brokerageProductUid]);
-
-  const completedWorkflow = find(
-    customerWorkflows,
-    (workflow) => get(workflow, ['summary', 'status']) === 'accepted'
-  );
-
-  const inProgressWorkflow = find(
-    customerWorkflows,
-    (workflow) => get(workflow, ['summary', 'status']) === 'in_progress'
-  );
-
-  const existingBrokerageProduct = find(customerProducts, { product_uid: brokerageProductUid });
-  const existingBrokerageAccount = find(liabilityAccounts, {
-    synthetic_account_category: 'target_yield_account',
-  });
-
-  const brokerageSelected = typeSelected === AccountTypes.target_yield_account;
-
-  const hideBrokerageOption = () => {
-    if (
-      existingBrokerageAccount ||
-      (existingBrokerageAccount && existingBrokerageProduct) ||
-      !brokerageProductUid
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  const products = (types) => {
+  const products = (types: SyntheticAccountType[]) => {
     const selection = types
-      .filter((type) => type.synthetic_account_category !== 'external')
+      .filter((type) => type.synthetic_account_category === 'general')
       .map((type) => {
         return {
           label: AccountTypes[type.synthetic_account_category],
           value: type.uid,
         };
       });
-
-    if (hideBrokerageOption()) {
-      const noBrokerage = selection.filter(
-        (option) => option.label !== AccountTypes.target_yield_account
-      );
-      setSelection(noBrokerage);
-    } else {
-      setSelection(selection);
-    }
+    setSelection(selection);
   };
 
   useEffect(() => {
@@ -107,7 +50,7 @@ const AccountsSetupScreen = ({ navigation }) => {
       }
     };
     getTypes();
-  }, []);
+  }, [accessToken]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -118,33 +61,21 @@ const AccountsSetupScreen = ({ navigation }) => {
   const poolUid = liabilityAccounts[0].pool_uid;
 
   const createAccount = async () => {
-    if (!hideBrokerageOption() || inProgressWorkflow) {
-      let workflow = inProgressWorkflow || completedWorkflow;
-
-      if (!workflow) {
-        workflow = await createComplianceWorkflow(brokerageProductUid);
-      }
-
-      await setComplianceWorkflow(workflow);
-      navigation.navigate('ConfirmPII', { productType: ProductType.Brokerage });
-      return;
-    } else {
-      try {
-        setLoading(true);
-        await AccountService.createSyntheticAccount({
-          accessToken,
-          name: name.trim(),
-          syntheticAccountTypeUid: account,
-          poolUid,
-        });
-        await refetchAccounts();
-        navigation.navigate('Accounts');
-        setLoading(false);
-      } catch (error) {
-        setShowError(true);
-        setName('');
-        setLoading(false);
-      }
+    try {
+      setLoading(true);
+      await AccountService.createSyntheticAccount({
+        accessToken,
+        name: name.trim(),
+        syntheticAccountTypeUid: account,
+        poolUid,
+      });
+      await refetchAccounts();
+      navigation.navigate('Accounts');
+      setLoading(false);
+    } catch (error) {
+      setShowError(true);
+      setName('');
+      setLoading(false);
     }
   };
 
@@ -165,28 +96,12 @@ const AccountsSetupScreen = ({ navigation }) => {
     const buttonDisabled = () => {
       if (typeSelected === AccountTypes.general && name !== '') {
         setDisabled(false);
-      } else if (brokerageSelected) {
-        setDisabled(false);
       } else {
         setDisabled(true);
       }
     };
     buttonDisabled();
-  }, [typeSelected, name, brokerageSelected]);
-
-  const buttonTitle = () => {
-    if (hideBrokerageOption()) {
-      return 'Add Account';
-    }
-
-    if (!hideBrokerageOption()) {
-      return 'Open Brokerage Account';
-    }
-
-    if (inProgressWorkflow) {
-      return 'Continue Brokerage Account Setup';
-    }
-  };
+  }, [typeSelected, name]);
 
   return (
     <Screen withoutHeader>
@@ -209,19 +124,16 @@ const AccountsSetupScreen = ({ navigation }) => {
         containerStyle={styles.marginBottom}
         onChange={handleSelection}
       />
-
-      {!brokerageSelected && (
-        <Input
-          label="Name Your New Account"
-          onChangeText={setName}
-          value={name}
-          containerStyle={styles.marginBottom}
-        />
-      )}
+      <Input
+        label="Name Your New Account"
+        onChangeText={setName}
+        value={name}
+        containerStyle={styles.marginBottom}
+      />
 
       <Button
         style={styles.button}
-        title={buttonTitle()}
+        title="Add Account"
         onPress={createAccount}
         disabled={disabled}
         loading={loading}
