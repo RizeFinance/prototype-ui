@@ -49,7 +49,7 @@ const states: State[] = [
   { label: 'TN', value: 'TN' },
   { label: 'TX', value: 'TX' },
   { label: 'UT', value: 'UT' },
-  { label: 'VT', value: 'BT' },
+  { label: 'VT', value: 'VT' },
   { label: 'VA', value: 'VA' },
   { label: 'WA', value: 'WA' },
   { label: 'WV', value: 'WV' },
