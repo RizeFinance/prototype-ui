@@ -60,7 +60,8 @@ export type RootStackParamList = {
   AccountsSetup: any;
   DebitCardActivation: any;
   PinSet: any;
-  ProfileQuestions: any;
+  BrokerageOverview: any;
+  BrokerageProductQuestions: any;
   BrokerageDisclosures: any;
-  ProcessingScreen: any;
+  BrokerageProcessing: any;
 };

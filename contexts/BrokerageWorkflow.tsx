@@ -6,6 +6,7 @@ import React, { useContext } from 'react';
 import { RootStackParamList } from '../types';
 import { AuthContext } from './Auth';
 import { AuthContextProps } from '../contexts/Auth';
+import { IComplanceWorkflowQuery } from './ComplianceWorkflow';
 import BrokerageWorkflowService from '../services/ComplianceWorkflowService';
 import { ProductService } from '../services';
 import config from '../config/config';
@@ -21,6 +22,7 @@ export const BrokerageProductType = 'brokerage';
 export type BrokerageWorkflowContextProps = {
   brokerageWorkflow?: ComplianceWorkflow;
   customerWorkflows?: ComplianceWorkflow[];
+  brokerageProduct?: Product;
   disclosures: ComplianceDocumentSelection[];
   bankingDisclosures: ComplianceDocumentSelection[];
   setBrokerageWorkflow: (brokerageWorkflow: ComplianceWorkflow) => Promise<void>;
@@ -34,6 +36,7 @@ export type BrokerageWorkflowContextProps = {
 
 export const BrokerageWorkflowContext = React.createContext<BrokerageWorkflowContextProps>({
   brokerageWorkflow: undefined,
+  brokerageProduct: undefined,
   customerWorkflows: [],
   disclosures: [],
   bankingDisclosures: [],
@@ -95,7 +98,9 @@ export class BrokerageWorkflowProvider extends React.Component<
       { product_uid: [productUid] }
     );
 
-    const activeWorkflow = find(workflows, { summary: { status: 'in_progress' } });
+    const activeWorkflow =
+      find(workflows, { summary: { status: 'in_progress' } }) ||
+      find(workflows, { summary: { status: 'accepted' } });
 
     if (activeWorkflow) {
       await this.setBrokerageWorkflow(activeWorkflow);
@@ -114,7 +119,9 @@ export class BrokerageWorkflowProvider extends React.Component<
       { product_uid: [productUid] }
     );
 
-    const activeWorkflow = find(workflows, { summary: { status: 'in_progress' } });
+    const activeWorkflow =
+      find(workflows, { summary: { status: 'in_progress' } }) ||
+      find(workflows, { summary: { status: 'accepted' } });
 
     if (activeWorkflow) {
       await this.setBrokerageWorkflow(activeWorkflow);

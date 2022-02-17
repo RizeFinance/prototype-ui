@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { View, ActivityIndicator, Text } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { Formik, useFormikContext } from 'formik';
 import { Button, Screen, Input, Dropdown, Checkbox, OrderedCheckboxGroup } from '../../components';
 import { Body, Heading3, Heading5 } from '../../components/Typography';
@@ -23,10 +23,6 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
   const [step, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // const onContinue = async (): Promise<void> => {
-  //   navigation.push('ConfirmPII', { productType: BrokerageProductType })
-  // };
 
   const currentStep = useMemo(() => {
     const questions = [];
@@ -58,19 +54,16 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
     const { setFieldValue } = useFormikContext<any>();
 
     if (question?.context?.includes('order')) {
-      const data = responses.map((response) => ({ value: response }))
-
       const handleOnChange = (data) => {
         !isEmpty(data) && setFieldValue(question.profile_requirement_uid, data);
-  console.log(data)        
-      }
+      };
 
       return (
         <>
           <InputLabel question={question} />
           <OrderedCheckboxGroup data={responses} onChange={handleOnChange} />
         </>
-      )
+      );
     } else if (responses && responses.includes('yes')) {
       if (!value) setFieldValue(question.profile_requirement_uid, 'no');
       const checked = value === 'yes';
@@ -128,7 +121,13 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
 
       try {
         await CustomerService.updateCustomerProfileAnswers(accessToken, data);
-        setCurrentStep((prevCount) => prevCount + 1);
+
+        const isLastStep = step === RequiredSteps.length - 1;
+        if (isLastStep) {
+          navigation.push('BrokerageDisclosures');
+        } else {
+          setCurrentStep((prevCount) => prevCount + 1);
+        }
         resetForm();
       } catch (err) {
         const firstError = get(err, ['data', 'errors', 0, 'title'], 'Something went wrong!');

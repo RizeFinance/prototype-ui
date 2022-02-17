@@ -12,7 +12,7 @@ import { ProductService } from '../services';
 import config from '../config/config';
 import { find } from 'lodash';
 
-interface IComplanceWorkflowQuery {
+export interface IComplanceWorkflowQuery {
   product_uid?: string[];
   in_progress?: boolean;
   limit?: number;

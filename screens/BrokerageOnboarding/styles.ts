@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     marginTop: 15,
     marginBottom: 15,
-    fontStyle: 'italic'
+    fontStyle: 'italic',
   },
 });
 

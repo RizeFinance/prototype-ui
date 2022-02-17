@@ -47,9 +47,8 @@ import {
   AgreementScreen,
   LockedScreen,
   PinSetScreen,
-  ProfileQuestionsScreen,
+  BrokerageProcessingScreen,
   BrokerageDisclosuresScreen,
-  ProcessingScreen,
   BrokerageOverviewScreen,
   BrokerageProductQuestionsScreen,
   AccountsSetupScreen,
@@ -167,16 +166,14 @@ function MainStackScreen() {
                   component={ProcessingApplicationScreen}
                 />
               </Stack.Navigator>
-            ) : customer.status === 'queued' || customer.status === 'identity_verified' ? (
+            ) : ['queued', 'identity_verified'].includes(customer.status) ? (
               <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
                 <Stack.Screen
                   name="ProcessingApplication"
                   component={ProcessingApplicationScreen}
                 />
               </Stack.Navigator>
-            ) : customer.status === 'manual_review' ||
-              customer.status === 'under_review' ||
-              customer.status === 'rejected' ? (
+            ) : ['manual_review', 'under_review', 'rejected'].includes(customer.status) ? (
               <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
                 <Stack.Screen
                   name="ApplicationUnapproved"
@@ -205,10 +202,9 @@ function MainStackScreen() {
                 {/* Product Onboarding */}
                 <Stack.Screen name="PII" component={PIIScreen} />
                 <Stack.Screen name="PDFReader" component={PDFReaderScreen} />
-                <Stack.Screen name="ProfileQuestions" component={ProfileQuestionsScreen} />
-                <Stack.Screen name="BrokerageDisclosures" component={BrokerageDisclosuresScreen} />
                 <Stack.Screen name="ConfirmPII" component={ConfirmPIIScreen} />
-                <Stack.Screen name="ProcessingScreen" component={ProcessingScreen} />
+                <Stack.Screen name="BrokerageProcessing" component={BrokerageProcessingScreen} />
+                <Stack.Screen name="BrokerageDisclosures" component={BrokerageDisclosuresScreen} />
                 <Stack.Screen name="BrokerageOverview" component={BrokerageOverviewScreen} />
                 <Stack.Screen
                   name="BrokerageProductQuestions"

@@ -7,9 +7,10 @@ export default function OpenBrokerageButton(): JSX.Element {
   const { findOrCreateBrokerageWorkflow } = useBrokerageWorkflow();
   const [loading, setLoading] = useState(false);
 
-  const startBrokerage = () => {
+  const startBrokerage = async () => {
     setLoading(true);
-    findOrCreateBrokerageWorkflow();
+    await findOrCreateBrokerageWorkflow();
+    setLoading(false);
   };
 
   return (
