@@ -84,7 +84,7 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
           Accounts
         </Heading3>
 
-        {liabilityAccounts?.length > 0 ? (
+        {!isEmpty(liabilityAccounts) ? (
           <>
             {liabilityAccounts.map((account, idx) => (
               <AccountInfo key={idx} account={account} />
@@ -100,14 +100,16 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
         )}
       </Screen>
 
-      <View style={styles.btnContainer}>
-        <OpenBrokerageButton />
-        <Button
-          style={styles.button}
-          title="Open Additional Account"
-          onPress={() => navigation.navigate('AccountsSetup')}
-        />
-      </View>
+      {!isEmpty(liabilityAccounts) && (
+        <View style={styles.btnContainer}>
+          <OpenBrokerageButton accounts={liabilityAccounts} />
+          <Button
+            style={styles.button}
+            title="Open Additional Account"
+            onPress={() => navigation.navigate('AccountsSetup')}
+          />
+        </View>
+      )}
     </>
   );
 }
