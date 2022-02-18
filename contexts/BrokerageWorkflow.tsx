@@ -6,7 +6,6 @@ import React, { useContext } from 'react';
 import { RootStackParamList } from '../types';
 import { AuthContext } from './Auth';
 import { AuthContextProps } from '../contexts/Auth';
-import { IComplanceWorkflowQuery } from './ComplianceWorkflow';
 import BrokerageWorkflowService from '../services/ComplianceWorkflowService';
 import { ProductService } from '../services';
 import config from '../config/config';
@@ -26,12 +25,8 @@ export type BrokerageWorkflowContextProps = {
   disclosures: ComplianceDocumentSelection[];
   bankingDisclosures: ComplianceDocumentSelection[];
   setBrokerageWorkflow: (brokerageWorkflow: ComplianceWorkflow) => Promise<void>;
-  setDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
-  setBankingDisclosures: (disclosures: ComplianceDocumentSelection[]) => Promise<void>;
   findOrCreateBrokerageWorkflow: () => Promise<void>;
   evaluateCurrentStep: () => Promise<void>;
-  loadBrokerageWorkflows: (query: IComplanceWorkflowQuery) => Promise<void>;
-  createBrokerageWorkflow: (product_uid: string) => Promise<any>;
 };
 
 export const BrokerageWorkflowContext = React.createContext<BrokerageWorkflowContextProps>({
@@ -41,12 +36,8 @@ export const BrokerageWorkflowContext = React.createContext<BrokerageWorkflowCon
   disclosures: [],
   bankingDisclosures: [],
   setBrokerageWorkflow: () => Promise.resolve(),
-  setDisclosures: () => Promise.resolve(),
-  setBankingDisclosures: () => Promise.resolve(),
   findOrCreateBrokerageWorkflow: () => Promise.resolve(),
   evaluateCurrentStep: () => Promise.resolve(),
-  loadBrokerageWorkflows: () => Promise.resolve(),
-  createBrokerageWorkflow: () => Promise.resolve(),
 });
 
 export interface BrokerageWorkflowProviderProps {
@@ -89,10 +80,10 @@ export class BrokerageWorkflowProvider extends React.Component<
     await this.refreshWorkflow();
   }
 
-  findOrCreateBrokerageWorkflow = async (): Promise<void> => {
+  findOrCreateBrokerageWorkflow = async (): Promise<ComplianceWorkflow> => {
     const navigation = this.props.navigation;
     const productUid = this.state.brokerageProductUid;
-
+    let workflow;
     const { data: workflows } = await BrokerageWorkflowService.getCustomerWorkflows(
       this.context.accessToken,
       { product_uid: [productUid] }
@@ -103,12 +94,13 @@ export class BrokerageWorkflowProvider extends React.Component<
       find(workflows, { summary: { status: 'accepted' } });
 
     if (activeWorkflow) {
-      await this.setBrokerageWorkflow(activeWorkflow);
+      workflow = await this.setBrokerageWorkflow(activeWorkflow);
     } else {
-      await this.createBrokerageWorkflow(productUid);
+      workflow = await this.createBrokerageWorkflow(productUid);
     }
 
     navigation.navigate('BrokerageOverview');
+    return workflow;
   };
 
   refreshWorkflow = async (): Promise<void> => {
@@ -133,11 +125,8 @@ export class BrokerageWorkflowProvider extends React.Component<
     const workflow = this.state.brokerageWorkflow;
 
     if (!workflow) {
-      await this.findOrCreateBrokerageWorkflow();
-    }
-
-    if (!workflow) {
-      return;
+      const newWorkflow = await this.findOrCreateBrokerageWorkflow();
+      if (!newWorkflow) return;
     }
 
     switch (workflow.summary.current_step) {
@@ -152,19 +141,6 @@ export class BrokerageWorkflowProvider extends React.Component<
     const product = await ProductService.getProduct(this.context.accessToken, productUid);
 
     this.setBrokerageProduct(product);
-  };
-
-  loadBrokerageWorkflows = async (query: any = {}): Promise<void> => {
-    try {
-      const { data: customerWorkflows } = await BrokerageWorkflowService.getCustomerWorkflows(
-        this.context.accessToken,
-        query
-      );
-      this.setState({ customerWorkflows });
-      return { data: customerWorkflows };
-    } catch (err) {
-      return { data: err };
-    }
   };
 
   createBrokerageWorkflow = async (productUid: string): Promise<ComplianceWorkflow> => {
@@ -201,16 +177,6 @@ export class BrokerageWorkflowProvider extends React.Component<
     await this.promisedSetState({ brokerageProduct: product });
   };
 
-  setDisclosures = async (disclosures: ComplianceDocumentSelection[]): Promise<void> => {
-    await this.promisedSetState({ disclosures });
-  };
-
-  setBankingDisclosures = async (
-    bankingDisclosures: ComplianceDocumentSelection[]
-  ): Promise<void> => {
-    await this.promisedSetState({ bankingDisclosures });
-  };
-
   render(): JSX.Element {
     const {
       brokerageWorkflow,
@@ -231,10 +197,6 @@ export class BrokerageWorkflowProvider extends React.Component<
           findOrCreateBrokerageWorkflow: this.findOrCreateBrokerageWorkflow,
           evaluateCurrentStep: this.evaluateCurrentStep,
           setBrokerageWorkflow: this.setBrokerageWorkflow,
-          setDisclosures: this.setDisclosures,
-          setBankingDisclosures: this.setBankingDisclosures,
-          loadBrokerageWorkflows: this.loadBrokerageWorkflows,
-          createBrokerageWorkflow: this.createBrokerageWorkflow,
         }}
       >
         {this.props.children}

@@ -32,7 +32,7 @@ export default function OpenBrokerageButton({
   return (
     <Button
       style={styles.button}
-      title="Open Target Yeild Brokerage Account"
+      title="Open Target Yield Brokerage Account"
       onPress={startBrokerage}
       loading={loading}
     />
