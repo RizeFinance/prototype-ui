@@ -25,7 +25,7 @@ export type BrokerageWorkflowContextProps = {
   disclosures: ComplianceDocumentSelection[];
   bankingDisclosures: ComplianceDocumentSelection[];
   setBrokerageWorkflow: (brokerageWorkflow: ComplianceWorkflow) => Promise<void>;
-  findOrCreateBrokerageWorkflow: () => Promise<void>;
+  findOrCreateBrokerageWorkflow: () => Promise<ComplianceWorkflow>;
   evaluateCurrentStep: () => Promise<void>;
 };
 
@@ -36,7 +36,7 @@ export const BrokerageWorkflowContext = React.createContext<BrokerageWorkflowCon
   disclosures: [],
   bankingDisclosures: [],
   setBrokerageWorkflow: () => Promise.resolve(),
-  findOrCreateBrokerageWorkflow: () => Promise.resolve(),
+  findOrCreateBrokerageWorkflow: () => Promise.resolve(null),
   evaluateCurrentStep: () => Promise.resolve(),
 });
 
@@ -189,11 +189,11 @@ export class BrokerageWorkflowProvider extends React.Component<
     return (
       <BrokerageWorkflowContext.Provider
         value={{
-          brokerageWorkflow: brokerageWorkflow,
-          customerWorkflows: customerWorkflows,
-          disclosures: disclosures,
-          bankingDisclosures: bankingDisclosures,
-          brokerageProduct: brokerageProduct,
+          brokerageWorkflow,
+          customerWorkflows,
+          disclosures,
+          bankingDisclosures,
+          brokerageProduct,
           findOrCreateBrokerageWorkflow: this.findOrCreateBrokerageWorkflow,
           evaluateCurrentStep: this.evaluateCurrentStep,
           setBrokerageWorkflow: this.setBrokerageWorkflow,
