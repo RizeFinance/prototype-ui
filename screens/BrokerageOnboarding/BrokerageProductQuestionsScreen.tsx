@@ -140,9 +140,9 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
     const validationSchema = useMemo(() => {
       const newObj = {};
       for (const stepQuestion of currentStep.questions) {
-        newObj[stepQuestion.profile_requirement_uid] = stepQuestion.required
-          ? Yup.mixed().required()
-          : Yup.mixed();
+        newObj[stepQuestion.profile_requirement_uid] = stepQuestion.pattern
+          ? Yup.string().required().matches(stepQuestion.pattern)
+          : Yup.mixed().required();
       }
 
       return Yup.object().shape(newObj);

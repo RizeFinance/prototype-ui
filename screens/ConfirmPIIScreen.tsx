@@ -100,9 +100,8 @@ export default function ConfirmPIIScreen({
       <Body style={{ color: gray }}>{data.dob}</Body>
       <Body>&nbsp;</Body>
       <Body fontWeight="semibold">Address</Body>
-      <Body
-        style={{ color: gray }}
-      >{`${data.street1} ${data.street2}, ${data.city}, ${data.state} ${data.postal_code}`}</Body>
+      <Body style={{ color: gray }}>{`${data.street1} ${data.street2}`}</Body>
+      <Body style={{ color: gray }}>{`${data.city}, ${data.state} ${data.postal_code}`}</Body>
       <Body>&nbsp;</Body>
       <Body fontWeight="semibold">Phone Number</Body>
       <Body style={{ color: gray }}>{data.phone}</Body>
@@ -118,14 +117,14 @@ export default function ConfirmPIIScreen({
       >
         {productType === ProductType.Checking && (
           <Body textAlign="center" fontWeight="semibold" style={styles.editButton}>
-            &#60; Edit Information
+            Revise Information
           </Body>
         )}
       </Pressable>
       <Button
         title="Confirm Information"
         onPress={(): Promise<void> => handleSubmit()}
-        disabled={isSubmitting}
+        loading={isSubmitting}
         style={{
           marginTop: 20,
         }}

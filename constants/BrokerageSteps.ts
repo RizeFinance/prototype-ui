@@ -8,6 +8,7 @@ const steps = [
       },
       {
         name: 'Annual Salary',
+        pattern: '^[0-9]*$',
       },
       {
         name: 'Are any of the account holders affiliated with or employed by a stock exchange, member firm of an exchange or FINRA, or a municipal securities broker-dealer?',
@@ -26,22 +27,27 @@ const steps = [
       {
         name: 'Employer Name',
         placeholder: 'Employer Name',
+        pattern: '[a-zA-Z]+',
       },
       {
         name: 'Occupation',
         placeholder: 'Occupation',
+        pattern: '[a-zA-Z]+',
       },
       {
         name: 'Number of Dependents',
         placeholder: 'Enter Number of Dependents',
+        pattern: '^([1-9]|10)$',
       },
       {
         name: 'Net Worth',
         placeholder: '$0',
+        pattern: '^[0-9]*$',
       },
       {
         name: 'Approximate Value of all Investments',
         placeholder: '$0',
+        pattern: '^[0-9]*$',
       },
       {
         name: 'Tax Bracket',
