@@ -1,6 +1,6 @@
 const steps = [
   {
-    header: 'Complete your financial profile',
+    header: 'Complete Your Financial Profile',
     questions: [
       {
         name: 'Employment Status',
@@ -37,7 +37,7 @@ const steps = [
       {
         name: 'Number of Dependents',
         placeholder: 'Enter Number of Dependents',
-        pattern: '^([1-9]|10)$',
+        pattern: '^([0-9]|10)$',
       },
       {
         name: 'Net Worth',
