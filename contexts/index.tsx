@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './Auth';
 import { AccountsProvider, useAccounts, AccountType } from './Accounts';
 import { ProductsProvider } from './Products';
 import { useComplianceWorkflow, ProductType } from './ComplianceWorkflow';
+import { useBrokerageWorkflow } from './BrokerageWorkflow';
 
 const ApplicationProviders = ({ children }: { children: JSX.Element }): JSX.Element => {
   return (
@@ -26,6 +27,7 @@ export {
   useAccounts,
   useDebitCards,
   useComplianceWorkflow,
+  useBrokerageWorkflow,
   ProductType,
   AccountType,
 };

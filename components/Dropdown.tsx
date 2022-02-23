@@ -48,6 +48,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
     label: {
       marginHorizontal: 8,
       marginBottom: 4,
+      marginTop: 5,
     },
     input: {
       color: body,
@@ -56,7 +57,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
       borderWidth: 2,
       padding: 10,
       lineHeight: 20,
-      fontSize: 16,
+      fontSize: 14,
       paddingLeft: 6,
       borderStyle: 'solid',
       backgroundColor: 'transparent',

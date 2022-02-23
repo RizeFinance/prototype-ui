@@ -91,6 +91,14 @@ export default function StatementScreen(): JSX.Element {
           ))}
         </View>
       )}
+
+      {!isLoading && isEmpty(documents) && (
+        <View style={styles.container}>
+          <Heading3 textAlign="center" style={styles.container}>
+            No statements are avaliable.
+          </Heading3>
+        </View>
+      )}
     </Screen>
   );
 }

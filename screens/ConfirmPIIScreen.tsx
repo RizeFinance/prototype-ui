@@ -6,7 +6,8 @@ import { Screen, Button, useThemeColor } from '../components';
 import { RootStackParamList } from '../types';
 import { Heading3, Body } from '../components/Typography';
 import CustomerService from '../services/CustomerService';
-import { useComplianceWorkflow, ProductType } from '../contexts/ComplianceWorkflow';
+import { ProductType } from '../contexts/ComplianceWorkflow';
+import { useBrokerageWorkflow, BrokerageProductType } from '../contexts/BrokerageWorkflow';
 import { useAuth } from '../contexts/Auth';
 import { get } from 'lodash';
 
@@ -19,7 +20,7 @@ export default function ConfirmPIIScreen({
   route,
   navigation,
 }: ConfirmPIIScreenProps): JSX.Element {
-  const { evaluateCurrentStep } = useComplianceWorkflow();
+  const { evaluateCurrentStep: evaluateCurrentBrokerageStep } = useBrokerageWorkflow();
   const { accessToken, customer } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string>('');
@@ -48,8 +49,8 @@ export default function ConfirmPIIScreen({
     setIsSubmitting(true);
 
     try {
-      if (productType === ProductType.Brokerage) {
-        await evaluateCurrentStep();
+      if (productType === BrokerageProductType) {
+        await evaluateCurrentBrokerageStep();
         return;
       }
 
@@ -99,9 +100,8 @@ export default function ConfirmPIIScreen({
       <Body style={{ color: gray }}>{data.dob}</Body>
       <Body>&nbsp;</Body>
       <Body fontWeight="semibold">Address</Body>
-      <Body
-        style={{ color: gray }}
-      >{`${data.street1} ${data.street2}, ${data.city}, ${data.state} ${data.postal_code}`}</Body>
+      <Body style={{ color: gray }}>{`${data.street1} ${data.street2}`}</Body>
+      <Body style={{ color: gray }}>{`${data.city}, ${data.state} ${data.postal_code}`}</Body>
       <Body>&nbsp;</Body>
       <Body fontWeight="semibold">Phone Number</Body>
       <Body style={{ color: gray }}>{data.phone}</Body>
@@ -117,14 +117,14 @@ export default function ConfirmPIIScreen({
       >
         {productType === ProductType.Checking && (
           <Body textAlign="center" fontWeight="semibold" style={styles.editButton}>
-            &#60; Edit Information
+            Revise Information
           </Body>
         )}
       </Pressable>
       <Button
         title="Confirm Information"
         onPress={(): Promise<void> => handleSubmit()}
-        disabled={isSubmitting}
+        loading={isSubmitting}
         style={{
           marginTop: 20,
         }}

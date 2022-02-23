@@ -7,6 +7,7 @@ import { useAccounts } from '../../contexts/Accounts';
 import { SyntheticAccount } from '../../models';
 import utils from '../../utils/utils';
 import styles from './styles';
+import OpenBrokerageButton from '../BrokerageOnboarding/OpenBrokerageButton';
 import { isEmpty } from 'lodash';
 
 interface AccountsScreenProps {
@@ -83,7 +84,7 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
           Accounts
         </Heading3>
 
-        {liabilityAccounts?.length > 0 ? (
+        {!isEmpty(liabilityAccounts) ? (
           <>
             {liabilityAccounts.map((account, idx) => (
               <AccountInfo key={idx} account={account} />
@@ -98,13 +99,17 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
           </View>
         )}
       </Screen>
-      <View style={styles.btnContainer}>
-        <Button
-          style={styles.button}
-          title="Open Additional Account"
-          onPress={() => navigation.navigate('AccountsSetup')}
-        />
-      </View>
+
+      {!isEmpty(liabilityAccounts) && (
+        <View style={styles.btnContainer}>
+          <OpenBrokerageButton accounts={liabilityAccounts} />
+          <Button
+            style={styles.button}
+            title="Open Additional Account"
+            onPress={() => navigation.navigate('AccountsSetup')}
+          />
+        </View>
+      )}
     </>
   );
 }

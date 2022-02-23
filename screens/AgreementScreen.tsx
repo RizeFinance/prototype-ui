@@ -25,6 +25,9 @@ export default function AgreementScreen(): JSX.Element {
     container: {
       marginTop: 25,
     },
+    product: {
+      marginBottom: 35,
+    },
     agreementInfo: {
       marginVertical: 16,
     },
@@ -63,16 +66,16 @@ export default function AgreementScreen(): JSX.Element {
 
       {!isEmpty(productAgreements) && (
         <View style={styles.container}>
-          {productAgreements.map((productAgreement) => {
+          {productAgreements.map((productAgreement, index) => {
             return (
-              <>
+              <View key={index} style={styles.product}>
                 {productAgreement.productName && (
                   <Heading4 textAlign="center">{productAgreement.productName}</Heading4>
                 )}
                 {productAgreement.agreements.map((agreement, i) => {
                   return <AgreementInfo key={i} agreement={agreement} />;
                 })}
-              </>
+              </View>
             );
           })}
         </View>

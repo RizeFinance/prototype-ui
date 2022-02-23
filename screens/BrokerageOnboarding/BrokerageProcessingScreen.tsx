@@ -1,20 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { Screen } from '../../components';
-import { Heading3, Heading4 } from '../../components/Typography';
+import { Heading3, Heading4, Heading5 } from '../../components/Typography';
 import { useAuth } from '../../contexts/Auth';
 import { useAccounts, AccountType } from '../../contexts/Accounts';
 import CustomerService from '../../services/CustomerService';
 import config from '../../config/config';
 import { find } from 'lodash';
 
-export default function ProcessingScreen(): JSX.Element {
+export default function BrokerageProcessingScreen(): JSX.Element {
   const navigation = useNavigation();
 
   const { accessToken, customerProducts } = useAuth();
   const { liabilityAccounts, refetchAccounts } = useAccounts();
 
+  const [errors, setErrors] = useState();
   const brokerageUid = config.application.brokerageProductUid;
 
   let timeout = null;
@@ -48,7 +49,7 @@ export default function ProcessingScreen(): JSX.Element {
         await CustomerService.verifyCustomer(accessToken);
         await CustomerService.createCustomerProduct(accessToken, brokerageUid);
       } catch (err) {
-        throw new Error(err);
+        setErrors(err);
       }
 
       refreshAccountsPeriodically();
@@ -61,11 +62,24 @@ export default function ProcessingScreen(): JSX.Element {
 
   return (
     <Screen style={styles.container}>
-      <ActivityIndicator size="large" />
-      <Heading3 textAlign="center" style={styles.heading}>
-        We&apos;re processing your application.
-      </Heading3>
-      <Heading4 textAlign="center">This should only take a few moments.</Heading4>
+      {!errors ? (
+        <>
+          <ActivityIndicator size="large" />
+          <Heading3 textAlign="center" style={styles.heading}>
+            We&apos;re processing your application.
+          </Heading3>
+          <Heading4 textAlign="center">This should only take a few moments.</Heading4>
+        </>
+      ) : (
+        <>
+          <Heading3 textAlign="center" style={styles.heading}>
+            Something went wrong...
+          </Heading3>
+          <Heading5 textAlign="center">
+            We could not process your application for the Brokerage product at this time.
+          </Heading5>
+        </>
+      )}
     </Screen>
   );
 }

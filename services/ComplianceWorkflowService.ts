@@ -4,10 +4,10 @@ import toQueryString from '../utils/toQueryString';
 import api from '../utils/api';
 
 interface IQuery {
-  product_uid: string[];
-  in_progress: boolean;
-  limit: number;
-  offset: number;
+  product_uid?: string[];
+  in_progress?: boolean;
+  limit?: number;
+  offset?: number;
 }
 
 const getCustomerWorkflows = async (accessToken: string, query: IQuery): Promise<any> => {

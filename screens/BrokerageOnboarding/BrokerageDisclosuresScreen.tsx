@@ -3,48 +3,28 @@ import { StyleSheet, View, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Screen, Checkbox, Button } from '../../components';
 import { Heading3, Body } from '../../components/Typography';
-import {
-  useComplianceWorkflow,
-  ComplianceDocumentSelection,
-} from '../../contexts/ComplianceWorkflow';
+import { ComplianceDocumentSelection } from '../../contexts/ComplianceWorkflow';
+import { useBrokerageWorkflow } from '../../contexts/BrokerageWorkflow';
 import { ComplianceDocumentAcknowledgementRequest } from '@rizefinance/rize-js/lib/core/compliance-workflow';
 import ComplianceWorkflowService from '../../services/ComplianceWorkflowService';
 import { useAuth } from '../../contexts/Auth';
-import config from '../../config/config';
-import { find, get } from 'lodash';
+import { get } from 'lodash';
 import * as Network from 'expo-network';
 
 export default function BrokerageDisclosuresScreen(): JSX.Element {
   const navigation = useNavigation();
 
-  const brokerageProductUid = config.application.brokerageProductUid;
-  const { customerWorkflows, loadComplianceWorkflows, setComplianceWorkflow } =
-    useComplianceWorkflow();
+  const { brokerageWorkflow, setBrokerageWorkflow } = useBrokerageWorkflow();
   const { accessToken } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checked, setChecked] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      if (brokerageProductUid) {
-        await loadComplianceWorkflows({ product_uid: [brokerageProductUid] });
-      }
-    })();
-  }, []);
-
-  const acceptedWorkflow = find(
-    customerWorkflows,
-    (workflow) => get(workflow, ['summary', 'status']) === 'accepted'
-  );
-  const inProgressWorkflow = find(
-    customerWorkflows,
-    (workflow) => get(workflow, ['summary', 'status']) === 'in_progress'
-  );
-  const brokerageAgreements = get(inProgressWorkflow, ['current_step_documents_pending']);
+  const isWorkflowAccepted = get(brokerageWorkflow, ['summary', 'status']) === 'accepted';
+  const brokerageAgreements = get(brokerageWorkflow, ['current_step_documents_pending']);
 
   useEffect(() => {
-    if (acceptedWorkflow) navigation.navigate('ProcessingScreen');
-  }, [acceptedWorkflow]);
+    if (isWorkflowAccepted) navigation.navigate('BrokerageProcessing');
+  }, [isWorkflowAccepted]);
 
   const styles = StyleSheet.create({
     heading: {
@@ -109,7 +89,7 @@ export default function BrokerageDisclosuresScreen(): JSX.Element {
     setIsSubmitting(true);
 
     try {
-      const unacceptedDocs = inProgressWorkflow.current_step_documents_pending;
+      const unacceptedDocs = brokerageWorkflow.current_step_documents_pending;
       if (unacceptedDocs.length > 0) {
         const ipAddress = await Network.getIpAddressAsync();
         const updatedComplianceWorkflow = await ComplianceWorkflowService.acknowledgeDocuments(
@@ -120,15 +100,15 @@ export default function BrokerageDisclosuresScreen(): JSX.Element {
                 accept: 'yes',
                 document_uid: doc.uid,
                 ip_address: ipAddress,
-                user_name: inProgressWorkflow.customer.email,
+                user_name: brokerageWorkflow.customer.email,
               } as ComplianceDocumentAcknowledgementRequest)
           )
         );
 
-        await setComplianceWorkflow(updatedComplianceWorkflow);
+        await setBrokerageWorkflow(updatedComplianceWorkflow);
 
         if (updatedComplianceWorkflow.summary.status === 'accepted') {
-          navigation.navigate('ProcessingScreen');
+          navigation.navigate('BrokerageProcessing');
         }
       }
     } finally {

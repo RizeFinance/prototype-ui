@@ -12,7 +12,7 @@ import { ProductService } from '../services';
 import config from '../config/config';
 import { find } from 'lodash';
 
-interface IComplanceWorkflowQuery {
+export interface IComplanceWorkflowQuery {
   product_uid?: string[];
   in_progress?: boolean;
   limit?: number;
@@ -137,15 +137,17 @@ export class ComplianceWorkflowProvider extends React.Component<
         this.props.auth.accessToken,
         customer.uid
       );
-      const workflows = await ComplianceWorkflowService.getComplianceWorkflows(
+      const { data: workflows } = await ComplianceWorkflowService.getComplianceWorkflows(
         this.props.auth.accessToken,
         customer.uid
       );
-      const ourAgreements = workflows.data.map((workflow, i) => {
+      const ourAgreements = customerProducts.map((product) => {
+        const workflow = find(workflows, {
+          product_uid: product.product_uid,
+        }) as ComplianceWorkflow;
         return {
-          productName:
-            customerProducts && customerProducts[i] ? customerProducts[i].product_name : '',
-          agreements: workflow ? workflow.accepted_documents : [],
+          productName: product.product_name,
+          agreements: workflow.accepted_documents,
         };
       }) as ProductAgreements[];
       this.setState({ productAgreements: ourAgreements });
