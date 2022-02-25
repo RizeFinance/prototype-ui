@@ -16,7 +16,7 @@ export { default as PIIScreen } from './PIIScreen';
 export { default as ProcessingApplicationScreen } from './ProcessingApplicationScreen';
 export { default as SetPasswordScreen } from './SetPasswordScreen';
 export { default as SignupScreen } from './SignupScreen';
-export { default as DebitCardScreen } from './DebitCardScreen';
+export { default as DebitCardScreen } from './DebitCardScreen/DebitCardScreen';
 export { default as DebitCardActivationScreen } from './DebitCardActivationScreen';
 export { default as StatementScreen } from './StatementScreen';
 export { default as AgreementScreen } from './AgreementScreen';

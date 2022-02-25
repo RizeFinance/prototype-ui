@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Switch, ActivityIndicator } from 'react-native';
+import { View, Switch, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Screen, Input, Button, Dropdown } from '../components';
-import { Heading3, Heading5, Body } from '../components/Typography';
-import TextLink from '../components/TextLink';
-import { useDebitCards } from '../contexts/DebitCards';
-import { useAccounts } from '../contexts/Accounts';
+import {
+  Screen,
+  Input,
+  Button,
+  Dropdown,
+  Heading3,
+  Heading5,
+  Body,
+  TextLink,
+} from '../../components';
+import { useDebitCards, useAccounts } from '../../contexts';
 import { RouteProp } from '@react-navigation/core';
 import { isEmpty, capitalize, isNil, startCase, toLower } from 'lodash';
-import utils from '../utils/utils';
+import utils from '../../utils/utils';
+import { styles } from './styles';
+import { RootStackParamList } from '../../types';
+
 
 interface DebitCardScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'DebitCard'>;
@@ -92,57 +101,6 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
       setAlert({ text, success });
     })();
   }, [isLocked]);
-
-  const styles = StyleSheet.create({
-    heading: {
-      marginBottom: 25,
-    },
-    loading_heading: {
-      marginTop: 25,
-    },
-    success: {
-      color: '#2ecc71',
-      marginBottom: 25,
-    },
-    failed: {
-      color: '#e74c3c',
-      marginBottom: 25,
-    },
-    container: {
-      marginTop: 25,
-    },
-    row: {
-      flexDirection: 'row',
-      marginBottom: 35,
-    },
-    column: {
-      flex: 1,
-    },
-    columnHeading: {
-      marginBottom: 5,
-    },
-    switchContainer: {
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    switch: {
-      marginRight: 10,
-    },
-    input: {
-      marginBottom: 15,
-    },
-    reissueContainer: {
-      borderTopColor: 'black',
-      borderTopWidth: 1,
-      paddingTop: 40,
-      marginTop: 60,
-      marginBottom: 15,
-    },
-    activateContainer: {
-      marginTop: 60,
-    },
-  });
 
   const onPressAccountName = (accountUid: string): void => {
     navigation.navigate('AccountDetails', {
