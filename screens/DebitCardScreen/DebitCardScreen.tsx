@@ -18,7 +18,6 @@ import utils from '../../utils/utils';
 import { styles } from './styles';
 import { RootStackParamList } from '../../types';
 
-
 interface DebitCardScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'DebitCard'>;
   route: RouteProp<RootStackParamList, 'DebitCard'>;
