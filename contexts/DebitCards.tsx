@@ -3,10 +3,8 @@ import { DebitCard } from '../models';
 import DebitCardService from '../services/DebitCardService';
 import { useAuth } from './Auth';
 
-type Error = Record<string, unknown>;
-
 export interface IDebitCardsResp {
-  data: DebitCard[] | Error;
+  data: DebitCard[];
   success: boolean;
 }
 
@@ -18,7 +16,7 @@ export type IDebitCards = {
   lockDebitCard: (uid: string) => Promise<void>;
   unlockDebitCard: (uid: string) => Promise<void>;
   reissueDebitCard: (uid: string, reason: string) => Promise<IDebitCardsResp | void>;
-  createDebitCard: (pool_uid: string) => Promise<IDebitCardsResp | void>;
+  createDebitCard: (pool_uid: string) => Promise<IDebitCardsResp>;
   activateDebitCard: (
     uid: string,
     cardLastFourDigits: string,
@@ -91,14 +89,14 @@ const DebitCardsProvider = ({ children }: IDebitCardsContext) => {
   );
 
   const createDebitCard = useCallback(
-    async (pool_uid: string): Promise<IDebitCardsResp | void> => {
+    async (pool_uid: string): Promise<IDebitCardsResp> => {
       setIsLoading(true);
 
       try {
         await DebitCardService.createDebitCard(accessToken, pool_uid);
-        await refetchDebitCards();
+        return await refetchDebitCards();
       } catch (err) {
-        return { success: false, data: err };
+        return { success: false, data: [] };
       } finally {
         setIsLoading(false);
       }

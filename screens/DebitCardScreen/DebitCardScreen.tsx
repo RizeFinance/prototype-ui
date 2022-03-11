@@ -18,7 +18,7 @@ import utils from '../../utils/utils';
 import { styles } from './styles';
 import { RootStackParamList } from '../../types';
 
-interface DebitCardScreenProps {
+export interface DebitCardScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'DebitCard'>;
   route: RouteProp<RootStackParamList, 'DebitCard'>;
 }
@@ -150,6 +150,7 @@ export default function DebitCardScreen({ navigation, route }: DebitCardScreenPr
     const { data: debitCards } = await refetchDebitCards();
 
     const readyCards = debitCards.filter((c) => !!c.card_last_four_digit && !c.closed_at);
+
     if (!isEmpty(readyCards)) {
       setLoadingNewCard(false);
       return;
