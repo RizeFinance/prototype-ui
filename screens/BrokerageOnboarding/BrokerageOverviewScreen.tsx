@@ -15,7 +15,7 @@ export default function BrokerageOverviewScreen({
   navigation,
 }: BrokerageOverviewScreenProps): JSX.Element {
   const onContinue = async (): Promise<void> => {
-    navigation.push('ConfirmPII', { productType: BrokerageProductType });
+    navigation.navigate('ConfirmPII', { productType: BrokerageProductType });
   };
 
   return (

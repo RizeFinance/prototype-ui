@@ -1,70 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
-import { Screen, useThemeColor } from '../components';
-import { Body, Heading3, Heading5 } from '../components/Typography';
-import { useAccounts } from '../contexts/Accounts';
-import { SyntheticAccount } from '../models';
-import PlaidLink from '../components/PlaidLink';
-import { useAuth } from '../contexts/Auth';
-import { AccountService } from '../services';
+import { View, Pressable, ActivityIndicator } from 'react-native';
+import { Button, Screen, TextLink } from '../../components';
+import { Body, Heading3, Heading5 } from '../../components/Typography';
+import { useAccounts } from '../../contexts/Accounts';
+import { SyntheticAccount } from '../../models';
+import PlaidLink from '../../components/PlaidLink';
+import { useAuth } from '../../contexts/Auth';
+import { AccountService } from '../../services';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/core';
+import { RootStackParamList } from '../../types';
+import { AccountScreen as styles } from './styles';
 import { capitalize, isEmpty } from 'lodash';
 
-const ExternalAccountScreen = (): JSX.Element => {
+interface ExternalAccountProps {
+  route: RouteProp<RootStackParamList, 'ExternalAccount'>;
+  navigation: StackNavigationProp<RootStackParamList, 'ExternalAccount'>;
+}
+
+const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX.Element => {
   const { externalAccounts, poolUids, refetchAccounts, linkToken, fetchLinkToken } = useAccounts();
   const { accessToken } = useAuth();
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
   const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [publicToken, setPublicToken] = useState<string>(null);
-  const [selectableAccounts, setSelectableAccounts] = useState<[]>([]);
+  const [selectableAccounts, setSelectableAccounts] = useState<SyntheticAccount[]>([]);
 
-  const primary = useThemeColor('primary');
+  const archiveStatus = route.params?.archiveStatus;
+  const archiveNote = route.params?.archiveNote;
 
   useEffect(() => {
     refetchAccounts();
     fetchLinkToken();
   }, []);
 
-  const styles = StyleSheet.create({
-    heading: {
-      marginTop: 24,
-      marginBottom: 24,
-    },
-    detailsSection: {
-      marginTop: 24,
-    },
-    row: {
-      flexDirection: 'row',
-    },
-    col: {
-      flex: 1,
-    },
-    contactSupport: {
-      marginTop: 48,
-    },
-    formGroup: {
-      marginVertical: 10,
-    },
-    submitButton: {
-      marginTop: 30,
-    },
-    connectStatusMessage: {
-      marginVertical: 8,
-    },
-    accountContainer: {
-      marginTop: 10,
-      padding: 20,
-      backgroundColor: primary,
-      borderRadius: 4,
-    },
-    accountName: {
-      color: 'white',
-      fontWeight: 'bold',
-    },
-    loading: {
-      marginTop: 55,
-    },
-  });
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TextLink onPress={() => navigation.push('ExternalAccounts')}>
+          &lt; External Accounts
+        </TextLink>
+      ),
+    });
+  }, [navigation]);
 
   const renderExternalAccountDetails = (externalAccount: SyntheticAccount): JSX.Element => {
     return (
@@ -84,10 +63,32 @@ const ExternalAccountScreen = (): JSX.Element => {
         </View>
         <View>
           <Body textAlign="center" style={styles.contactSupport}>
-            Please contact customer support if you need to update your account.
+            <Button
+              title="Archive Bank Account"
+              onPress={() =>
+                navigation.navigate('ArchiveExternalAccount', {
+                  accountUid: externalAccount.uid,
+                })
+              }
+            />
           </Body>
         </View>
       </View>
+    );
+  };
+
+  const renderArchiveOutcome = () => {
+    const success = archiveStatus === 'success';
+
+    return (
+      <Body
+        color={success ? 'success' : 'error'}
+        textAlign="center"
+        fontWeight="semibold"
+        style={styles.connectStatusMessage}
+      >
+        Account Archive {success ? 'Successful' : 'Failed'}.{'\n'} {!success && archiveNote}
+      </Body>
     );
   };
 
@@ -151,17 +152,18 @@ const ExternalAccountScreen = (): JSX.Element => {
             Select an Account
           </Heading5>
           {selectableAccounts.map((account, index) => (
-            <View key={index} style={styles.accountContainer}>
-              <Pressable
-                onPress={(): void => {
-                  onCreateAccount(account);
-                }}
-              >
+            <Pressable
+              onPress={(): void => {
+                onCreateAccount(account);
+              }}
+              key={index}
+            >
+              <View key={index} style={styles.accountContainer}>
                 <Body style={styles.accountName}>
                   {account.name}: {capitalize(account.subtype)}
                 </Body>
-              </Pressable>
-            </View>
+              </View>
+            </Pressable>
           ))}
         </>
       );
@@ -199,6 +201,9 @@ const ExternalAccountScreen = (): JSX.Element => {
       <Heading3 textAlign="center" style={styles.heading}>
         External Account
       </Heading3>
+
+      {archiveStatus && renderArchiveOutcome()}
+
       {showSuccessMessage && (
         <Body
           color="success"

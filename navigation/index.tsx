@@ -30,7 +30,9 @@ import {
   BankingDisclosuresScreen,
   ConfirmPIIScreen,
   DisclosuresScreen,
+  ExternalAccountsScreen,
   ExternalAccountScreen,
+  ArchiveExternalAccountScreen,
   ForgotPasswordScreen,
   InitTransferScreen,
   LoginScreen,
@@ -191,7 +193,12 @@ function MainStackScreen() {
                 <Stack.Screen name="AccountsSetup" component={AccountsSetupScreen} />
 
                 <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
+                <Stack.Screen name="ExternalAccounts" component={ExternalAccountsScreen} />
                 <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
+                <Stack.Screen
+                  name="ArchiveExternalAccount"
+                  component={ArchiveExternalAccountScreen}
+                />
                 <Stack.Screen name="InitTransfer" component={InitTransferScreen} />
                 <Stack.Screen name="DebitCard" component={DebitCardScreen} />
                 <Stack.Screen name="DebitCardActivation" component={DebitCardActivationScreen} />
