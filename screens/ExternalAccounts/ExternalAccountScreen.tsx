@@ -202,7 +202,7 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
         External Account
       </Heading3>
 
-      {archiveStatus && renderArchiveOutcome()}
+      {!showSuccessMessage && !showFailedMessage && archiveStatus && renderArchiveOutcome()}
 
       {showSuccessMessage && (
         <Body
