@@ -1,11 +1,11 @@
 import React from 'react';
-import { PlaidLink as WebPlaidLink, PlaidLinkOnSuccess } from 'react-plaid-link';
+import { PlaidLink as WebPlaidLink } from 'react-plaid-link';
 
 interface PlaidLinkProps {
   linkToken: string;
   onEvent?(event: any): any;
   onExit?(exit: any): any;
-  onSuccess?(success: PlaidLinkOnSuccess): any;
+  onSuccess(success: any): void;
 }
 
 export default function PlaidLink({
@@ -17,7 +17,7 @@ export default function PlaidLink({
   const overrideStyles = {
     backgroundColor: '#586CB7',
     color: 'white',
-    fontWeight: 'bold',
+    fontWeight: 700,
     fontSize: 16,
     padding: 15,
     marginTop: 25,

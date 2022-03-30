@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Pressable, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { Button, Screen, TextLink } from '../../components';
 import { Body, Heading3, Heading5 } from '../../components/Typography';
 import { useAccounts } from '../../contexts/Accounts';
@@ -11,21 +11,30 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../../types';
 import { AccountScreen as styles } from './styles';
-import { capitalize, isEmpty } from 'lodash';
+import { capitalize, isEmpty, get } from 'lodash';
 
 interface ExternalAccountProps {
   route: RouteProp<RootStackParamList, 'ExternalAccount'>;
   navigation: StackNavigationProp<RootStackParamList, 'ExternalAccount'>;
 }
 
+interface PlaidAccount {
+  subtype: string;
+  name: string;
+  id: string;
+}
+
+const PlaidExternal = 'plaid_external';
+
 const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX.Element => {
   const { externalAccounts, poolUids, refetchAccounts, linkToken, fetchLinkToken } = useAccounts();
   const { accessToken } = useAuth();
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
   const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
+  const [status, setStatus] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [publicToken, setPublicToken] = useState<string>(null);
-  const [selectableAccounts, setSelectableAccounts] = useState<SyntheticAccount[]>([]);
+  const [selectableAccounts, setSelectableAccounts] = useState<PlaidAccount[]>([]);
 
   const archiveStatus = route.params?.archiveStatus;
   const archiveNote = route.params?.archiveNote;
@@ -96,13 +105,12 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
     const onCreateAccount = async (account): Promise<void> => {
       setShowFailedMessage(false);
       setIsLoading(true);
+      setStatus(null);
 
       try {
         // Get the synthetic account type
         const types = await AccountService.getSyntheticAccountTypes(accessToken);
-        const externalType = types.data.find(
-          (x) => x.synthetic_account_category === 'plaid_external'
-        );
+        const externalType = types.data.find((x) => x.synthetic_account_category === PlaidExternal);
 
         // Create the synthetic account
         await AccountService.createSyntheticAccount({
@@ -118,7 +126,11 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
         setShowSuccessMessage(true);
       } catch (err) {
         setShowFailedMessage(true);
+
+        const status = get(err, ['data', 'errors', 0, 'detail']);
+        setStatus(status);
         setIsLoading(false);
+        setSelectableAccounts([]);
         throw err;
       }
     };
@@ -128,7 +140,7 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
 
       const readyAccounts = accounts.filter(
         (account) =>
-          account.synthetic_account_category === 'plaid_external' && !!account.routing_number
+          account.synthetic_account_category === PlaidExternal && !!account.routing_number
       );
       if (!isEmpty(readyAccounts)) {
         setIsLoading(false);
@@ -140,7 +152,7 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
       }, 5000);
     };
 
-    const onHandleSuccess = (publicToken, metadata) => {
+    const onHandleSuccess = (publicToken: string, metadata: any) => {
       setPublicToken(publicToken);
       setSelectableAccounts(metadata.accounts);
     };
@@ -149,21 +161,19 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
       return (
         <>
           <Heading5 textAlign="center" style={styles.heading}>
-            Select an Account
+            Select account from the avaliable accounts:
           </Heading5>
           {selectableAccounts.map((account, index) => (
-            <Pressable
+            <TextLink
+              textAlign="center"
+              style={{ marginBottom: 20 }}
               onPress={(): void => {
                 onCreateAccount(account);
               }}
               key={index}
             >
-              <View key={index} style={styles.accountContainer}>
-                <Body style={styles.accountName}>
-                  {account.name}: {capitalize(account.subtype)}
-                </Body>
-              </View>
-            </Pressable>
+              {account.name}: {capitalize(account.subtype)}
+            </TextLink>
           ))}
         </>
       );
@@ -202,7 +212,11 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
         External Account
       </Heading3>
 
-      {!showSuccessMessage && !showFailedMessage && archiveStatus && renderArchiveOutcome()}
+      {!selectableAccounts &&
+        !showSuccessMessage &&
+        !showFailedMessage &&
+        archiveStatus &&
+        renderArchiveOutcome()}
 
       {showSuccessMessage && (
         <Body
@@ -221,7 +235,7 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
           fontWeight="semibold"
           style={styles.connectStatusMessage}
         >
-          Account failed to connect.
+          Account failed to connect. {'\n'} {status}
         </Body>
       )}
       {externalAccounts &&
