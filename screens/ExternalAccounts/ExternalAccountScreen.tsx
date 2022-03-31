@@ -161,7 +161,7 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
       return (
         <>
           <Heading5 textAlign="center" style={styles.heading}>
-            Select account from the avaliable accounts:
+            Select account from the available accounts:
           </Heading5>
           {selectableAccounts.map((account, index) => (
             <TextLink
