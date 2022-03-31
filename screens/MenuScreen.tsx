@@ -38,7 +38,7 @@ export default function MenuScreen({ navigation }: MenuScreenProps): JSX.Element
   };
 
   const onPressExternalAccounts = (): void => {
-    navigation.navigate('ExternalAccount');
+    navigation.navigate('ExternalAccounts');
   };
 
   const onPressTransfer = (): void => {

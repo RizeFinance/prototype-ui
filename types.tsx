@@ -33,6 +33,11 @@ export type AccountDetailsParams = {
   accountUid: string;
 };
 
+export type ExternalAccountParams = {
+  archiveStatus?: string;
+  archiveNote?: string;
+};
+
 export type RootStackParamList = {
   BankingDisclosures: undefined;
   Disclosures: undefined;
@@ -47,7 +52,9 @@ export type RootStackParamList = {
   PDFReader: PDFReaderParams;
   Accounts: undefined;
   AccountDetails: AccountDetailsParams;
-  ExternalAccount: undefined;
+  ExternalAccount: ExternalAccountParams;
+  ExternalAccounts: undefined;
+  ArchiveExternalAccount: AccountDetailsParams;
   InitTransfer: undefined;
   Menu: undefined;
   NotFound: undefined;

@@ -47,6 +47,14 @@ const createSyntheticAccount = async ({
     .then((response) => response.data);
 };
 
+const archiveSyntheticAccount = async (accessToken: string, accountUid: string) => {
+  return await api
+    .delete(`/synthetic_accounts/${accountUid}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => response.data);
+};
+
 const getLinkToken = async (accessToken: string): Promise<string> => {
   return await api
     .get('/synthetic_accounts/auth/get_token', {
@@ -55,4 +63,10 @@ const getLinkToken = async (accessToken: string): Promise<string> => {
     .then((response) => response.data.link_token);
 };
 
-export { getSyntheticAccounts, createSyntheticAccount, getSyntheticAccountTypes, getLinkToken };
+export {
+  getSyntheticAccounts,
+  createSyntheticAccount,
+  getSyntheticAccountTypes,
+  archiveSyntheticAccount,
+  getLinkToken,
+};

@@ -124,7 +124,7 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
 
         const isLastStep = step === RequiredSteps.length - 1;
         if (isLastStep) {
-          navigation.push('BrokerageDisclosures');
+          navigation.navigate('BrokerageDisclosures');
         } else {
           setCurrentStep((prevCount) => prevCount + 1);
         }

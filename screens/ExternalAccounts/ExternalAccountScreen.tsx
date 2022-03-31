@@ -1,70 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Pressable, ActivityIndicator } from 'react-native';
-import { Screen, useThemeColor } from '../components';
-import { Body, Heading3, Heading5 } from '../components/Typography';
-import { useAccounts } from '../contexts/Accounts';
-import { SyntheticAccount } from '../models';
-import PlaidLink from '../components/PlaidLink';
-import { useAuth } from '../contexts/Auth';
-import { AccountService } from '../services';
-import { capitalize, isEmpty } from 'lodash';
+import { View, ActivityIndicator } from 'react-native';
+import { Button, Screen, TextLink } from '../../components';
+import { Body, Heading3, Heading5 } from '../../components/Typography';
+import { useAccounts } from '../../contexts/Accounts';
+import { SyntheticAccount } from '../../models';
+import PlaidLink from '../../components/PlaidLink';
+import { useAuth } from '../../contexts/Auth';
+import { AccountService } from '../../services';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/core';
+import { RootStackParamList } from '../../types';
+import { AccountScreen as styles } from './styles';
+import { capitalize, isEmpty, get } from 'lodash';
 
-const ExternalAccountScreen = (): JSX.Element => {
+interface ExternalAccountProps {
+  route: RouteProp<RootStackParamList, 'ExternalAccount'>;
+  navigation: StackNavigationProp<RootStackParamList, 'ExternalAccount'>;
+}
+
+interface PlaidAccount {
+  subtype: string;
+  name: string;
+  id: string;
+}
+
+const PlaidExternal = 'plaid_external';
+
+const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX.Element => {
   const { externalAccounts, poolUids, refetchAccounts, linkToken, fetchLinkToken } = useAccounts();
   const { accessToken } = useAuth();
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
   const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
+  const [status, setStatus] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [publicToken, setPublicToken] = useState<string>(null);
-  const [selectableAccounts, setSelectableAccounts] = useState<[]>([]);
+  const [selectableAccounts, setSelectableAccounts] = useState<PlaidAccount[]>([]);
 
-  const primary = useThemeColor('primary');
+  const archiveStatus = route.params?.archiveStatus;
+  const archiveNote = route.params?.archiveNote;
 
   useEffect(() => {
     refetchAccounts();
     fetchLinkToken();
   }, []);
 
-  const styles = StyleSheet.create({
-    heading: {
-      marginTop: 24,
-      marginBottom: 24,
-    },
-    detailsSection: {
-      marginTop: 24,
-    },
-    row: {
-      flexDirection: 'row',
-    },
-    col: {
-      flex: 1,
-    },
-    contactSupport: {
-      marginTop: 48,
-    },
-    formGroup: {
-      marginVertical: 10,
-    },
-    submitButton: {
-      marginTop: 30,
-    },
-    connectStatusMessage: {
-      marginVertical: 8,
-    },
-    accountContainer: {
-      marginTop: 10,
-      padding: 20,
-      backgroundColor: primary,
-      borderRadius: 4,
-    },
-    accountName: {
-      color: 'white',
-      fontWeight: 'bold',
-    },
-    loading: {
-      marginTop: 55,
-    },
-  });
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TextLink onPress={() => navigation.push('ExternalAccounts')}>
+          &lt; External Accounts
+        </TextLink>
+      ),
+    });
+  }, [navigation]);
 
   const renderExternalAccountDetails = (externalAccount: SyntheticAccount): JSX.Element => {
     return (
@@ -84,10 +72,32 @@ const ExternalAccountScreen = (): JSX.Element => {
         </View>
         <View>
           <Body textAlign="center" style={styles.contactSupport}>
-            Please contact customer support if you need to update your account.
+            <Button
+              title="Archive Bank Account"
+              onPress={() =>
+                navigation.navigate('ArchiveExternalAccount', {
+                  accountUid: externalAccount.uid,
+                })
+              }
+            />
           </Body>
         </View>
       </View>
+    );
+  };
+
+  const renderArchiveOutcome = () => {
+    const success = archiveStatus === 'success';
+
+    return (
+      <Body
+        color={success ? 'success' : 'error'}
+        textAlign="center"
+        fontWeight="semibold"
+        style={styles.connectStatusMessage}
+      >
+        Account Archive {success ? 'Successful' : 'Failed'}.{'\n'} {!success && archiveNote}
+      </Body>
     );
   };
 
@@ -95,13 +105,12 @@ const ExternalAccountScreen = (): JSX.Element => {
     const onCreateAccount = async (account): Promise<void> => {
       setShowFailedMessage(false);
       setIsLoading(true);
+      setStatus(null);
 
       try {
         // Get the synthetic account type
         const types = await AccountService.getSyntheticAccountTypes(accessToken);
-        const externalType = types.data.find(
-          (x) => x.synthetic_account_category === 'plaid_external'
-        );
+        const externalType = types.data.find((x) => x.synthetic_account_category === PlaidExternal);
 
         // Create the synthetic account
         await AccountService.createSyntheticAccount({
@@ -117,7 +126,11 @@ const ExternalAccountScreen = (): JSX.Element => {
         setShowSuccessMessage(true);
       } catch (err) {
         setShowFailedMessage(true);
+
+        const status = get(err, ['data', 'errors', 0, 'detail']);
+        setStatus(status);
         setIsLoading(false);
+        setSelectableAccounts([]);
         throw err;
       }
     };
@@ -127,7 +140,7 @@ const ExternalAccountScreen = (): JSX.Element => {
 
       const readyAccounts = accounts.filter(
         (account) =>
-          account.synthetic_account_category === 'plaid_external' && !!account.routing_number
+          account.synthetic_account_category === PlaidExternal && !!account.routing_number
       );
       if (!isEmpty(readyAccounts)) {
         setIsLoading(false);
@@ -139,7 +152,7 @@ const ExternalAccountScreen = (): JSX.Element => {
       }, 5000);
     };
 
-    const onHandleSuccess = (publicToken, metadata) => {
+    const onHandleSuccess = (publicToken: string, metadata: any) => {
       setPublicToken(publicToken);
       setSelectableAccounts(metadata.accounts);
     };
@@ -148,20 +161,19 @@ const ExternalAccountScreen = (): JSX.Element => {
       return (
         <>
           <Heading5 textAlign="center" style={styles.heading}>
-            Select an Account
+            Select account from the available accounts:
           </Heading5>
           {selectableAccounts.map((account, index) => (
-            <View key={index} style={styles.accountContainer}>
-              <Pressable
-                onPress={(): void => {
-                  onCreateAccount(account);
-                }}
-              >
-                <Body style={styles.accountName}>
-                  {account.name}: {capitalize(account.subtype)}
-                </Body>
-              </Pressable>
-            </View>
+            <TextLink
+              textAlign="center"
+              style={{ marginBottom: 20 }}
+              onPress={(): void => {
+                onCreateAccount(account);
+              }}
+              key={index}
+            >
+              {account.name}: {capitalize(account.subtype)}
+            </TextLink>
           ))}
         </>
       );
@@ -199,6 +211,13 @@ const ExternalAccountScreen = (): JSX.Element => {
       <Heading3 textAlign="center" style={styles.heading}>
         External Account
       </Heading3>
+
+      {!selectableAccounts &&
+        !showSuccessMessage &&
+        !showFailedMessage &&
+        archiveStatus &&
+        renderArchiveOutcome()}
+
       {showSuccessMessage && (
         <Body
           color="success"
@@ -216,7 +235,7 @@ const ExternalAccountScreen = (): JSX.Element => {
           fontWeight="semibold"
           style={styles.connectStatusMessage}
         >
-          Account failed to connect.
+          Account failed to connect. {'\n'} {status}
         </Body>
       )}
       {externalAccounts &&
