@@ -9,7 +9,7 @@ import { RootStackParamList } from '../types';
 import * as Yup from 'yup';
 import TransferService from '../services/TransferService';
 import utils from '../utils/utils';
-import { SyntheticAccount, SyntheticAccountCategory } from '../models';
+import { SyntheticAccount, SyntheticAccountCategory, Transfer } from '../models';
 import Reference from 'yup/lib/Reference';
 
 interface InitTransferScreenProps {
@@ -116,6 +116,15 @@ interface AccountDropdownItem extends DropdownItem {
   category: SyntheticAccountCategory;
 }
 
+enum MessageStatus {
+  SUCCESS = 'success',
+  ERROR = 'error',
+}
+interface MessageState {
+  status?: MessageStatus;
+  copy?: string;
+}
+
 export default function InitTransferScreen({ navigation }: InitTransferScreenProps): JSX.Element {
   const { accessToken } = useAuth();
   const { refetchAccounts, liabilityAccounts, externalAccounts } = useAccounts();
@@ -142,8 +151,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
 
   const eligibleDestinationAccounts = accountItems;
 
-  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
-  const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
+  const [message, setMessage] = useState<MessageState>({});
   const [loading, setLoading] = useState(false);
 
   const styles = StyleSheet.create({
@@ -224,30 +232,55 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
     return unsubscribe;
   }, [navigation, refetchAccounts]);
 
+  const handleSetMessage = (newTransfer?: Transfer, error?: Error): void => {
+    const destinationAccount = syntheticAccounts.find(
+      (account) => account.uid === newTransfer?.destination_synthetic_account_uid
+    );
+    const isDestinationExternal = ['external', 'plaid_external', 'outbound_ach'].includes(
+      destinationAccount?.synthetic_account_category
+    );
+
+    if (error) {
+      setMessage({ status: MessageStatus.ERROR, copy: 'Transfer Failed' });
+    } else if (isDestinationExternal) {
+      setMessage({
+        status: MessageStatus.SUCCESS,
+        copy: 'Transfer Successful \n It can take up to 3 business days for the transaction to settle in the destination account.',
+      });
+    } else if (destinationAccount) {
+      setMessage({
+        status: MessageStatus.SUCCESS,
+        copy: 'Transfer Successful.',
+      });
+    } else {
+      setMessage({});
+    }
+
+    return;
+  };
+
   const onSubmit = async (
     values: TransferFields,
     actions: FormikHelpers<TransferFields>
   ): Promise<void> => {
-    setShowFailedMessage(false);
-    setShowSuccessMessage(false);
+    handleSetMessage();
     setLoading(true);
-
     try {
-      await TransferService.initiateTransfer(
+      const newTransfer = await TransferService.initiateTransfer(
         accessToken,
         values.fromSyntheticAccountUid,
         values.toSyntheticAccountUid,
         values.amount.toString()
       );
 
-      setShowSuccessMessage(true);
-      actions.resetForm();
+      handleSetMessage(newTransfer);
       setLoading(false);
-    } catch {
-      setShowFailedMessage(true);
+    } catch (err) {
+      handleSetMessage(undefined, err);
       setLoading(false);
     } finally {
       refetchAccounts();
+      actions.resetForm();
     }
   };
 
@@ -256,26 +289,17 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
       <Heading3 textAlign="center" style={styles.heading}>
         Transfer
       </Heading3>
-      {showSuccessMessage && (
+      {message.status && (
         <Body
-          color="success"
+          color={message.status}
           textAlign="center"
           fontWeight="semibold"
           style={styles.connectStatusMessage}
         >
-          Transfer Successful.
+          {message.copy}
         </Body>
       )}
-      {showFailedMessage && (
-        <Body
-          color="error"
-          textAlign="center"
-          fontWeight="semibold"
-          style={styles.connectStatusMessage}
-        >
-          Transfer failed.
-        </Body>
-      )}
+
       <Formik
         initialValues={initialValues}
         onSubmit={onSubmit}
