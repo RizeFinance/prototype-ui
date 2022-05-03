@@ -4,8 +4,7 @@ import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../../types';
 import { Screen, TextLink, Button } from '../../components';
 import { Body, Heading3 } from '../../components/Typography';
-import { useAuth, useAccounts } from '../../contexts';
-import { AccountService } from '../../services';
+import { useAccounts } from '../../contexts';
 import { View } from 'react-native';
 import { ArchiveScreen as styles } from './styles';
 import { get } from 'lodash';
@@ -19,8 +18,7 @@ export default function ArchiveExternalAccountScreen({
   navigation,
   route,
 }: ArchiveExternalAccountScreenProps): JSX.Element {
-  const { accessToken } = useAuth();
-  const { liabilityAccounts, refetchAccounts } = useAccounts();
+  const { liabilityAccounts, refetchAccounts, archiveAccount } = useAccounts();
 
   const accountUid = route.params?.accountUid;
   const externalAccount = liabilityAccounts.find((x) => x.uid === accountUid);
@@ -47,8 +45,7 @@ export default function ArchiveExternalAccountScreen({
     setLoading(true);
 
     try {
-      await AccountService.archiveSyntheticAccount(accessToken, accountUid);
-      await refetchAccounts();
+      await archiveAccount(accountUid);
       navigation.navigate('ExternalAccounts', { archiveStatus: 'success' });
     } catch (err) {
       const archiveNote = get(
