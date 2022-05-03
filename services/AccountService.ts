@@ -22,6 +22,9 @@ interface CreateAccount {
   accountId?: string;
   accessToken: string;
   publicToken?: string;
+  accountNumber?: string;
+  routingNumber?: string;
+  externalUid?: string;
 }
 
 const createSyntheticAccount = async ({
@@ -31,6 +34,9 @@ const createSyntheticAccount = async ({
   accountId,
   accessToken,
   publicToken,
+  accountNumber,
+  routingNumber,
+  externalUid,
 }: CreateAccount): Promise<SyntheticAccount> => {
   return await api
     .post(
@@ -41,6 +47,9 @@ const createSyntheticAccount = async ({
         name: name,
         account_id: accountId,
         public_token: publicToken,
+        routing_number: routingNumber,
+        account_number: accountNumber,
+        external_uid: externalUid,
       },
       { headers: { Authorization: `Bearer ${accessToken}` } }
     )

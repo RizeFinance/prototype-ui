@@ -78,4 +78,18 @@ const AccountsScreen = StyleSheet.create({
   },
 });
 
-export { ArchiveScreen, AccountScreen, AccountsScreen };
+const ConnectScreen = StyleSheet.create({
+  heading: {
+    marginTop: 24,
+    marginBottom: 24,
+  },
+  list: {
+    marginBottom: 24,
+  },
+  bullet: {
+    fontWeight: 'bold',
+    marginRight: 6,
+  },
+});
+
+export { ArchiveScreen, AccountScreen, AccountsScreen, ConnectScreen };

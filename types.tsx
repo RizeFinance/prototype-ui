@@ -54,6 +54,8 @@ export type RootStackParamList = {
   AccountDetails: AccountDetailsParams;
   ExternalAccount: ExternalAccountParams;
   ExternalAccounts: undefined;
+  ConnectAccount: undefined;
+  ConnectOneWay: undefined;
   ArchiveExternalAccount: AccountDetailsParams;
   InitTransfer: undefined;
   Menu: undefined;

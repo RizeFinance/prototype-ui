@@ -6,7 +6,12 @@ import {
 type UpdatedAccount = Omit<BaseSyntheticAccount, 'synthetic_account_category'>;
 
 interface ISyntheticAccount extends UpdatedAccount {
-  synthetic_account_category: 'general' | 'external' | 'plaid_external' | 'target_yield_account';
+  synthetic_account_category:
+    | 'general'
+    | 'external'
+    | 'plaid_external'
+    | 'target_yield_account'
+    | 'outbound_ach';
   asset_balances?: IAsset[];
 }
 

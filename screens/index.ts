@@ -8,6 +8,8 @@ export { default as DisclosuresScreen } from './DisclosuresScreen';
 export { default as ExternalAccountScreen } from './ExternalAccounts/ExternalAccountScreen';
 export { default as ExternalAccountsScreen } from './ExternalAccounts/ExternalAccountsScreen';
 export { default as ArchiveExternalAccountScreen } from './ExternalAccounts/ArchiveExternalAccountScreen';
+export { default as ConnectAccountScreen } from './ExternalAccounts/ConnectAccountScreen';
+export { default as ConnectOneWayScreen } from './ExternalAccounts/ConnectOneWayScreen';
 export { default as ForgotPasswordScreen } from './ForgotPasswordScreen/ForgotPasswordScreen';
 export { default as InitTransferScreen } from './InitTransferScreen';
 export { default as LoginScreen } from './LoginScreen/LoginScreen';

@@ -4,7 +4,7 @@ import { Button, Screen, TextLink } from '../../components';
 import { Body, Heading3, Heading5 } from '../../components/Typography';
 import { useAccounts } from '../../contexts/Accounts';
 import { SyntheticAccount } from '../../models';
-import PlaidLink from '../../components/PlaidLink';
+//import PlaidLink from '../../components/PlaidLink';
 import { useAuth } from '../../contexts/Auth';
 import { AccountService } from '../../services';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -33,7 +33,6 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
   const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
   const [status, setStatus] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [publicToken, setPublicToken] = useState<string>(null);
   const [selectableAccounts, setSelectableAccounts] = useState<PlaidAccount[]>([]);
 
   const archiveStatus = route.params?.archiveStatus;
@@ -114,12 +113,11 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
 
         // Create the synthetic account
         await AccountService.createSyntheticAccount({
-          accessToken,
+          accessToken: accessToken,
           syntheticAccountTypeUid: externalType.uid,
           poolUid: poolUids[0],
           name: account.name,
           accountId: account.id,
-          publicToken,
         });
 
         refreshAccountsPeriodically();
@@ -152,11 +150,6 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
       }, 5000);
     };
 
-    const onHandleSuccess = (publicToken: string, metadata: any) => {
-      setPublicToken(publicToken);
-      setSelectableAccounts(metadata.accounts);
-    };
-
     if (selectableAccounts?.length >= 1) {
       return (
         <>
@@ -182,7 +175,11 @@ const ExternalAccountScreen = ({ navigation, route }: ExternalAccountProps): JSX
     return (
       <>
         {linkToken ? (
-          <PlaidLink linkToken={linkToken} onSuccess={onHandleSuccess} />
+          // <PlaidLink linkToken={linkToken} onSuccess={onHandleSuccess} />
+          <Button
+            title="Connect Account"
+            onPress={(): void => navigation.navigate('ConnectAccount')}
+          />
         ) : (
           <View style={styles.loading}>
             <ActivityIndicator size="large" />

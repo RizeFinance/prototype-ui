@@ -64,10 +64,10 @@ const AccountsSetupScreen = ({ navigation }) => {
     try {
       setLoading(true);
       await AccountService.createSyntheticAccount({
-        accessToken,
-        name: name.trim(),
         syntheticAccountTypeUid: account,
         poolUid,
+        name: name.trim(),
+        accessToken: accessToken,
       });
       await refetchAccounts();
       navigation.navigate('Accounts');
