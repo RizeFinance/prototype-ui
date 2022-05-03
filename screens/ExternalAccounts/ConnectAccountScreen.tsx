@@ -18,7 +18,7 @@ const ConnectAccountScreen = ({ navigation }: ConnectAccountScreenProps): JSX.El
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <TextLink onPress={() => navigation.push('ExternalAccounts')}>
+        <TextLink onPress={() => navigation.navigate('ExternalAccounts')}>
           &lt; External Accounts
         </TextLink>
       ),

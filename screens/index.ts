@@ -5,7 +5,6 @@ export { default as ApplicationUnapprovedScreen } from './ApplicationUnapprovedS
 export { default as BankingDisclosuresScreen } from './BankingDisclosuresScreen';
 export { default as ConfirmPIIScreen } from './ConfirmPIIScreen';
 export { default as DisclosuresScreen } from './DisclosuresScreen';
-export { default as ExternalAccountScreen } from './ExternalAccounts/ExternalAccountScreen';
 export { default as ExternalAccountsScreen } from './ExternalAccounts/ExternalAccountsScreen';
 export { default as ArchiveExternalAccountScreen } from './ExternalAccounts/ArchiveExternalAccountScreen';
 export { default as ConnectAccountScreen } from './ExternalAccounts/ConnectAccountScreen';

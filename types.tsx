@@ -33,7 +33,7 @@ export type AccountDetailsParams = {
   accountUid: string;
 };
 
-export type ExternalAccountParams = {
+export type ExternalAccountsParams = {
   archiveStatus?: string;
   archiveNote?: string;
 };
@@ -52,8 +52,7 @@ export type RootStackParamList = {
   PDFReader: PDFReaderParams;
   Accounts: undefined;
   AccountDetails: AccountDetailsParams;
-  ExternalAccount: ExternalAccountParams;
-  ExternalAccounts: undefined;
+  ExternalAccounts: ExternalAccountsParams;
   ConnectAccount: undefined;
   ConnectOneWay: undefined;
   ArchiveExternalAccount: AccountDetailsParams;

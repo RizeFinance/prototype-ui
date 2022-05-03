@@ -12,7 +12,6 @@ export default {
           SetPassword: 'set-password',
           Accounts: 'accounts',
           ExternalAccounts: 'external-accounts',
-          ExternalAccount: 'external-account',
           ArchiveExternalAccount: 'archive-external-account',
           Menu: 'menu',
           ProcessingApplication: 'processing-application',

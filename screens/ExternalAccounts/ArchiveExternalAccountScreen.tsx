@@ -36,7 +36,7 @@ export default function ArchiveExternalAccountScreen({
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <TextLink onPress={() => navigation.push('ExternalAccount')}>
+        <TextLink onPress={() => navigation.navigate('ConnectAccount')}>
           &lt; Connect Bank Account
         </TextLink>
       ),
@@ -49,7 +49,7 @@ export default function ArchiveExternalAccountScreen({
     try {
       await AccountService.archiveSyntheticAccount(accessToken, accountUid);
       await refetchAccounts();
-      navigation.navigate('ExternalAccount', { archiveStatus: 'success' });
+      navigation.navigate('ExternalAccounts', { archiveStatus: 'success' });
     } catch (err) {
       const archiveNote = get(
         err,
@@ -57,7 +57,7 @@ export default function ArchiveExternalAccountScreen({
         'Something went wrong. Please contact us to resolve.'
       );
 
-      navigation.navigate('ExternalAccount', { archiveStatus: 'failed', archiveNote });
+      navigation.navigate('ExternalAccounts', { archiveStatus: 'failed', archiveNote });
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ export default function ArchiveExternalAccountScreen({
         <TextLink
           textAlign={'center'}
           onPress={(): void => {
-            navigation.navigate('ExternalAccount');
+            navigation.navigate('ExternalAccounts');
           }}
         >
           No, return to view connected bank account.
