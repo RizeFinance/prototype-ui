@@ -9,7 +9,7 @@ import { RootStackParamList } from '../types';
 import * as Yup from 'yup';
 import TransferService from '../services/TransferService';
 import utils from '../utils/utils';
-import { SyntheticAccount } from '../models';
+import { SyntheticAccount, SyntheticAccountCategory } from '../models';
 import Reference from 'yup/lib/Reference';
 
 interface InitTransferScreenProps {
@@ -25,9 +25,16 @@ type TransferFields = {
 
 declare module 'yup' {
   interface StringSchema {
+    validSourceAndDestination(
+      liabilityAccounts: SyntheticAccount[],
+      sourceSyntheticAccountUidRef: Reference<string>,
+      destinationSyntheticAccountUidRef: Reference<string>,
+      message: string
+    ): StringSchema;
+  }
+  interface StringSchema {
     validSourceBalance(liabilityAccounts: SyntheticAccount[], message: string): StringSchema;
   }
-
   interface NumberSchema {
     amountWithinSourceBalance(
       sourceSyntheticAccountUidRef: Reference<string>,
@@ -36,6 +43,36 @@ declare module 'yup' {
     ): NumberSchema;
   }
 }
+
+Yup.addMethod(
+  Yup.string,
+  'validSourceAndDestination',
+  function (
+    liabilityAccounts: SyntheticAccount[],
+    sourceSyntheticAccountUidRef: Reference<string>,
+    destinationSyntheticAccountUidRef: Reference<string>,
+    message: string
+  ) {
+    return this.test('validSourceAndDestination', message, function () {
+      const sourceAccount = liabilityAccounts.find(
+        (x) => x.uid === this.resolve(sourceSyntheticAccountUidRef)
+      );
+
+      const destinationAccount = liabilityAccounts.find(
+        (x) => x.uid === this.resolve(destinationSyntheticAccountUidRef)
+      );
+
+      if (
+        sourceAccount?.synthetic_account_category === 'plaid_external' &&
+        destinationAccount?.synthetic_account_category === 'outbound_ach'
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+);
 
 Yup.addMethod(
   Yup.string,
@@ -75,21 +112,35 @@ Yup.addMethod(
   }
 );
 
+interface AccountDropdownItem extends DropdownItem {
+  category: SyntheticAccountCategory;
+}
+
 export default function InitTransferScreen({ navigation }: InitTransferScreenProps): JSX.Element {
   const { accessToken } = useAuth();
   const { refetchAccounts, liabilityAccounts, externalAccounts } = useAccounts();
 
-  const syntheticAccounts = [...liabilityAccounts, ...externalAccounts].map(
+  const syntheticAccounts = [...liabilityAccounts, ...externalAccounts];
+  const accountItems = syntheticAccounts.map(
     (account) =>
       ({
         label:
           account.name +
-          (['plaid_external', 'external'].includes(account.synthetic_account_category)
+          (['plaid_external', 'external', 'outbound_ach'].includes(
+            account.synthetic_account_category
+          )
             ? ''
             : ` (${utils.formatCurrency(account.net_usd_available_balance)})`),
         value: account.uid,
-      } as DropdownItem)
+        category: account.synthetic_account_category,
+      } as AccountDropdownItem)
   );
+
+  const eligibleSourceAccounts = accountItems.filter(
+    (account) => account.category !== 'outbound_ach'
+  );
+
+  const eligibleDestinationAccounts = accountItems;
 
   const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
   const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
@@ -134,6 +185,12 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
       .validSourceBalance(liabilityAccounts, 'Source account does not have enough balance.'),
     toSyntheticAccountUid: Yup.string()
       .required('Destination account is required.')
+      .validSourceAndDestination(
+        syntheticAccounts,
+        Yup.ref<string>('fromSyntheticAccountUid'),
+        Yup.ref<string>('toSyntheticAccountUid'),
+        'Cannot perform a transfer between two external accounts'
+      )
       .not(
         [Yup.ref('fromSyntheticAccountUid'), null],
         'Source should not be the same as the destination.'
@@ -241,7 +298,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
               <Dropdown
                 label="From"
                 placeholder="Select Account"
-                items={syntheticAccounts}
+                items={eligibleSourceAccounts}
                 value={values.fromSyntheticAccountUid}
                 onChange={(value) => {
                   if (value) {
@@ -255,7 +312,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
               <Dropdown
                 label="To"
                 placeholder="Select Account"
-                items={syntheticAccounts}
+                items={eligibleDestinationAccounts}
                 value={values.toSyntheticAccountUid}
                 onChange={(value) => {
                   if (value) {
