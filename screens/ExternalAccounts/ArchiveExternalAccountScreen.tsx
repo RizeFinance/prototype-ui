@@ -45,7 +45,7 @@ export default function ArchiveExternalAccountScreen({
     setLoading(true);
 
     try {
-      await archiveAccount(accountUid + 'dfsafsda');
+      await archiveAccount(accountUid);
       navigation.navigate('ExternalAccounts', {
         status: MessageStatus.SUCCESS,
         copy: 'Account Archive Successful.',
