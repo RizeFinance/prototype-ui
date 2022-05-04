@@ -79,7 +79,7 @@ export class AccountsProvider extends React.Component<
       );
       const liabilityAccounts = sortedAccounts.filter((x) => x.liability);
       const externalAccounts = sortedAccounts.filter((x) =>
-        ['external', 'plaid_external'].includes(x.synthetic_account_category)
+        ['external', 'plaid_external', 'outbound_ach'].includes(x.synthetic_account_category)
       );
       const poolUids = _.uniq(sortedAccounts.map((x) => x.pool_uid));
 
