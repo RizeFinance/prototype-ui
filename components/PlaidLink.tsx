@@ -5,7 +5,8 @@ interface PlaidLinkProps {
   linkToken: string;
   onEvent?(event: any): any;
   onExit?(exit: any): any;
-  onSuccess(success: any): void;
+  onSuccess?(success: any): void;
+  title?: string;
 }
 
 export default function PlaidLink({
@@ -13,6 +14,7 @@ export default function PlaidLink({
   onEvent,
   onExit,
   onSuccess,
+  title,
 }: PlaidLinkProps): JSX.Element {
   const overrideStyles = {
     backgroundColor: '#586CB7',
@@ -31,7 +33,7 @@ export default function PlaidLink({
       onEvent={onExit}
       style={overrideStyles}
     >
-      Connect External Account
+      {title ? title : 'Connect External Account'}
     </WebPlaidLink>
   );
 }

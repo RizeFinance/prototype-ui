@@ -11,6 +11,7 @@ export type SyntheticAccountCategory =
   | 'plaid_external'
   | 'target_yield_account'
   | 'outbound_ach';
+
 interface ISyntheticAccount extends UpdatedAccount {
   synthetic_account_category: SyntheticAccountCategory;
   asset_balances?: IAsset[];

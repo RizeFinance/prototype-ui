@@ -37,6 +37,9 @@ const AccountScreen = StyleSheet.create({
   loading: {
     marginTop: 55,
   },
+  status: {
+    marginTop: 25,
+  },
 });
 
 const ArchiveScreen = StyleSheet.create({
@@ -76,6 +79,38 @@ const AccountsScreen = StyleSheet.create({
   link: {
     marginBottom: 30,
   },
+  cardContainer: {
+    marginTop: 25,
+    marginBottom: 25,
+  },
+  cardDetails: {
+    display: 'flex',
+    flexDirection: 'row',
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  detail: {
+    display: 'flex',
+    flexDirection: 'column',
+    marginRight: 30,
+  },
+  status: {
+    marginTop: 25,
+  },
 });
 
-export { ArchiveScreen, AccountScreen, AccountsScreen };
+const ConnectScreen = StyleSheet.create({
+  heading: {
+    marginTop: 24,
+    marginBottom: 24,
+  },
+  list: {
+    marginBottom: 24,
+  },
+  bullet: {
+    fontWeight: 'bold',
+    marginRight: 6,
+  },
+});
+
+export { ArchiveScreen, AccountScreen, AccountsScreen, ConnectScreen };
