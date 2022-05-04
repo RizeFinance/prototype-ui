@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Button, Screen, TextLink } from '../../components';
 import { Body, Heading3, Heading5 } from '../../components/Typography';
-import PlaidLink from '../../components/PlaidLink';
-import { useAccounts } from '../../contexts/Accounts';
+// import PlaidLink from '../../components/PlaidLink';
+// import { useAccounts } from '../../contexts/Accounts';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../../types';
@@ -14,7 +14,7 @@ interface ConnectAccountScreenProps {
 }
 
 const ConnectAccountScreen = ({ navigation }: ConnectAccountScreenProps): JSX.Element => {
-  const { linkToken } = useAccounts();
+  // const { linkToken } = useAccounts();
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
@@ -53,7 +53,7 @@ const ConnectAccountScreen = ({ navigation }: ConnectAccountScreenProps): JSX.El
         <Body style={styles.bullet}>{'\u2022'}</Body>
         You cannot remove / archive an account until after 30 days from the initial connection.
       </Body>
-      <PlaidLink title="Connect Two-way Transfer Account" linkToken={linkToken} />
+      {/* <PlaidLink title="Connect Two-way Transfer Account" linkToken={linkToken} /> */}
       <Heading5 textAlign="center" fontWeight="bold" style={styles.heading}>
         One-Way Outgoing Transfer Account
       </Heading5>
