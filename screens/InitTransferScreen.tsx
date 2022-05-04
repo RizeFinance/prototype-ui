@@ -9,7 +9,7 @@ import { RootStackParamList } from '../types';
 import * as Yup from 'yup';
 import TransferService from '../services/TransferService';
 import utils from '../utils/utils';
-import { SyntheticAccount } from '../models';
+import { SyntheticAccount, SyntheticAccountCategory, Transfer } from '../models';
 import Reference from 'yup/lib/Reference';
 
 interface InitTransferScreenProps {
@@ -25,9 +25,16 @@ type TransferFields = {
 
 declare module 'yup' {
   interface StringSchema {
+    validSourceAndDestination(
+      liabilityAccounts: SyntheticAccount[],
+      sourceSyntheticAccountUidRef: Reference<string>,
+      destinationSyntheticAccountUidRef: Reference<string>,
+      message: string
+    ): StringSchema;
+  }
+  interface StringSchema {
     validSourceBalance(liabilityAccounts: SyntheticAccount[], message: string): StringSchema;
   }
-
   interface NumberSchema {
     amountWithinSourceBalance(
       sourceSyntheticAccountUidRef: Reference<string>,
@@ -36,6 +43,36 @@ declare module 'yup' {
     ): NumberSchema;
   }
 }
+
+Yup.addMethod(
+  Yup.string,
+  'validSourceAndDestination',
+  function (
+    liabilityAccounts: SyntheticAccount[],
+    sourceSyntheticAccountUidRef: Reference<string>,
+    destinationSyntheticAccountUidRef: Reference<string>,
+    message: string
+  ) {
+    return this.test('validSourceAndDestination', message, function () {
+      const sourceAccount = liabilityAccounts.find(
+        (x) => x.uid === this.resolve(sourceSyntheticAccountUidRef)
+      );
+
+      const destinationAccount = liabilityAccounts.find(
+        (x) => x.uid === this.resolve(destinationSyntheticAccountUidRef)
+      );
+
+      if (
+        sourceAccount?.synthetic_account_category === 'plaid_external' &&
+        destinationAccount?.synthetic_account_category === 'outbound_ach'
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+);
 
 Yup.addMethod(
   Yup.string,
@@ -75,24 +112,46 @@ Yup.addMethod(
   }
 );
 
+interface AccountDropdownItem extends DropdownItem {
+  category: SyntheticAccountCategory;
+}
+
+enum MessageStatus {
+  SUCCESS = 'success',
+  ERROR = 'error',
+}
+interface MessageState {
+  status?: MessageStatus;
+  copy?: string;
+}
+
 export default function InitTransferScreen({ navigation }: InitTransferScreenProps): JSX.Element {
   const { accessToken } = useAuth();
   const { refetchAccounts, liabilityAccounts, externalAccounts } = useAccounts();
 
-  const syntheticAccounts = [...liabilityAccounts, ...externalAccounts].map(
+  const syntheticAccounts = [...liabilityAccounts, ...externalAccounts];
+  const accountItems = syntheticAccounts.map(
     (account) =>
       ({
         label:
           account.name +
-          (['plaid_external', 'external'].includes(account.synthetic_account_category)
+          (['plaid_external', 'external', 'outbound_ach'].includes(
+            account.synthetic_account_category
+          )
             ? ''
             : ` (${utils.formatCurrency(account.net_usd_available_balance)})`),
         value: account.uid,
-      } as DropdownItem)
+        category: account.synthetic_account_category,
+      } as AccountDropdownItem)
   );
 
-  const [showSuccessMessage, setShowSuccessMessage] = useState<boolean>(false);
-  const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
+  const eligibleSourceAccounts = accountItems.filter(
+    (account) => account.category !== 'outbound_ach'
+  );
+
+  const eligibleDestinationAccounts = accountItems;
+
+  const [message, setMessage] = useState<MessageState>({});
   const [loading, setLoading] = useState(false);
 
   const styles = StyleSheet.create({
@@ -134,6 +193,12 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
       .validSourceBalance(liabilityAccounts, 'Source account does not have enough balance.'),
     toSyntheticAccountUid: Yup.string()
       .required('Destination account is required.')
+      .validSourceAndDestination(
+        syntheticAccounts,
+        Yup.ref<string>('fromSyntheticAccountUid'),
+        Yup.ref<string>('toSyntheticAccountUid'),
+        'Cannot perform a transfer between two external accounts'
+      )
       .not(
         [Yup.ref('fromSyntheticAccountUid'), null],
         'Source should not be the same as the destination.'
@@ -167,30 +232,55 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
     return unsubscribe;
   }, [navigation, refetchAccounts]);
 
+  const handleSetMessage = (newTransfer?: Transfer, error?: Error): void => {
+    const destinationAccount = syntheticAccounts.find(
+      (account) => account.uid === newTransfer?.destination_synthetic_account_uid
+    );
+    const isDestinationExternal = ['external', 'plaid_external', 'outbound_ach'].includes(
+      destinationAccount?.synthetic_account_category
+    );
+
+    if (error) {
+      setMessage({ status: MessageStatus.ERROR, copy: 'Transfer Failed' });
+    } else if (isDestinationExternal) {
+      setMessage({
+        status: MessageStatus.SUCCESS,
+        copy: 'Transfer Successful \n It can take up to 3 business days for the transaction to settle in the destination account.',
+      });
+    } else if (destinationAccount) {
+      setMessage({
+        status: MessageStatus.SUCCESS,
+        copy: 'Transfer Successful.',
+      });
+    } else {
+      setMessage({});
+    }
+
+    return;
+  };
+
   const onSubmit = async (
     values: TransferFields,
     actions: FormikHelpers<TransferFields>
   ): Promise<void> => {
-    setShowFailedMessage(false);
-    setShowSuccessMessage(false);
+    handleSetMessage();
     setLoading(true);
-
     try {
-      await TransferService.initiateTransfer(
+      const newTransfer = await TransferService.initiateTransfer(
         accessToken,
         values.fromSyntheticAccountUid,
         values.toSyntheticAccountUid,
         values.amount.toString()
       );
 
-      setShowSuccessMessage(true);
-      actions.resetForm();
+      handleSetMessage(newTransfer);
       setLoading(false);
-    } catch {
-      setShowFailedMessage(true);
+    } catch (err) {
+      handleSetMessage(undefined, err);
       setLoading(false);
     } finally {
       refetchAccounts();
+      actions.resetForm();
     }
   };
 
@@ -199,26 +289,17 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
       <Heading3 textAlign="center" style={styles.heading}>
         Transfer
       </Heading3>
-      {showSuccessMessage && (
+      {message.status && (
         <Body
-          color="success"
+          color={message.status}
           textAlign="center"
           fontWeight="semibold"
           style={styles.connectStatusMessage}
         >
-          Transfer Successful.
+          {message.copy}
         </Body>
       )}
-      {showFailedMessage && (
-        <Body
-          color="error"
-          textAlign="center"
-          fontWeight="semibold"
-          style={styles.connectStatusMessage}
-        >
-          Transfer failed.
-        </Body>
-      )}
+
       <Formik
         initialValues={initialValues}
         onSubmit={onSubmit}
@@ -241,7 +322,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
               <Dropdown
                 label="From"
                 placeholder="Select Account"
-                items={syntheticAccounts}
+                items={eligibleSourceAccounts}
                 value={values.fromSyntheticAccountUid}
                 onChange={(value) => {
                   if (value) {
@@ -255,7 +336,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
               <Dropdown
                 label="To"
                 placeholder="Select Account"
-                items={syntheticAccounts}
+                items={eligibleDestinationAccounts}
                 value={values.toSyntheticAccountUid}
                 onChange={(value) => {
                   if (value) {
