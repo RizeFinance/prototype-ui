@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/core';
-import { RootStackParamList } from '../../types';
 import { Screen, TextLink, Button } from '../../components';
 import { Body, Heading3 } from '../../components/Typography';
 import { useAccounts } from '../../contexts';
 import { View } from 'react-native';
 import { ArchiveScreen as styles } from './styles';
+import { RootStackParamList, MessageStatus } from '../../types';
 import { get } from 'lodash';
 
 interface ArchiveExternalAccountScreenProps {
@@ -34,8 +34,8 @@ export default function ArchiveExternalAccountScreen({
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <TextLink onPress={() => navigation.navigate('ConnectAccount')}>
-          &lt; Connect Bank Account
+        <TextLink onPress={() => navigation.navigate('ExternalAccounts')}>
+          &lt; External Accounts
         </TextLink>
       ),
     });
@@ -45,16 +45,22 @@ export default function ArchiveExternalAccountScreen({
     setLoading(true);
 
     try {
-      await archiveAccount(accountUid);
-      navigation.navigate('ExternalAccounts', { archiveStatus: 'success' });
+      await archiveAccount(accountUid + 'dfsafsda');
+      navigation.navigate('ExternalAccounts', {
+        status: MessageStatus.SUCCESS,
+        copy: 'Account Archive Successful.',
+      });
     } catch (err) {
-      const archiveNote = get(
+      const apiError = get(
         err,
         ['data', 'errors', 0, 'detail'],
         'Something went wrong. Please contact us to resolve.'
       );
 
-      navigation.navigate('ExternalAccounts', { archiveStatus: 'failed', archiveNote });
+      navigation.navigate('ExternalAccounts', {
+        status: MessageStatus.ERROR,
+        copy: `Account Archive Failed. \n ${apiError}`,
+      });
     } finally {
       setLoading(false);
     }
@@ -62,7 +68,7 @@ export default function ArchiveExternalAccountScreen({
 
   return (
     <Screen style={styles.screen}>
-      <Heading3 textAlign="center">Archive Connected Bank Account?</Heading3>
+      <Heading3 textAlign="center">Archive Two-way Transfer Account?</Heading3>
 
       <Body style={styles.description}>
         Over your lifetime as a customer, only 5 accounts can be connected. You cannot archive an

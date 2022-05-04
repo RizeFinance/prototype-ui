@@ -1,47 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { defaultColors } from '../../constants/Colors';
 
-const AccountScreen = StyleSheet.create({
-  heading: {
-    marginTop: 24,
-    marginBottom: 24,
-  },
-  detailsSection: {
-    marginTop: 24,
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  col: {
-    flex: 1,
-  },
-  contactSupport: {
-    marginTop: 48,
-  },
-  formGroup: {
-    marginVertical: 10,
-  },
-  connectStatusMessage: {
-    marginVertical: 8,
-  },
-  accountContainer: {
-    marginTop: 10,
-    padding: 20,
-    backgroundColor: defaultColors.primary,
-    borderRadius: 4,
-  },
-  accountName: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  loading: {
-    marginTop: 55,
-  },
-  status: {
-    marginTop: 25,
-  },
-});
-
 const ArchiveScreen = StyleSheet.create({
   screen: {
     maxWidth: 400,
@@ -76,6 +35,16 @@ const AccountsScreen = StyleSheet.create({
   ctaContainer: {
     marginTop: 30,
   },
+  status: {
+    marginTop: 25,
+  },
+  loading: {
+    marginTop: 25,
+    marginBottom: 55,
+  },
+});
+
+const AccountCard = StyleSheet.create({
   link: {
     marginBottom: 30,
   },
@@ -94,9 +63,6 @@ const AccountsScreen = StyleSheet.create({
     flexDirection: 'column',
     marginRight: 30,
   },
-  status: {
-    marginTop: 25,
-  },
 });
 
 const ConnectScreen = StyleSheet.create({
@@ -111,6 +77,9 @@ const ConnectScreen = StyleSheet.create({
     fontWeight: 'bold',
     marginRight: 6,
   },
+  loading: {
+    marginTop: 55,
+  },
 });
 
-export { ArchiveScreen, AccountScreen, AccountsScreen, ConnectScreen };
+export { AccountCard, ArchiveScreen, AccountsScreen, ConnectScreen };

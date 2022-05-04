@@ -33,9 +33,18 @@ export type AccountDetailsParams = {
   accountUid: string;
 };
 
+export enum MessageStatus {
+  SUCCESS = 'success',
+  ERROR = 'error',
+}
+export interface MessageState {
+  status?: MessageStatus;
+  copy?: string;
+}
+
 export type ExternalAccountsParams = {
-  archiveStatus?: string;
-  archiveNote?: string;
+  status?: MessageStatus;
+  copy?: string;
 };
 
 export type RootStackParamList = {
