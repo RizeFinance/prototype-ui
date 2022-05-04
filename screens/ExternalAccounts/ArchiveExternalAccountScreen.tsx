@@ -4,8 +4,7 @@ import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../../types';
 import { Screen, TextLink, Button } from '../../components';
 import { Body, Heading3 } from '../../components/Typography';
-import { useAuth, useAccounts } from '../../contexts';
-import { AccountService } from '../../services';
+import { useAccounts } from '../../contexts';
 import { View } from 'react-native';
 import { ArchiveScreen as styles } from './styles';
 import { get } from 'lodash';
@@ -19,8 +18,7 @@ export default function ArchiveExternalAccountScreen({
   navigation,
   route,
 }: ArchiveExternalAccountScreenProps): JSX.Element {
-  const { accessToken } = useAuth();
-  const { liabilityAccounts, refetchAccounts } = useAccounts();
+  const { liabilityAccounts, refetchAccounts, archiveAccount } = useAccounts();
 
   const accountUid = route.params?.accountUid;
   const externalAccount = liabilityAccounts.find((x) => x.uid === accountUid);
@@ -36,7 +34,7 @@ export default function ArchiveExternalAccountScreen({
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <TextLink onPress={() => navigation.push('ExternalAccount')}>
+        <TextLink onPress={() => navigation.navigate('ConnectAccount')}>
           &lt; Connect Bank Account
         </TextLink>
       ),
@@ -47,9 +45,8 @@ export default function ArchiveExternalAccountScreen({
     setLoading(true);
 
     try {
-      await AccountService.archiveSyntheticAccount(accessToken, accountUid);
-      await refetchAccounts();
-      navigation.navigate('ExternalAccount', { archiveStatus: 'success' });
+      await archiveAccount(accountUid);
+      navigation.navigate('ExternalAccounts', { archiveStatus: 'success' });
     } catch (err) {
       const archiveNote = get(
         err,
@@ -57,7 +54,7 @@ export default function ArchiveExternalAccountScreen({
         'Something went wrong. Please contact us to resolve.'
       );
 
-      navigation.navigate('ExternalAccount', { archiveStatus: 'failed', archiveNote });
+      navigation.navigate('ExternalAccounts', { archiveStatus: 'failed', archiveNote });
     } finally {
       setLoading(false);
     }
@@ -84,7 +81,7 @@ export default function ArchiveExternalAccountScreen({
         <TextLink
           textAlign={'center'}
           onPress={(): void => {
-            navigation.navigate('ExternalAccount');
+            navigation.navigate('ExternalAccounts');
           }}
         >
           No, return to view connected bank account.

@@ -31,7 +31,7 @@ const ConnectOneWayScreen = ({ navigation }: ConnectOneWayScreenProps): JSX.Elem
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <TextLink onPress={() => navigation.push('ConnectAccount')}>
+        <TextLink onPress={() => navigation.navigate('ConnectAccount')}>
           &lt; External Accounts
         </TextLink>
       ),
