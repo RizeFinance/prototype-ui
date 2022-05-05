@@ -5,18 +5,22 @@ import CustomerService from '../services/CustomerService';
 import { Customer } from '../models';
 
 export type AuthContextProps = {
-  accessToken?: string;
+  accessToken: string;
   refreshToken?: string;
   userName?: string;
-  login: (userName: string, password: string) => Promise<any>;
+  login: (userName: string, password: string) => Promise<AuthResponse>;
   logout: () => void;
-  register: (username: string, password: string) => Promise<any>;
-  forgotPassword: (email: string) => Promise<any>;
-  confirmPassword: (data: IConfirmPW) => Promise<any>;
-  setPassword: (username: string, oldPassword: string, newPassword: string) => Promise<any>;
+  register: (username: string, password: string) => Promise<AuthResponse>;
+  forgotPassword: (email: string) => Promise<AuthResponse>;
+  confirmPassword: (data: IConfirmPW) => Promise<AuthResponse>;
+  setPassword: (
+    username: string,
+    oldPassword: string,
+    newPassword: string
+  ) => Promise<AuthResponse>;
   refreshCustomer: () => Promise<Customer>;
   customer?: Customer;
-  customerProducts?: any;
+  customerProducts?: Record<string, unknown>;
   setCustomer: React.Dispatch<React.SetStateAction<Customer>>;
 };
 
@@ -37,7 +41,7 @@ export const AuthContext = createContext<AuthContextProps>({
 });
 
 export type AuthProviderState = {
-  accessToken?: string;
+  accessToken: string;
   refreshToken?: string;
   userName?: string;
   customer: Customer;
@@ -51,6 +55,11 @@ const initialState = {
   customer: undefined,
   customerProducts: [],
 };
+
+interface AuthResponse {
+  success: boolean;
+  message?: string;
+}
 
 export interface AuthProviderProps {
   children?: React.ReactChildren[];
@@ -139,28 +148,31 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     }
   }, []);
 
-  const register = useCallback(async (username: string, password: string): Promise<any> => {
-    try {
-      const result = await AuthService.register(username, password);
+  const register = useCallback(
+    async (username: string, password: string): Promise<AuthResponse> => {
+      try {
+        const result = await AuthService.register(username, password);
 
-      if (result.success && result.data && result.data.accessToken) {
-        setAuthData((initialState) => ({
-          ...initialState,
-          accessToken: result.data.accessToken,
-          refreshToken: result.data.refreshToken,
-        }));
+        if (result.success && result.data && result.data.accessToken) {
+          setAuthData((initialState) => ({
+            ...initialState,
+            accessToken: result.data.accessToken,
+            refreshToken: result.data.refreshToken,
+          }));
+        }
+
+        return result;
+      } catch (err) {
+        return {
+          success: false,
+          message: err.data.message,
+        };
       }
+    },
+    []
+  );
 
-      return result;
-    } catch (err) {
-      return {
-        success: false,
-        message: err.data.message,
-      };
-    }
-  }, []);
-
-  const forgotPassword = useCallback(async (email: string): Promise<any> => {
+  const forgotPassword = useCallback(async (email: string): Promise<AuthResponse> => {
     try {
       const response = await AuthService.forgotPassword(email);
       return {
@@ -181,7 +193,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     }
   }, []);
 
-  const confirmPassword = useCallback(async (data: IConfirmPW): Promise<any> => {
+  const confirmPassword = useCallback(async (data: IConfirmPW): Promise<AuthResponse> => {
     try {
       const response = await AuthService.confirmPassword(data);
       return response;
@@ -191,7 +203,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
   }, []);
 
   const setPassword = useCallback(
-    async (username: string, oldPassword: string, newPassword: string): Promise<any> => {
+    async (username: string, oldPassword: string, newPassword: string): Promise<AuthResponse> => {
       try {
         const result = await AuthService.setPassword(username, oldPassword, newPassword);
         if (result.success && result.data.accessToken) {
@@ -210,7 +222,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     []
   );
 
-  const refreshCustomer = useCallback(async (): Promise<Customer> => {
+  const refreshCustomer = useCallback(async (): Promise<Customer | undefined> => {
     if (!authData.customer) {
       return undefined;
     }

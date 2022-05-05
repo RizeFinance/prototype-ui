@@ -18,7 +18,7 @@ export const DocumentsContext = React.createContext<DocumentsContextProps>({
   isLoading: false,
   documents: [],
   getDocuments: () => Promise.resolve([]),
-  viewDocument: () => Promise.resolve(),
+  viewDocument: () => Promise.resolve({ base_64: '' }),
 });
 
 export type DocumentProviderState = {
@@ -40,7 +40,6 @@ export class DocumentsProvider extends React.Component<
   DocumentProviderState
 > {
   static contextType = AuthContext;
-  context: React.ContextType<typeof AuthContext>;
 
   constructor(props: DocumentsProviderProps) {
     super(props);
@@ -54,9 +53,7 @@ export class DocumentsProvider extends React.Component<
     try {
       const { data: documents } = await DocumentService.getDocuments(this.context.accessToken);
       this.setState({ documents });
-      return { data: documents };
-    } catch (err) {
-      return { data: err };
+      return documents;
     } finally {
       this.setState({ isLoading: false });
     }

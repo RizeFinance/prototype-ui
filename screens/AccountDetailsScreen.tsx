@@ -12,8 +12,8 @@ import {
   useThemeColor,
 } from '../components';
 
-import { RootStackParamList } from '../types';
-import { useAccounts, useDebitCards, useAuth, AccountType } from '../contexts';
+import { RootStackParamList, AccountCategory } from '../types';
+import { useAccounts, useDebitCards, useAuth } from '../contexts';
 import { RouteProp } from '@react-navigation/core';
 import utils from '../utils/utils';
 import { find } from 'lodash';
@@ -111,7 +111,7 @@ export default function AccountsScreen({ navigation, route }: AccountsScreenProp
         </View>
       </View>
 
-      {account.synthetic_account_category === AccountType.target_yield_account && (
+      {account.synthetic_account_category === AccountCategory.TARGET_YEILD_ACCOUNT && (
         <>
           {account.asset_balances?.map((asset) => {
             <Body fontWeight="bold" style={{ marginBottom: 10 }}>

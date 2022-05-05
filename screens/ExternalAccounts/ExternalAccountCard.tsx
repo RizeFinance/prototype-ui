@@ -9,7 +9,7 @@ interface AccountCard {
   onHandleArchive: () => void;
 }
 
-const AccountCard = ({ account, onHandleArchive }: AccountCard) => {
+const AccountCard = ({ account, onHandleArchive }: AccountCard): JSX.Element => {
   return (
     <View style={styles.cardContainer}>
       <Heading5 fontWeight="bold">{account.name}</Heading5>

@@ -19,7 +19,6 @@ export default function ApplicationUnapprovedScreen({
       break;
     case 'manual_review':
     case 'under_review':
-    case 'queued':
       message += ' is under manual review.';
       break;
   }

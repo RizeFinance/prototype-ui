@@ -5,8 +5,8 @@ import { View, StyleSheet } from 'react-native';
 import { Button, Dropdown, DropdownItem, Screen, Checkbox, MaskedInput } from '../components';
 import Message, { useMessage } from '../components/Message';
 import { Heading3, BodySmall } from '../components/Typography';
-import { useAccounts, AccountType, useAuth } from '../contexts';
-import { MessageStatus, RootStackParamList } from '../types';
+import { useAccounts, useAuth } from '../contexts';
+import { AccountCategory, MessageStatus, RootStackParamList } from '../types';
 import * as Yup from 'yup';
 import TransferService from '../services/TransferService';
 import utils from '../utils/utils';
@@ -172,11 +172,11 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
     checked: false,
   };
 
-  const isBrokerageAccount = (selectedUid) => {
+  const isBrokerageAccount = (selectedUid: string) => {
     const account = liabilityAccounts.find(
       (liabilityAccount) => liabilityAccount.uid === selectedUid
     );
-    return account && account.synthetic_account_category === AccountType.target_yield_account;
+    return account && account.synthetic_account_category === AccountCategory.TARGET_YEILD_ACCOUNT;
   };
 
   const transferValidationSchema = Yup.object().shape({

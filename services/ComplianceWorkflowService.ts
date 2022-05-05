@@ -3,14 +3,10 @@ import { ComplianceDocumentAcknowledgementRequest, RizeList } from '../models';
 import toQueryString from '../utils/toQueryString';
 import api from '../utils/api';
 
-interface IQuery {
-  product_uid?: string[];
-  in_progress?: boolean;
-  limit?: number;
-  offset?: number;
-}
-
-const getCustomerWorkflows = async (accessToken: string, query: IQuery): Promise<any> => {
+const getCustomerWorkflows = async (
+  accessToken: string,
+  query: Record<string, null>
+): Promise<RizeList<ComplianceWorkflow>> => {
   return await api
     .get(`/compliance_workflows${toQueryString(query)}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -18,7 +14,7 @@ const getCustomerWorkflows = async (accessToken: string, query: IQuery): Promise
     .then((response) => response.data);
 };
 
-const viewLatestWorkflow = async (accessToken: string): Promise<any> => {
+const viewLatestWorkflow = async (accessToken: string): Promise<ComplianceWorkflow> => {
   return await api
     .get('/compliance_workflows/latest', { headers: { Authorization: `Bearer ${accessToken}` } })
     .then((response) => response.data);
@@ -27,7 +23,7 @@ const viewLatestWorkflow = async (accessToken: string): Promise<any> => {
 const acknowledgeDocuments = async (
   accessToken: string,
   documents: ComplianceDocumentAcknowledgementRequest | ComplianceDocumentAcknowledgementRequest[]
-): Promise<any> => {
+): Promise<ComplianceWorkflow> => {
   return await api
     .post(
       '/compliance_workflows/batch_acknowledge_documents',
@@ -37,7 +33,10 @@ const acknowledgeDocuments = async (
     .then((response) => response.data);
 };
 
-const createWorkflow = async (accessToken: string, productUid: string): Promise<any> => {
+const createWorkflow = async (
+  accessToken: string,
+  productUid: string
+): Promise<ComplianceWorkflow> => {
   return await api
     .post(
       '/compliance_workflows',
@@ -47,7 +46,7 @@ const createWorkflow = async (accessToken: string, productUid: string): Promise<
     .then((response) => response.data);
 };
 
-const renewWorkflow = async (accessToken: string): Promise<any> => {
+const renewWorkflow = async (accessToken: string): Promise<ComplianceWorkflow> => {
   return await api
     .post(
       '/compliance_workflows/renew',

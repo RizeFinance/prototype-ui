@@ -54,7 +54,7 @@ export default function AccountsScreen({ navigation }: AccountsScreenProps): JSX
   };
 
   const refreshAccountsPeriodically = async (): Promise<void> => {
-    const { data: accounts } = await refetchAccounts();
+    const accounts = await refetchAccounts();
     const readyAccounts = accounts.filter((account) => account.liability);
     if (!isEmpty(readyAccounts)) {
       setIsLoading(false);

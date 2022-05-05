@@ -2,7 +2,7 @@ import React from 'react';
 import { DebitCardsProvider, useDebitCards } from './DebitCards';
 import { DocumentsProvider } from './Documents';
 import { AuthProvider, useAuth } from './Auth';
-import { AccountsProvider, useAccounts, AccountType } from './Accounts';
+import { AccountsProvider, useAccounts } from './Accounts';
 import { ProductsProvider } from './Products';
 import { useComplianceWorkflow, ProductType } from './ComplianceWorkflow';
 import { useBrokerageWorkflow } from './BrokerageWorkflow';
@@ -29,5 +29,4 @@ export {
   useComplianceWorkflow,
   useBrokerageWorkflow,
   ProductType,
-  AccountType,
 };

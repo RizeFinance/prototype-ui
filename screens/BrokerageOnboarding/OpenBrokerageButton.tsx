@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from '../../components';
-import { useBrokerageWorkflow, AccountType } from '../../contexts';
+import { useBrokerageWorkflow } from '../../contexts';
 import { SyntheticAccount } from '../../models';
 import styles from './styles';
 import { some } from 'lodash';
 import config from '../../config/config';
+import { AccountCategory } from '../../types';
 
 export default function OpenBrokerageButton({
   accounts,
@@ -25,7 +26,7 @@ export default function OpenBrokerageButton({
     !brokerageUid ||
     some(
       accounts,
-      (account) => account.synthetic_account_category === AccountType.target_yield_account
+      (account) => account.synthetic_account_category === AccountCategory.TARGET_YEILD_ACCOUNT
     )
   )
     return <></>;

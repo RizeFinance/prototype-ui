@@ -240,7 +240,7 @@ export class ComplianceWorkflowProvider extends React.Component<
       productId: brokerageProductUid,
     };
 
-    const { data: products } = await ProductService.getProducts(this.props.auth.accessToken);
+    const products = await ProductService.getProducts(this.props.auth.accessToken);
 
     const brokerageProduct = find(products, { uid: brokerageProductUid });
 

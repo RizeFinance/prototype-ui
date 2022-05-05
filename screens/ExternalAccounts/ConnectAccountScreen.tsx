@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Screen, TextLink } from '../../components';
 import { Body, Heading3, Heading5 } from '../../components/Typography';
-import PlaidLink, { PlaidAccount, PlaidExternal } from '../../components/PlaidLink';
+import PlaidLink, { PlaidAccount } from '../../components/PlaidLink';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/core';
-import { RootStackParamList, MessageStatus } from '../../types';
+import { RootStackParamList, MessageStatus, AccountCategory } from '../../types';
 import { ConnectScreen as styles } from './styles';
 import AccountCard from './ExternalAccountCard';
 import { useAccounts } from '../../contexts/Accounts';
 import { useAuth } from '../../contexts/Auth';
-import { capitalize, get, isEmpty } from 'lodash';
+import { capitalize, find, get, isEmpty } from 'lodash';
 import { AccountService } from '../../services';
 import { View, ActivityIndicator } from 'react-native';
 
@@ -20,7 +20,7 @@ interface ConnectAccountScreenProps {
 
 const ConnectAccountScreen = ({ navigation }: ConnectAccountScreenProps): JSX.Element => {
   const [selectableAccounts, setSelectableAccounts] = useState<PlaidAccount[]>([]);
-  const [publicToken, setPublicToken] = useState<string>(null);
+  const [publicToken, setPublicToken] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { accessToken } = useAuth();
@@ -46,14 +46,19 @@ const ConnectAccountScreen = ({ navigation }: ConnectAccountScreenProps): JSX.El
   }, [navigation]);
 
   const ExternalAccountForm = (): JSX.Element => {
-    const onCreateAccount = async (account): Promise<void> => {
+    const onCreateAccount = async (account: PlaidAccount): Promise<void> => {
       setIsLoading(true);
 
       try {
         // Get the synthetic account type
-        const types = await AccountService.getSyntheticAccountTypes(accessToken);
-        const externalType = types.data.find((x) => x.synthetic_account_category === PlaidExternal);
+        const { data: types } = await AccountService.getSyntheticAccountTypes(accessToken);
+        const externalType = find(types, {
+          synthetic_account_category: AccountCategory.PLAID_EXTERNAL,
+        });
 
+        if (!externalType) {
+          throw new Error('Unable to create account.');
+        }
         // Create the synthetic account
         await AccountService.createSyntheticAccount({
           accessToken,
@@ -82,11 +87,12 @@ const ConnectAccountScreen = ({ navigation }: ConnectAccountScreenProps): JSX.El
     };
 
     const refreshAccountsPeriodically = async (): Promise<void> => {
-      const { data: accounts } = await refetchAccounts();
+      const accounts = await refetchAccounts();
 
       const readyAccounts = accounts.filter(
         (account) =>
-          account.synthetic_account_category === PlaidExternal && !!account.routing_number
+          account.synthetic_account_category === AccountCategory.PLAID_EXTERNAL &&
+          !!account.routing_number
       );
       if (!isEmpty(readyAccounts)) {
         setIsLoading(false);
@@ -98,30 +104,30 @@ const ConnectAccountScreen = ({ navigation }: ConnectAccountScreenProps): JSX.El
       }, 5000);
     };
 
-    if (selectableAccounts?.length >= 1) {
-      return (
-        <>
-          <Heading5 textAlign="center" style={styles.heading}>
-            Select account from the available accounts:
-          </Heading5>
-          {selectableAccounts.map((account, index) => (
-            <TextLink
-              textAlign="center"
-              style={{ marginBottom: 20 }}
-              onPress={(): void => {
-                onCreateAccount(account);
-              }}
-              key={index}
-            >
-              {account.name}: {capitalize(account.subtype)}
-            </TextLink>
-          ))}
-        </>
-      );
-    }
+    if (isEmpty(selectableAccounts)) return <></>;
+
+    return (
+      <>
+        <Heading5 textAlign="center" style={styles.heading}>
+          Select account from the available accounts:
+        </Heading5>
+        {selectableAccounts.map((account, index) => (
+          <TextLink
+            textAlign="center"
+            style={{ marginBottom: 20 }}
+            onPress={(): void => {
+              onCreateAccount(account);
+            }}
+            key={index}
+          >
+            {account.name}: {capitalize(account.subtype)}
+          </TextLink>
+        ))}
+      </>
+    );
   };
 
-  const onHandleSuccess = (publicToken: string, metadata: any) => {
+  const onHandleSuccess = (publicToken: string, metadata: { accounts: PlaidAccount[] }) => {
     setPublicToken(publicToken);
     setSelectableAccounts(metadata.accounts);
   };

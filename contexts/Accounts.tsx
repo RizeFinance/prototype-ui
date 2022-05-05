@@ -2,28 +2,16 @@ import React, { useContext } from 'react';
 import { SyntheticAccount } from '../models';
 import { AccountService } from '../services';
 import { AuthContext } from './Auth';
-import _ from 'lodash';
-
-export const AccountType = {
-  target_yield_account: 'target_yield_account',
-  general: 'general',
-} as const;
-
-interface IAccountAPIResponse {
-  total_count: string;
-  limit: string;
-  offset: string;
-  data: SyntheticAccount[];
-}
+import { uniq } from 'lodash';
 
 export type AccountsContextProps = {
   isLoading: boolean;
-  liabilityAccounts?: SyntheticAccount[];
-  externalAccounts?: SyntheticAccount[];
-  poolUids?: string[];
+  liabilityAccounts: SyntheticAccount[];
+  externalAccounts: SyntheticAccount[];
+  poolUids: string[];
   linkToken?: string;
-  archiveAccount: (accountUid: string) => Promise<IAccountAPIResponse>;
-  refetchAccounts: () => Promise<IAccountAPIResponse>;
+  archiveAccount: (accountUid: string) => Promise<SyntheticAccount[]>;
+  refetchAccounts: () => Promise<SyntheticAccount[]>;
   fetchLinkToken: () => Promise<string>;
 };
 
@@ -34,14 +22,14 @@ export const AccountsContext = React.createContext<AccountsContextProps>({
   poolUids: [],
   archiveAccount: () => Promise.resolve([]),
   refetchAccounts: () => Promise.resolve([]),
-  fetchLinkToken: () => Promise.resolve(),
+  fetchLinkToken: () => Promise.resolve(''),
 });
 
 export type AccountsProviderState = {
   isLoading: boolean;
-  liabilityAccounts?: SyntheticAccount[];
-  externalAccounts?: SyntheticAccount[];
-  poolUids?: string[];
+  liabilityAccounts: SyntheticAccount[];
+  externalAccounts: SyntheticAccount[];
+  poolUids: string[];
   linkToken?: string;
 };
 
@@ -50,7 +38,7 @@ const initialState = {
   liabilityAccounts: [],
   externalAccounts: [],
   poolUids: [],
-  linkToken: null,
+  linkToken: undefined,
 };
 
 export interface AccountsProviderProps {
@@ -62,11 +50,9 @@ export class AccountsProvider extends React.Component<
   AccountsProviderState
 > {
   static contextType = AuthContext;
-  context: React.ContextType<typeof AuthContext>;
 
   constructor(props: AccountsProviderProps) {
     super(props);
-
     this.state = initialState;
   }
 
@@ -74,8 +60,10 @@ export class AccountsProvider extends React.Component<
     this.setState({ isLoading: true });
 
     try {
-      const accountList = await AccountService.getSyntheticAccounts(this.context.accessToken);
-      const nonArchivedAccounts = accountList.data.filter((x) => x.status !== 'archived');
+      const { data: accountList } = await AccountService.getSyntheticAccounts(
+        this.context.accessToken
+      );
+      const nonArchivedAccounts = accountList.filter((x) => x.status !== 'archived');
       const sortedAccounts = nonArchivedAccounts.sort(
         (a, b) => new Date(a.opened_at).getTime() - new Date(b.opened_at).getTime()
       );
@@ -83,7 +71,7 @@ export class AccountsProvider extends React.Component<
       const externalAccounts = sortedAccounts.filter((x) =>
         ['external', 'plaid_external', 'outbound_ach'].includes(x.synthetic_account_category)
       );
-      const poolUids = _.uniq(sortedAccounts.map((x) => x.pool_uid));
+      const poolUids = uniq(sortedAccounts.map((x) => x.pool_uid));
 
       this.setState({ liabilityAccounts, externalAccounts, poolUids });
 
@@ -142,5 +130,4 @@ export class AccountsProvider extends React.Component<
 }
 
 export const AccountsConsumer = AccountsContext.Consumer;
-
 export const useAccounts = (): AccountsContextProps => useContext(AccountsContext);

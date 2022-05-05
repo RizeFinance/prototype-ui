@@ -8,12 +8,11 @@ export interface PlaidAccount {
   id: string;
 }
 
-export const PlaidExternal = 'plaid_external';
 interface PlaidLinkProps {
   linkToken: string;
   onEvent?(event: any): any;
   onExit?(exit: any): any;
-  onSuccess?(publicToken: string, metadata: string): void;
+  onSuccess(publicToken: string, metadata: { accounts: PlaidAccount[] }): void;
   title?: string;
   disabled?: boolean;
 }

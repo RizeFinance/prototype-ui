@@ -34,7 +34,6 @@ export class ProductsProvider extends React.Component<
   ProductsProviderState
 > {
   static contextType = AuthContext;
-  context: React.ContextType<typeof AuthContext>;
 
   constructor(props: ProductsProviderProps) {
     super(props);
@@ -48,7 +47,7 @@ export class ProductsProvider extends React.Component<
     try {
       const { data: products } = await ProductService.getProducts(this.context.accessToken);
       this.setState({ products });
-      return { data: products };
+      return products;
     } catch (err) {
       return { data: err };
     } finally {

@@ -4,10 +4,11 @@ import { ActivityIndicator, StyleSheet } from 'react-native';
 import { Screen } from '../../components';
 import { Heading3, Heading4, Heading5 } from '../../components/Typography';
 import { useAuth } from '../../contexts/Auth';
-import { useAccounts, AccountType } from '../../contexts/Accounts';
+import { useAccounts } from '../../contexts/Accounts';
 import CustomerService from '../../services/CustomerService';
 import config from '../../config/config';
 import { find } from 'lodash';
+import { AccountCategory } from '../../types';
 
 export default function BrokerageProcessingScreen(): JSX.Element {
   const navigation = useNavigation();
@@ -31,7 +32,7 @@ export default function BrokerageProcessingScreen(): JSX.Element {
 
   useEffect(() => {
     const newAccount = find(liabilityAccounts, {
-      synthetic_account_category: AccountType.target_yield_account,
+      synthetic_account_category: AccountCategory.TARGET_YEILD_ACCOUNT,
     });
     if (newAccount) navigation.navigate('Accounts');
   }, [customerProducts, liabilityAccounts]);

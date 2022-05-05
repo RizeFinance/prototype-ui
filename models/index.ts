@@ -9,5 +9,5 @@ export {
 } from './SyntheticAccount';
 export { Transaction } from './Transaction';
 export { Transfer } from './Transfer';
-export { Document } from './Document';
+export { Document, ViewableDoc } from './Document';
 export { Product } from './Product';

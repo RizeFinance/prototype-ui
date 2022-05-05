@@ -1,5 +1,5 @@
-import { MessageStatus } from './enums';
-export { MessageStatus };
+import { AccountCategory, AccountStatus, MessageStatus } from './enums';
+export { AccountCategory, AccountStatus, MessageStatus };
 
 export type PDFReaderParams = {
   url: string;
@@ -60,7 +60,7 @@ export type RootStackParamList = {
   PDFReader: PDFReaderParams;
   Accounts: undefined;
   AccountDetails: AccountDetailsParams;
-  ExternalAccounts: ExternalAccountsParams;
+  ExternalAccounts?: ExternalAccountsParams;
   ConnectAccount: undefined;
   ConnectOneWay: undefined;
   ArchiveExternalAccount: AccountDetailsParams;
@@ -72,12 +72,12 @@ export type RootStackParamList = {
   DebitCard: undefined;
   Statements: undefined;
   Agreements: undefined;
-  Main: any;
-  AccountsSetup: any;
-  DebitCardActivation: any;
-  PinSet: any;
-  BrokerageOverview: any;
-  BrokerageProductQuestions: any;
-  BrokerageDisclosures: any;
-  BrokerageProcessing: any;
+  Main: undefined;
+  AccountsSetup: undefined;
+  DebitCardActivation: undefined;
+  PinSet: undefined;
+  BrokerageOverview: undefined;
+  BrokerageProductQuestions: undefined;
+  BrokerageDisclosures: undefined;
+  BrokerageProcessing: undefined;
 };

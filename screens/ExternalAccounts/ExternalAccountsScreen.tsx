@@ -41,7 +41,7 @@ const ExternalAccountsScreen = ({
     (account) => account.synthetic_account_category === 'outbound_ach'
   );
 
-  const handleArchiveAccount = async (accountUid: string) => {
+  const handleArchiveAccount = async (accountUid: string): Promise<void> => {
     try {
       await archiveAccount(accountUid);
       setMessage({ status: MessageStatus.SUCCESS, copy: 'Account Archive Successful.' });
