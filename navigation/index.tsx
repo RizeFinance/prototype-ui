@@ -31,7 +31,6 @@ import {
   ConfirmPIIScreen,
   DisclosuresScreen,
   ExternalAccountsScreen,
-  ExternalAccountScreen,
   ArchiveExternalAccountScreen,
   ForgotPasswordScreen,
   InitTransferScreen,
@@ -54,6 +53,8 @@ import {
   BrokerageOverviewScreen,
   BrokerageProductQuestionsScreen,
   AccountsSetupScreen,
+  ConnectAccountScreen,
+  ConnectOneWayScreen,
 } from '../screens';
 
 // Contexts
@@ -194,7 +195,8 @@ function MainStackScreen() {
 
                 <Stack.Screen name="AccountDetails" component={AccountDetailsScreen} />
                 <Stack.Screen name="ExternalAccounts" component={ExternalAccountsScreen} />
-                <Stack.Screen name="ExternalAccount" component={ExternalAccountScreen} />
+                <Stack.Screen name="ConnectAccount" component={ConnectAccountScreen} />
+                <Stack.Screen name="ConnectOneWay" component={ConnectOneWayScreen} />
                 <Stack.Screen
                   name="ArchiveExternalAccount"
                   component={ArchiveExternalAccountScreen}

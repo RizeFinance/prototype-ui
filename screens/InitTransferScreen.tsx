@@ -3,9 +3,10 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik, FormikHelpers, Field } from 'formik';
 import { View, StyleSheet } from 'react-native';
 import { Button, Dropdown, DropdownItem, Screen, Checkbox, MaskedInput } from '../components';
-import { Body, Heading3, BodySmall } from '../components/Typography';
+import Message, { useMessage } from '../components/Message';
+import { Heading3, BodySmall } from '../components/Typography';
 import { useAccounts, AccountType, useAuth } from '../contexts';
-import { RootStackParamList } from '../types';
+import { MessageStatus, RootStackParamList } from '../types';
 import * as Yup from 'yup';
 import TransferService from '../services/TransferService';
 import utils from '../utils/utils';
@@ -116,15 +117,6 @@ interface AccountDropdownItem extends DropdownItem {
   category: SyntheticAccountCategory;
 }
 
-enum MessageStatus {
-  SUCCESS = 'success',
-  ERROR = 'error',
-}
-interface MessageState {
-  status?: MessageStatus;
-  copy?: string;
-}
-
 export default function InitTransferScreen({ navigation }: InitTransferScreenProps): JSX.Element {
   const { accessToken } = useAuth();
   const { refetchAccounts, liabilityAccounts, externalAccounts } = useAccounts();
@@ -151,7 +143,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
 
   const eligibleDestinationAccounts = accountItems;
 
-  const [message, setMessage] = useState<MessageState>({});
+  const { message: alert, setMessage } = useMessage();
   const [loading, setLoading] = useState(false);
 
   const styles = StyleSheet.create({
@@ -289,16 +281,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
       <Heading3 textAlign="center" style={styles.heading}>
         Transfer
       </Heading3>
-      {message.status && (
-        <Body
-          color={message.status}
-          textAlign="center"
-          fontWeight="semibold"
-          style={styles.connectStatusMessage}
-        >
-          {message.copy}
-        </Body>
-      )}
+      <Message message={alert} />
 
       <Formik
         initialValues={initialValues}

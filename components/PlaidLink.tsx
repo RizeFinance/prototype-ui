@@ -1,11 +1,21 @@
 import React from 'react';
-import { PlaidLink as WebPlaidLink } from 'react-plaid-link';
+import Button from './Button';
+import { usePlaidLink } from 'react-plaid-link';
 
+export interface PlaidAccount {
+  subtype: string;
+  name: string;
+  id: string;
+}
+
+export const PlaidExternal = 'plaid_external';
 interface PlaidLinkProps {
   linkToken: string;
   onEvent?(event: any): any;
   onExit?(exit: any): any;
-  onSuccess(success: any): void;
+  onSuccess?(publicToken: string, metadata: string): void;
+  title?: string;
+  disabled?: boolean;
 }
 
 export default function PlaidLink({
@@ -13,25 +23,22 @@ export default function PlaidLink({
   onEvent,
   onExit,
   onSuccess,
+  title,
+  disabled,
 }: PlaidLinkProps): JSX.Element {
-  const overrideStyles = {
-    backgroundColor: '#586CB7',
-    color: 'white',
-    fontWeight: 700,
-    fontSize: 16,
-    padding: 15,
-    marginTop: 25,
-  };
+  const { open, ready } = usePlaidLink({
+    token: linkToken,
+    onSuccess,
+    onEvent,
+    onExit,
+  });
 
   return (
-    <WebPlaidLink
-      token={linkToken}
-      onSuccess={onSuccess}
-      onExit={onEvent}
-      onEvent={onExit}
-      style={overrideStyles}
-    >
-      Connect External Account
-    </WebPlaidLink>
+    <Button
+      title={title ? title : 'Connect External Account'}
+      disabled={disabled || !ready}
+      onPress={(): void => open()}
+      style={{ marginBottom: 40 }}
+    />
   );
 }

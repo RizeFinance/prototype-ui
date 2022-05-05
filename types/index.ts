@@ -1,3 +1,6 @@
+import { MessageStatus } from './enums';
+export { MessageStatus };
+
 export type PDFReaderParams = {
   url: string;
 };
@@ -33,9 +36,14 @@ export type AccountDetailsParams = {
   accountUid: string;
 };
 
-export type ExternalAccountParams = {
-  archiveStatus?: string;
-  archiveNote?: string;
+export interface MessageState {
+  status?: MessageStatus;
+  copy?: string;
+}
+
+export type ExternalAccountsParams = {
+  status?: MessageStatus;
+  copy?: string;
 };
 
 export type RootStackParamList = {
@@ -52,8 +60,9 @@ export type RootStackParamList = {
   PDFReader: PDFReaderParams;
   Accounts: undefined;
   AccountDetails: AccountDetailsParams;
-  ExternalAccount: ExternalAccountParams;
-  ExternalAccounts: undefined;
+  ExternalAccounts: ExternalAccountsParams;
+  ConnectAccount: undefined;
+  ConnectOneWay: undefined;
   ArchiveExternalAccount: AccountDetailsParams;
   InitTransfer: undefined;
   Menu: undefined;

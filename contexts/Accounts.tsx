@@ -22,6 +22,7 @@ export type AccountsContextProps = {
   externalAccounts?: SyntheticAccount[];
   poolUids?: string[];
   linkToken?: string;
+  archiveAccount: (accountUid: string) => Promise<IAccountAPIResponse>;
   refetchAccounts: () => Promise<IAccountAPIResponse>;
   fetchLinkToken: () => Promise<string>;
 };
@@ -31,6 +32,7 @@ export const AccountsContext = React.createContext<AccountsContextProps>({
   liabilityAccounts: [],
   externalAccounts: [],
   poolUids: [],
+  archiveAccount: () => Promise.resolve([]),
   refetchAccounts: () => Promise.resolve([]),
   fetchLinkToken: () => Promise.resolve(),
 });
@@ -91,7 +93,19 @@ export class AccountsProvider extends React.Component<
     }
   };
 
-  fetchLinkToken = async (): string => {
+  archiveAccount = async (accountUid: string): Promise<SyntheticAccount[]> => {
+    this.setState({ isLoading: true });
+    try {
+      await AccountService.archiveSyntheticAccount(this.context.accessToken, accountUid);
+      const accountList = await this.refetchAccounts();
+
+      return accountList;
+    } finally {
+      this.setState({ isLoading: false });
+    }
+  };
+
+  fetchLinkToken = async (): Promise<string> => {
     this.setState({ isLoading: true });
 
     try {
@@ -116,6 +130,7 @@ export class AccountsProvider extends React.Component<
           externalAccounts: externalAccounts,
           poolUids: poolUids,
           linkToken: linkToken,
+          archiveAccount: this.archiveAccount,
           refetchAccounts: this.refetchAccounts,
           fetchLinkToken: this.fetchLinkToken,
         }}
