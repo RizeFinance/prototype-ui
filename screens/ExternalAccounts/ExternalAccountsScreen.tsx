@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Screen, HorizontalLine, Button } from '../../components';
-import { Body, Heading3, Heading4, Heading5 } from '../../components/Typography';
+import Message, { useMessage } from '../../components/Message';
+import { Heading3, Heading4, Heading5 } from '../../components/Typography';
 import { ActivityIndicator, View } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { useAccounts } from '../../contexts/Accounts';
@@ -8,7 +9,7 @@ import { AccountsScreen as styles } from './styles';
 import AccountCard from './ExternalAccountCard';
 import { isEmpty } from 'lodash';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList, MessageStatus, MessageState } from '../../types';
+import { RootStackParamList, MessageStatus } from '../../types';
 interface ExternalAccountsScreenProps {
   route: RouteProp<RootStackParamList, 'ExternalAccounts'>;
   navigation: StackNavigationProp<RootStackParamList, 'ExternalAccounts'>;
@@ -19,7 +20,7 @@ const ExternalAccountsScreen = ({
   navigation,
 }: ExternalAccountsScreenProps): JSX.Element => {
   const { externalAccounts, refetchAccounts, archiveAccount, isLoading } = useAccounts();
-  const [message, setMessage] = useState<MessageState>({});
+  const { message: alert, setMessage } = useMessage();
 
   const status = route.params?.status;
   const copy = route.params?.copy;
@@ -52,11 +53,7 @@ const ExternalAccountsScreen = ({
   return (
     <Screen>
       <Heading3 textAlign="center">External Accounts</Heading3>
-      {message.status && (
-        <Body color={message.status} textAlign="center" fontWeight="semibold" style={styles.status}>
-          {message.copy}
-        </Body>
-      )}
+      <Message message={alert} />
 
       <View style={styles.ctaContainer}>
         {twoWayTransferAccount && (
