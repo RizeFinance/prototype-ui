@@ -27,7 +27,7 @@ type OneWayAccountFields = {
 const OutboundACH = 'outbound_ach';
 
 const ConnectOneWayScreen = ({ navigation }: ConnectOneWayScreenProps): JSX.Element => {
-  const { poolUids } = useAccounts();
+  const { poolUids, refetchAccounts } = useAccounts();
   const { accessToken } = useAuth();
   useEffect(() => {
     navigation.setOptions({
@@ -78,6 +78,7 @@ const ConnectOneWayScreen = ({ navigation }: ConnectOneWayScreenProps): JSX.Elem
         routingNumber: values.routingNumber,
         accountNumber: values.accountNumber,
       });
+      await refetchAccounts();
       navigation.navigate('ExternalAccounts', {
         status: MessageStatus.SUCCESS,
         copy: 'Account successfully added.',
@@ -144,7 +145,8 @@ const ConnectOneWayScreen = ({ navigation }: ConnectOneWayScreenProps): JSX.Elem
             />
             <Button
               title="Connect ACH Account"
-              disabled={!dirty || !isValid || isSubmitting}
+              disabled={!dirty || !isValid}
+              loading={isSubmitting}
               onPress={(): void => handleSubmit()}
               style={styles.connect}
             />
