@@ -6,6 +6,7 @@ import { Body } from './Typography';
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
+    marginTop: 16,
   },
 });
 

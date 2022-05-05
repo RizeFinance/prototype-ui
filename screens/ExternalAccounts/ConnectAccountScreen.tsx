@@ -214,6 +214,7 @@ const ConnectAccountScreen = ({ navigation }: ConnectAccountScreenProps): JSX.El
       <Button
         title="Connect One-way Outgoing Transfer Account"
         onPress={() => navigation.push('ConnectOneWay')}
+        style={{ marginTop: 20 }}
       />
     </Screen>
   );
