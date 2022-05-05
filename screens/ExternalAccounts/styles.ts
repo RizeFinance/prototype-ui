@@ -82,4 +82,14 @@ const ConnectScreen = StyleSheet.create({
   },
 });
 
-export { AccountCard, ArchiveScreen, AccountsScreen, ConnectScreen };
+const ConnectOneWayScreen = StyleSheet.create({
+  heading: {
+    marginTop: 24,
+    marginBottom: 24,
+  },
+  connect: {
+    marginTop: 10,
+  },
+});
+
+export { AccountCard, ArchiveScreen, AccountsScreen, ConnectScreen, ConnectOneWayScreen };

@@ -8,8 +8,9 @@ import { useAuth } from '../../contexts/Auth';
 import { AccountService } from '../../services';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/core';
-import { RootStackParamList } from '../../types';
-import { ConnectScreen as styles } from './styles';
+import { MessageStatus, RootStackParamList } from '../../types';
+import { ConnectOneWayScreen as styles } from './styles';
+import { get } from 'lodash';
 import * as Yup from 'yup';
 
 interface ConnectOneWayScreenProps {
@@ -26,7 +27,7 @@ type OneWayAccountFields = {
 const OutboundACH = 'outbound_ach';
 
 const ConnectOneWayScreen = ({ navigation }: ConnectOneWayScreenProps): JSX.Element => {
-  const { poolUids } = useAccounts();
+  const { poolUids, refetchAccounts } = useAccounts();
   const { accessToken } = useAuth();
   useEffect(() => {
     navigation.setOptions({
@@ -48,15 +49,19 @@ const ConnectOneWayScreen = ({ navigation }: ConnectOneWayScreenProps): JSX.Elem
     nickname: Yup.string().required('Nickname is required.'),
     accountNumber: Yup.string()
       .required('Account Number is required.')
-      .matches(/^[a-zA-Z0-9]{1,21}$/g, {
+      .min(8, 'Account Numbers must be 8 characters or more')
+      .max(21, 'Account Number must be less than 22 alphanumeric characters.')
+      .matches(/^[a-zA-Z0-9]+$/g, {
         excludeEmptyString: true,
-        message: 'Account Number must be up to 21 alphanumeric characters.',
+        message: 'Account Number must only have alphanumeric characters.',
       }),
     routingNumber: Yup.string()
       .required('Routing Number is required.')
-      .matches(/^[a-zA-Z0-9]{1,9}$/g, {
+      .min(9, 'Routing Number must be 9 characters')
+      .max(9, 'Routing Number must be 9 characters')
+      .matches(/^[a-zA-Z0-9]+$/g, {
         excludeEmptyString: true,
-        message: 'Routing Number must be up to 9 alphanumeric characters.',
+        message: 'Routing Number must only have alphanumeric characters.',
       }),
   });
 
@@ -73,9 +78,21 @@ const ConnectOneWayScreen = ({ navigation }: ConnectOneWayScreenProps): JSX.Elem
         routingNumber: values.routingNumber,
         accountNumber: values.accountNumber,
       });
-    } catch {
-      //
-      console.error('Account creation failed');
+      await refetchAccounts();
+      navigation.navigate('ExternalAccounts', {
+        status: MessageStatus.SUCCESS,
+        copy: 'Account successfully added.',
+      });
+    } catch (err) {
+      const apiError = get(
+        err,
+        ['data', 'errors', 0, 'detail'],
+        'Something went wrong. Please contact us to resolve.'
+      );
+      navigation.navigate('ExternalAccounts', {
+        status: MessageStatus.ERROR,
+        copy: `Account was not added. \n ${apiError}`,
+      });
     }
   };
 
@@ -128,8 +145,10 @@ const ConnectOneWayScreen = ({ navigation }: ConnectOneWayScreenProps): JSX.Elem
             />
             <Button
               title="Connect ACH Account"
-              disabled={!dirty || !isValid || isSubmitting}
+              disabled={!dirty || !isValid}
+              loading={isSubmitting}
               onPress={(): void => handleSubmit()}
+              style={styles.connect}
             />
           </View>
         )}
