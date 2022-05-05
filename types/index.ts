@@ -1,3 +1,6 @@
+import { MessageStatus } from './enums';
+export { MessageStatus };
+
 export type PDFReaderParams = {
   url: string;
 };
@@ -33,9 +36,14 @@ export type AccountDetailsParams = {
   accountUid: string;
 };
 
+export interface MessageState {
+  status?: MessageStatus;
+  copy?: string;
+}
+
 export type ExternalAccountsParams = {
-  archiveStatus?: string;
-  archiveNote?: string;
+  status?: MessageStatus;
+  copy?: string;
 };
 
 export type RootStackParamList = {

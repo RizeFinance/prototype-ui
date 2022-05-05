@@ -1,34 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import { Screen, TextLink, HorizontalLine, Button } from '../../components';
-import { Body, Heading3, Heading5 } from '../../components/Typography';
-import { View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { Screen, HorizontalLine, Button } from '../../components';
+import Message, { useMessage } from '../../components/Message';
+import { Heading3, Heading4, Heading5 } from '../../components/Typography';
+import { ActivityIndicator, View } from 'react-native';
+import { RouteProp } from '@react-navigation/native';
 import { useAccounts } from '../../contexts/Accounts';
 import { AccountsScreen as styles } from './styles';
-import { SyntheticAccount } from '../../models';
+import AccountCard from './ExternalAccountCard';
 import { isEmpty } from 'lodash';
-
-interface AccountCard {
-  account: SyntheticAccount;
-  onHandleArchive: () => void;
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList, MessageStatus } from '../../types';
+interface ExternalAccountsScreenProps {
+  route: RouteProp<RootStackParamList, 'ExternalAccounts'>;
+  navigation: StackNavigationProp<RootStackParamList, 'ExternalAccounts'>;
 }
 
-enum MessageStatus {
-  SUCCESS = 'success',
-  ERROR = 'error',
-}
-interface MessageState {
-  status?: MessageStatus;
-  copy?: string;
-}
-
-export default function ExternalAccountsScreen(): JSX.Element {
-  const navigation = useNavigation();
+const ExternalAccountsScreen = ({
+  route,
+  navigation,
+}: ExternalAccountsScreenProps): JSX.Element => {
   const { externalAccounts, refetchAccounts, archiveAccount, isLoading } = useAccounts();
-  const [message, setMessage] = useState<MessageState>({});
+  const { message: alert, setMessage } = useMessage();
+
+  const status = route.params?.status;
+  const copy = route.params?.copy;
+
   useEffect(() => {
     refetchAccounts();
   }, []);
+
+  useEffect(() => {
+    status && setMessage({ status, copy });
+  }, [route.params]);
 
   const twoWayTransferAccount = externalAccounts.find(
     (account) => account.synthetic_account_category === 'plaid_external'
@@ -47,38 +50,10 @@ export default function ExternalAccountsScreen(): JSX.Element {
     }
   };
 
-  const AccountCard = ({ account, onHandleArchive }: AccountCard) => {
-    return (
-      <View style={styles.cardContainer}>
-        <Heading5 fontWeight="bold">{account.name}</Heading5>
-
-        <View style={styles.cardDetails}>
-          <View style={styles.detail}>
-            <Body fontWeight="semibold">Account</Body>
-            <Body>{account.account_number || account.account_number_last_four}</Body>
-          </View>
-
-          <View style={styles.detail}>
-            <Body fontWeight="semibold">Routing</Body>
-            <Body>{account.routing_number}</Body>
-          </View>
-        </View>
-
-        <TextLink disabled={isLoading} style={styles.link} onPress={onHandleArchive}>
-          Archive Account
-        </TextLink>
-      </View>
-    );
-  };
-
   return (
     <Screen>
       <Heading3 textAlign="center">External Accounts</Heading3>
-      {message.status && (
-        <Body color={message.status} textAlign="center" fontWeight="semibold" style={styles.status}>
-          {message.copy}
-        </Body>
-      )}
+      <Message message={alert} />
 
       <View style={styles.ctaContainer}>
         {twoWayTransferAccount && (
@@ -92,20 +67,31 @@ export default function ExternalAccountsScreen(): JSX.Element {
                 })
               }
             />
-            <HorizontalLine style={{ marginBottom: 50 }} />
+            {!isEmpty(oneWayTransferAccounts) && <HorizontalLine style={{ marginBottom: 50 }} />}
           </>
         )}
 
         {!isEmpty(oneWayTransferAccounts) && (
           <>
-            <Heading5 textAlign="center">One-way Outgoing Transfer Accounts</Heading5>
-            {oneWayTransferAccounts.map((account, index) => (
-              <AccountCard
-                key={index}
-                account={account}
-                onHandleArchive={() => handleArchiveAccount(account.uid)}
-              />
-            ))}
+            {isLoading ? (
+              <View style={styles.loading}>
+                <ActivityIndicator size="large" />
+                <Heading4 textAlign="center" style={styles.loading}>
+                  Archiving Account
+                </Heading4>
+              </View>
+            ) : (
+              <>
+                <Heading5 textAlign="center">One-way Outgoing Transfer Accounts</Heading5>
+                {oneWayTransferAccounts.map((account, index) => (
+                  <AccountCard
+                    key={index}
+                    account={account}
+                    onHandleArchive={() => handleArchiveAccount(account.uid)}
+                  />
+                ))}
+              </>
+            )}
           </>
         )}
 
@@ -113,4 +99,6 @@ export default function ExternalAccountsScreen(): JSX.Element {
       </View>
     </Screen>
   );
-}
+};
+
+export default ExternalAccountsScreen;
