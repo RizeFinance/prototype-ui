@@ -5,7 +5,7 @@ import { AuthContext } from './Auth';
 
 export type DebitCardsContextProps = {
   isLoading: boolean;
-  debitCards?: DebitCard[];
+  debitCards: DebitCard[];
   pinSetToken?: string;
   refetchDebitCards: () => Promise<DebitCard[]>;
   lockDebitCard: (uid: string) => Promise<DebitCard[]>;
@@ -24,7 +24,7 @@ export type DebitCardsContextProps = {
 export const DebitCardsContext = React.createContext<DebitCardsContextProps>({
   isLoading: false,
   debitCards: [],
-  pinSetToken: null,
+  pinSetToken: undefined,
   refetchDebitCards: () => Promise.resolve([]),
   lockDebitCard: () => Promise.resolve([]),
   unlockDebitCard: () => Promise.resolve([]),
@@ -36,7 +36,7 @@ export const DebitCardsContext = React.createContext<DebitCardsContextProps>({
 
 export type DebitCardProviderState = {
   isLoading: boolean;
-  debitCards?: DebitCard[];
+  debitCards: DebitCard[];
 };
 
 const initialState = {
@@ -53,7 +53,6 @@ export class DebitCardsProvider extends React.Component<
   DebitCardProviderState
 > {
   static contextType = AuthContext;
-  context: React.ContextType<typeof AuthContext>;
 
   constructor(props: DebitCardsProviderProps) {
     super(props);

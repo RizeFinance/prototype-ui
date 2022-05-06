@@ -31,7 +31,7 @@ const defaultStyles = StyleSheet.create({
 
 const Checkbox = (props: PropsWithChildren<CheckboxProps>): JSX.Element => {
   const [checked, setChecked] = useState<boolean>(props.checked);
-  const CheckBoxSvg = checked ? Svg.CheckboxChecked : Svg.CheckboxUnchecked;
+  const CheckBoxSvg: React.ElementType = checked ? Svg.CheckboxChecked : Svg.CheckboxUnchecked;
 
   const onPressablePress = (): void => {
     const newCheckedValue = !checked;

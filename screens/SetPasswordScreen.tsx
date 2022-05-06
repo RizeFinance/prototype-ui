@@ -18,7 +18,7 @@ interface SetPasswordScreenProps {
 }
 
 interface SetPasswordFields {
-  username: string;
+  username?: string;
   oldPassword: string;
   newPassword: string;
 }
@@ -30,7 +30,7 @@ export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps
   const [message, setMesage] = useState<string>('');
 
   const initialValues: SetPasswordFields = {
-    username: auth?.userName,
+    username: auth.userName,
     oldPassword: '',
     newPassword: '',
   };
@@ -65,7 +65,7 @@ export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps
   const validateForm = (values: SetPasswordFields): any => {
     const errors: any = {};
 
-    if (validator.isEmpty(values.username, { ignore_whitespace: true })) {
+    if (!values.username || validator.isEmpty(values.username, { ignore_whitespace: true })) {
       errors.email = 'Email is required.';
     } else if (!validator.isEmail(values.username)) {
       errors.email = 'Invalid email address.';
@@ -83,6 +83,10 @@ export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps
     const { username, oldPassword, newPassword } = values;
 
     try {
+      if (!username) {
+        throw new Error('Unable to find username/email');
+      }
+
       const result = await auth.setPassword(username, oldPassword, newPassword);
 
       if (result.success) {
@@ -98,7 +102,7 @@ export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps
         setMesage('Failed reset password.');
       }
     } catch (err) {
-      setMesage('Something went wrong! Try again later.');
+      setMesage('Something went wrong! Try again later. \n {err.message}');
     }
   };
 
@@ -135,12 +139,11 @@ export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps
                 label="Email"
                 containerStyle={styles.inputContainer}
                 autoCapitalize={'none'}
-                keyboardType="username"
                 textContentType="username"
                 onChangeText={handleChange('username')}
                 onBlur={handleBlur('username')}
                 value={values.username}
-                errorText={touched.username && errors.username}
+                errorText={touched.username ? errors.username : ''}
                 editable={!isSubmitting}
                 onSubmitEditing={(): void => handleSubmit()}
               />
@@ -148,13 +151,13 @@ export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps
                 label="Old Password"
                 containerStyle={styles.inputContainer}
                 autoCapitalize={'none'}
-                keyboardType="oldPassword"
-                textContentType="oldPassword"
+                keyboardType="visible-password"
+                textContentType="password"
                 onChangeText={handleChange('oldPassword')}
                 onBlur={handleBlur('oldPassword')}
                 secureTextEntry={true}
                 value={values.oldPassword}
-                errorText={touched.oldPassword && errors.oldPassword}
+                errorText={touched.oldPassword ? errors.oldPassword : ''}
                 editable={!isSubmitting}
                 onSubmitEditing={(): void => handleSubmit()}
               />
@@ -162,13 +165,13 @@ export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps
                 label="New Password"
                 containerStyle={styles.inputContainer}
                 autoCapitalize={'none'}
-                keyboardType="newPassword"
+                keyboardType="visible-password"
                 textContentType="newPassword"
                 onChangeText={handleChange('newPassword')}
                 onBlur={handleBlur('newPassword')}
                 secureTextEntry={true}
                 value={values.newPassword}
-                errorText={touched.newPassword && errors.newPassword}
+                errorText={touched.newPassword ? errors.newPassword : ''}
                 editable={!isSubmitting}
                 onSubmitEditing={(): void => handleSubmit()}
               />

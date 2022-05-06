@@ -9,7 +9,7 @@ interface ViewableDoc {
 
 export type DocumentsContextProps = {
   isLoading: boolean;
-  documents?: Document[];
+  documents: Document[];
   getDocuments: () => Promise<Document[]>;
   viewDocument: (uid: string) => Promise<ViewableDoc>;
 };
@@ -23,7 +23,7 @@ export const DocumentsContext = React.createContext<DocumentsContextProps>({
 
 export type DocumentProviderState = {
   isLoading: boolean;
-  documents?: Document[];
+  documents: Document[];
 };
 
 const initialState = {

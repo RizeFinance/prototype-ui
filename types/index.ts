@@ -49,7 +49,7 @@ export type ExternalAccountsParams = {
 export type RootStackParamList = {
   BankingDisclosures: undefined;
   Disclosures: undefined;
-  Login: LoginParams;
+  Login?: LoginParams;
   Signup: undefined;
   ForgotPassword: undefined;
   PatriotAct: undefined;

@@ -48,7 +48,7 @@ export class ProductsProvider extends React.Component<
       const { data: products } = await ProductService.getProducts(this.context.accessToken);
       this.setState({ products });
       return products;
-    } catch (err) {
+    } catch (err: any) {
       return { data: err };
     } finally {
       this.setState({ isLoading: false });

@@ -28,7 +28,7 @@ export type DatePickerInputProps = {
 
 const DatePickerInput = (props: DatePickerInputProps): JSX.Element => {
   const [date, setDate] = useState<Date | undefined>(props.value);
-  const [temporaryDate, setTemporaryDate] = useState<Date | undefined>(
+  const [temporaryDate, setTemporaryDate] = useState<Date>(
     props.value ?? props.initialValue ?? new Date()
   );
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -103,14 +103,14 @@ const DatePickerInput = (props: DatePickerInputProps): JSX.Element => {
         value={temporaryDate ?? new Date()}
         mode={'date'}
         display={Platform.OS === 'ios' ? 'inline' : 'default'}
-        onChange={(e, d): void => {
-          if (e.type === 'dismissed') {
+        onChange={(event: any, date: any): void => {
+          if (event.type === 'dismissed') {
             setModalVisible(false);
           } else {
             if (Platform.OS === 'ios') {
-              setTemporaryDate(d);
+              setTemporaryDate(date);
             } else {
-              onConfirm(d);
+              onConfirm(date);
             }
           }
         }}

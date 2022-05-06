@@ -20,7 +20,7 @@ const storeData = async ({ storageKey, data }: IStoreData): Promise<void | strin
 
 type IStorageKey = Omit<IStoreData, 'data'>;
 
-const getData = async ({ storageKey }: IStorageKey): Promise<void | string> => {
+const getData = async ({ storageKey }: IStorageKey): Promise<any> => {
   try {
     const json = await AsyncStorage.getItem(storageKey);
     return json !== null ? JSON.parse(json) : null;

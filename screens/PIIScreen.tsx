@@ -189,7 +189,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                     setFieldValue('dob', value);
                   }}
                   onBlur={handleBlur('dob')}
-                  value={values.dob}
+                  value={values.dob as any}
                   errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
                   editable={!isSubmitting}
                 />

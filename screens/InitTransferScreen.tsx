@@ -99,12 +99,16 @@ Yup.addMethod(
     liabilityAccounts: SyntheticAccount[],
     message: string
   ) {
-    return this.test('amountWithinSourceBalance', message, function (value) {
+    return this.test('amountWithinSourceBalance', message, function (value): boolean {
       const liabilityAccount = liabilityAccounts.find(
         (x) => x.uid === this.resolve(sourceSyntheticAccountUidRef)
       );
 
-      if (liabilityAccount && value > parseFloat(liabilityAccount.net_usd_available_balance)) {
+      if (
+        liabilityAccount &&
+        value &&
+        value > parseFloat(liabilityAccount.net_usd_available_balance)
+      ) {
         return false;
       }
 
@@ -168,7 +172,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
   const initialValues: TransferFields = {
     fromSyntheticAccountUid: '',
     toSyntheticAccountUid: '',
-    amount: null,
+    amount: '',
     checked: false,
   };
 
@@ -229,7 +233,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
       (account) => account.uid === newTransfer?.destination_synthetic_account_uid
     );
     const isDestinationExternal = ['external', 'plaid_external', 'outbound_ach'].includes(
-      destinationAccount?.synthetic_account_category
+      destinationAccount?.synthetic_account_category || ''
     );
 
     if (error) {
@@ -267,7 +271,7 @@ export default function InitTransferScreen({ navigation }: InitTransferScreenPro
 
       handleSetMessage(newTransfer);
       setLoading(false);
-    } catch (err) {
+    } catch (err: any) {
       handleSetMessage(undefined, err);
       setLoading(false);
     } finally {

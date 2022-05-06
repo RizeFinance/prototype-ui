@@ -15,7 +15,7 @@ const EmailInput = ({ f }: { f: IFormik }): JSX.Element => {
         onChangeText={f.handleChange('email')}
         onBlur={f.handleBlur('email')}
         value={f.values.email}
-        errorText={f.touched.email && f.errors.email}
+        errorText={f.touched.email ? f.errors.email : ''}
         editable={!f.isSubmitting}
         onSubmitEditing={(): void => f.handleSubmit()}
       />

@@ -9,7 +9,7 @@ import config from '../config/config';
 export default function ProcessingApplicationScreen(): JSX.Element {
   const { accessToken, refreshCustomer, customer } = useAuth();
 
-  let timeout = null;
+  let timeout: ReturnType<typeof setTimeout>;
 
   const styles = StyleSheet.create({
     container: {
@@ -21,7 +21,7 @@ export default function ProcessingApplicationScreen(): JSX.Element {
   });
 
   const refreshCustomerPeriodically = async (): Promise<void> => {
-    if (customer.status === 'active') return;
+    if (customer?.status === 'active') return;
     await refreshCustomer();
     timeout = setTimeout(() => {
       refreshCustomerPeriodically();
@@ -30,7 +30,7 @@ export default function ProcessingApplicationScreen(): JSX.Element {
 
   useEffect(() => {
     const verificationCheck = async (): Promise<void> => {
-      if (customer.status === 'initiated') {
+      if (customer?.status === 'initiated') {
         await CustomerService.createCustomerProduct(
           accessToken,
           config.application.defaultProductUid

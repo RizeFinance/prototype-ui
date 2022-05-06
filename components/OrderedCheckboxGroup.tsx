@@ -2,6 +2,7 @@ import React, { useState, useEffect, PropsWithChildren } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Checkbox from './Checkbox';
 import { Body } from './Typography';
+import { set } from 'lodash';
 
 export type OrderCheckboxGroupProps = {
   data: any;
@@ -18,7 +19,7 @@ const OrderedCheckboxGroup = (props: PropsWithChildren<OrderCheckboxGroupProps>)
   const { data, onChange } = props;
   const [currentOrder, setOrder] = useState<string[]>([]);
 
-  const onChangeOrder = (elm, adding): void => {
+  const onChangeOrder = (elm: string, adding: boolean): void => {
     if (adding) {
       setOrder((prevOrder) => [...prevOrder, elm]);
     } else {
@@ -29,8 +30,8 @@ const OrderedCheckboxGroup = (props: PropsWithChildren<OrderCheckboxGroupProps>)
 
   useEffect(() => {
     const returnedHash = {};
-    currentOrder.forEach((value, index) => {
-      returnedHash[index] = value;
+    currentOrder.map((value: string, index: number) => {
+      set(returnedHash, index, value);
     });
 
     onChange && onChange(returnedHash);

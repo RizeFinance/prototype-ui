@@ -2,12 +2,12 @@ import React, { useContext, useEffect, useState, createContext, useMemo, useCall
 import AuthService, { IConfirmPW } from '../services/AuthService';
 import { storeData, getData, removeValue } from '../utils/asyncStorage';
 import CustomerService from '../services/CustomerService';
-import { Customer } from '../models';
+import { Customer, ComplianceWorkflow, CustomerProduct } from '../models';
 
 export type AuthContextProps = {
   accessToken: string;
-  refreshToken?: string;
-  userName?: string;
+  refreshToken: string;
+  userName: string;
   login: (userName: string, password: string) => Promise<AuthResponse>;
   logout: () => void;
   register: (username: string, password: string) => Promise<AuthResponse>;
@@ -20,7 +20,7 @@ export type AuthContextProps = {
   ) => Promise<AuthResponse>;
   refreshCustomer: () => Promise<Customer>;
   customer?: Customer;
-  customerProducts?: Record<string, unknown>;
+  customerProducts: CustomerProduct[];
   setCustomer: React.Dispatch<React.SetStateAction<Customer>>;
 };
 
@@ -29,7 +29,7 @@ export const AuthContext = createContext<AuthContextProps>({
   refreshToken: '',
   userName: '',
   login: () => Promise.resolve(),
-  logout: () => null,
+  logout: () => Promise.resolve(),
   register: () => Promise.resolve(null),
   forgotPassword: () => Promise.resolve(null),
   setPassword: () => Promise.resolve(null),
@@ -42,9 +42,9 @@ export const AuthContext = createContext<AuthContextProps>({
 
 export type AuthProviderState = {
   accessToken: string;
-  refreshToken?: string;
-  userName?: string;
-  customer: Customer;
+  refreshToken: string;
+  userName: string;
+  customer?: Customer;
   customerProducts?: any;
 };
 
@@ -56,7 +56,20 @@ const initialState = {
   customerProducts: [],
 };
 
+interface AuthData {
+  accessToken: string;
+  refreshToken: string;
+  workflow: ComplianceWorkflow;
+  require_new_password: boolean;
+}
+
 interface AuthResponse {
+  success: boolean;
+  message?: string;
+  data: AuthData;
+}
+
+interface FailedResponse {
   success: boolean;
   message?: string;
 }
@@ -65,7 +78,7 @@ export interface AuthProviderProps {
   children?: React.ReactChildren[];
 }
 
-export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps => {
+export const AuthProvider = ({ children }: AuthProviderProps): Element => {
   const [authData, setAuthData] = useState<AuthProviderState>(initialState);
 
   useEffect(() => {
@@ -85,6 +98,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
             refreshToken,
             customer,
             customerProducts,
+            userName: customer.email,
           });
         }
       } catch (err) {
@@ -114,6 +128,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
         if (customer) {
           const customerData = {
             customer,
+            userName: customer.email,
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
           };
@@ -129,7 +144,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       }
 
       return response;
-    } catch (err) {
+    } catch (err: any) {
       if (err.status === 403) {
         return {
           success: false,
@@ -149,7 +164,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
   }, []);
 
   const register = useCallback(
-    async (username: string, password: string): Promise<AuthResponse> => {
+    async (username: string, password: string): Promise<AuthResponse | FailedResponse> => {
       try {
         const result = await AuthService.register(username, password);
 
@@ -162,7 +177,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
         }
 
         return result;
-      } catch (err) {
+      } catch (err: any) {
         return {
           success: false,
           message: err.data.message,
@@ -172,35 +187,41 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     []
   );
 
-  const forgotPassword = useCallback(async (email: string): Promise<AuthResponse> => {
-    try {
-      const response = await AuthService.forgotPassword(email);
-      return {
-        ...response,
-        message: 'The password reset code has been sent to your email address.',
-      };
-    } catch (err) {
-      if (err.status === 429) {
+  const forgotPassword = useCallback(
+    async (email: string): Promise<AuthResponse | FailedResponse> => {
+      try {
+        const response = await AuthService.forgotPassword(email);
+        return {
+          ...response,
+          message: 'The password reset code has been sent to your email address.',
+        };
+      } catch (err: any) {
+        if (err.status === 429) {
+          return {
+            success: false,
+            message: 'Too many attempts, please try again after some time',
+          };
+        }
         return {
           success: false,
-          message: 'Too many attempts, please try again after some time',
+          message: 'Something went wrong. Please try again.',
         };
       }
-      return {
-        success: false,
-        message: 'Something went wrong. Please try again.',
-      };
-    }
-  }, []);
+    },
+    []
+  );
 
-  const confirmPassword = useCallback(async (data: IConfirmPW): Promise<AuthResponse> => {
-    try {
-      const response = await AuthService.confirmPassword(data);
-      return response;
-    } catch (err) {
-      return { success: false };
-    }
-  }, []);
+  const confirmPassword = useCallback(
+    async (data: IConfirmPW): Promise<AuthResponse | FailedResponse> => {
+      try {
+        const response = await AuthService.confirmPassword(data);
+        return response;
+      } catch (err) {
+        return { success: false };
+      }
+    },
+    []
+  );
 
   const setPassword = useCallback(
     async (username: string, oldPassword: string, newPassword: string): Promise<AuthResponse> => {
@@ -215,7 +236,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
         }
 
         return result;
-      } catch (err) {
+      } catch (err: any) {
         return err;
       }
     },

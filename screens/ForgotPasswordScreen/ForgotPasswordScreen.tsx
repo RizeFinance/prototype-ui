@@ -13,6 +13,12 @@ import * as yup from 'yup';
 import { machine } from './machine';
 import { useMachine } from '@xstate/react';
 
+interface FormValues {
+  email: string;
+  code: string;
+  password: string;
+}
+
 export const passwordErrors = {
   min: 'be at least 10 characters',
   lowercase: 'have at least 1 lowercase letter',
@@ -47,11 +53,11 @@ const initValues = {
 
 export type IFormik = FormikProps<typeof initValues>;
 
-interface IProps {
+interface ForgotPasswordScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'ForgotPassword'>;
 }
 
-const ForgotPasswordScreen = ({ navigation }: { navigation: IProps }): JSX.Element => {
+const ForgotPasswordScreen = ({ navigation }: ForgotPasswordScreenProps): JSX.Element => {
   const { forgotPassword, confirmPassword, login } = useAuth();
 
   const [fetchState, sendToFetch] = useMachine(machine, {
@@ -62,7 +68,7 @@ const ForgotPasswordScreen = ({ navigation }: { navigation: IProps }): JSX.Eleme
     },
   });
 
-  const onSubmit = async (values, actions): Promise<void> => {
+  const onSubmit = async (values: FormValues, actions: any): Promise<void> => {
     if (values.email !== '') {
       sendToFetch({ type: 'SUBMIT_EMAIL', email: values.email });
     }
@@ -126,13 +132,13 @@ const ForgotPasswordScreen = ({ navigation }: { navigation: IProps }): JSX.Eleme
 
   const validateForm = (values: typeof initValues): any => {
     try {
-      currentValidationSchema().validateSync(values, {
+      currentValidationSchema()?.validateSync(values, {
         abortEarly: false,
       });
-    } catch (err) {
+    } catch (err: any) {
       if (err.name === 'ValidationError') {
         const errorKeyValues = Object.keys(values).map((key) => {
-          const ve = err.inner.filter((x) => x.path === key);
+          const ve = err.inner.filter((x: { path: string }) => x.path === key);
           return {
             key: key,
             value:

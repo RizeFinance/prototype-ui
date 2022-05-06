@@ -136,7 +136,7 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
                 value={values.email}
-                errorText={touched.email && errors.email}
+                errorText={touched.email ? errors.email : ''}
                 editable={!isSubmitting}
                 onSubmitEditing={(): void => handleSubmit()}
               />
@@ -147,7 +147,7 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
                 onBlur={handleBlur('password')}
                 value={values.password}
                 secureTextEntry
-                errorText={touched.password && errors.password}
+                errorText={touched.password ? errors.password : ''}
                 editable={!isSubmitting}
                 onSubmitEditing={(): void => handleSubmit()}
               />

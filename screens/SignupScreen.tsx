@@ -88,15 +88,19 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
   const validateForm = (values: SignupFields): any => {
     try {
       signupSchema.validateSync(values, { abortEarly: false });
-    } catch (err) {
+    } catch (err: any) {
       if (err.name === 'ValidationError') {
         const errorKeyValues = Object.keys(values).map((key) => {
-          const ve = err.inner.filter((x) => x.path === key);
+          const ve = err.inner.filter((x: any) => x.path === key);
 
           return {
             key: key,
             value:
-              ve.length === 0 ? '' : ve.length === 1 ? ve[0].message : ve.map((x) => x.message),
+              ve.length === 0
+                ? ''
+                : ve.length === 1
+                ? ve[0].message
+                : ve.map((x: any) => x.message),
           };
         });
 
@@ -120,20 +124,20 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
   const onSubmit = async (values: SignupFields): Promise<void> => {
     setCommonError('');
 
-    const result = await register(values.email, values.password);
+    const { success, message, data } = await register(values.email, values.password);
 
-    if (!result.success) {
-      setCommonError(`Unable to register user. ${result.message || ''}`);
+    if (!success) {
+      setCommonError(`Unable to register user. ${message || ''}`);
     } else {
-      if (!result.data.accessToken) {
+      if (!data.accessToken) {
         navigation.navigate('Login', {
           message:
             'A verification link has been sent to your email address. Please verify before you log in.',
         });
       } else {
-        await setComplianceWorkflow(result.data.workflow);
+        await setComplianceWorkflow(data.workflow);
 
-        const customer = await CustomerService.getCustomer(result.data.accessToken);
+        const customer = await CustomerService.getCustomer(data.accessToken);
 
         await setCustomer(customer);
       }
@@ -182,7 +186,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
                   onChangeText={handleChange('email')}
                   onBlur={handleBlur('email')}
                   value={values.email}
-                  errorText={touched.email && errors.email}
+                  errorText={touched.email ? errors.email : ''}
                   editable={!isSubmitting}
                   onSubmitEditing={(): void => handleSubmit()}
                 />
@@ -240,7 +244,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps): JSX.Ele
                   onChangeText={handleChange('confirmPassword')}
                   onBlur={handleBlur('confirmPassword')}
                   value={values.confirmPassword}
-                  errorText={touched.confirmPassword && errors.confirmPassword}
+                  errorText={touched.confirmPassword ? errors.confirmPassword : ''}
                   editable={!isSubmitting}
                   onSubmitEditing={(): void => handleSubmit()}
                 />

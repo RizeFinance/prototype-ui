@@ -1,4 +1,4 @@
-export { ComplianceDocumentAcknowledgementRequest } from './ComplianceWorkflow';
+export { ComplianceWorkflow, ComplianceDocumentAcknowledgementRequest } from './ComplianceWorkflow';
 export { Customer, CustomerDetails, CustomerProduct } from './Customer';
 export { DebitCard } from './DebitCard';
 export { RizeList } from './Common';

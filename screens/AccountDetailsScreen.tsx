@@ -26,7 +26,7 @@ export default function AccountsScreen({ navigation, route }: AccountsScreenProp
   const { accessToken } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  const account = liabilityAccounts.find((x) => x.uid === route.params?.accountUid);
+  const account = liabilityAccounts.find((a) => a.uid === route.params?.accountUid);
 
   useEffect(() => {
     const loadTransactions = async (): Promise<void> => {
@@ -34,7 +34,7 @@ export default function AccountsScreen({ navigation, route }: AccountsScreenProp
         accessToken,
         100,
         0,
-        account.uid
+        account?.uid
       );
       setTransactions(
         transactionList.data.sort(
@@ -43,7 +43,7 @@ export default function AccountsScreen({ navigation, route }: AccountsScreenProp
       );
     };
     loadTransactions();
-  }, [accessToken, account.uid]);
+  }, [accessToken, account?.uid]);
 
   const gray = useThemeColor('gray');
 
@@ -89,7 +89,9 @@ export default function AccountsScreen({ navigation, route }: AccountsScreenProp
     return unsubscribe;
   }, [navigation, refetchAccounts]);
 
-  const associatedDebitCard = find(debitCards, { synthetic_account_uid: account.uid });
+  const associatedDebitCard = find(debitCards, { synthetic_account_uid: account?.uid });
+
+  if (!account) return <></>;
 
   return (
     <Screen withoutHeader useScrollView>
@@ -143,7 +145,7 @@ export default function AccountsScreen({ navigation, route }: AccountsScreenProp
                 Associated Debit Card
               </Body>
               {/* not plural due to typo in middleware */}
-              <Heading5>**** **** **** {associatedDebitCard.card_last_four_digit}</Heading5>
+              <Heading5>**** **** **** {associatedDebitCard.card_last_four_digits}</Heading5>
             </View>
           </View>
           <HorizontalLine style={{ marginVertical: 40 }} />
