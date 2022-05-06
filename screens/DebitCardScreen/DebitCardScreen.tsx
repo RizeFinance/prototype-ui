@@ -3,7 +3,7 @@ import { View, Switch, ActivityIndicator, Image } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Screen, Button, Dropdown, Heading3, Body } from '../../components';
 import { useDebitCards } from '../../contexts';
-import { capitalize, startCase, toLower } from 'lodash';
+import { capitalize, startCase } from 'lodash';
 import { styles } from './styles';
 import { RootStackParamList } from '../../types';
 import { useIsFocused } from '@react-navigation/native';
@@ -44,8 +44,9 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     'usable_without_pin',
   ].includes(activeCard?.status);
 
-  const showRequestBtn =
-    activeCard?.type === 'virtual' || (activeCard?.type === 'physical' && isCardActive);
+  const cardIsShipped = activeCard?.type === 'physical' && activeCard?.status === 'shipped';
+
+  const showRequestBtn = activeCard?.type === 'virtual' || cardIsShipped;
 
   const unableToLock = ['closed', 'closed_by_administrator', 'lost', 'stolen', 'queued'].includes(
     activeCard?.status
@@ -106,6 +107,16 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     }
   }, [isFocused]);
 
+  useEffect(() => {
+    if (cardIsShipped) {
+      setPhysicalRequested(true);
+      setAlert({ text: 'Physical Card has been successfully requested', success: true });
+    } else {
+      setAlert(alertDefault);
+      setPhysicalRequested(false);
+    }
+  }, [cardIsShipped]);
+
   const checkCardAfterReissue = () => {
     const checkCard = setInterval(async () => {
       const { success, data: card } = await getActiveCard();
@@ -146,7 +157,6 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
       const { data: card } = await getCardByUid(activeCard.uid);
       if (card.type === 'physical') {
         clearInterval(checkCard);
-        setPhysicalRequested(false);
         setAlert(alertDefault);
       }
       if (!isFocused) clearInterval(checkCard);
@@ -204,9 +214,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
           <Body fontWeight="bold" style={styles.status}>
             Status
           </Body>
-          <Body>
-            {physicalRequested ? 'Requested' : capitalize(startCase(toLower(activeCard?.status)))}
-          </Body>
+          <Body>{physicalRequested ? 'Requested' : capitalize(startCase(activeCard?.status))}</Body>
         </View>
 
         <>
