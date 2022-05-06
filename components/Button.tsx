@@ -50,8 +50,8 @@ const Button = (props: ButtonProps): JSX.Element => {
 
   return (
     <Pressable
-      style={[styles.pressable, disabled && styles.pressableDisabled, style]}
-      disabled={disabled}
+      style={[styles.pressable, (disabled || loading) && styles.pressableDisabled, style]}
+      disabled={disabled || loading}
       {...otherProps}
     >
       <View style={styles.container}>

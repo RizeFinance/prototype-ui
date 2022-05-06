@@ -65,18 +65,23 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
         const { accessToken, refreshToken } = await getData({ storageKey: '@tokens' });
 
         if (accessToken) {
-          const customer = await CustomerService.getCustomer(accessToken);
-          const { data: customerProducts } = await CustomerService.getCustomerProducts(
-            accessToken,
-            customer.uid
-          );
+          try {
+            const customer = await CustomerService.getCustomer(accessToken);
 
-          setAuthData({
-            accessToken,
-            refreshToken,
-            customer,
-            customerProducts,
-          });
+            const { data: customerProducts } = await CustomerService.getCustomerProducts(
+              accessToken,
+              customer.uid
+            );
+
+            setAuthData({
+              accessToken,
+              refreshToken,
+              customer,
+              customerProducts,
+            });
+          } catch (err) {
+            removeValue({ storageKey: '@tokens' });
+          }
         }
       } catch (err) {
         setAuthData(initialState);

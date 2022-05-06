@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleProp, StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
-import RNPickerSelect, { Item } from 'react-native-picker-select';
+import RNPickerSelect, { Item, PickerSelectProps } from 'react-native-picker-select';
 import { useThemeColor } from '../components';
 import { Body, BodySmall, fontStyles } from './Typography';
 
@@ -10,7 +10,7 @@ export type DropdownProps = {
   items: DropdownItem[];
   value?: string;
   label?: string;
-  placeholder?: string;
+  placeholder?: PickerSelectProps['placeholder'];
   errorText?: string;
   labelStyle?: TextStyle;
   inputStyle?: StyleProp<TextStyle>;
@@ -110,12 +110,10 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
           inputIOS: actualInputStyle,
           inputAndroid: actualInputStyle,
           inputWeb: disabled
-            ? { ...StyleSheet.flatten(defaultStyles.input), backgroundColor: 'unset' }
+            ? { ...StyleSheet.flatten(defaultStyles.input), backgroundColor: '#F0F0F0' }
             : defaultStyles.input,
         }}
-        placeholder={{
-          label: placeholder ?? '',
-        }}
+        placeholder={{ label: placeholder, value: placeholder }}
         items={items}
         value={value}
       />

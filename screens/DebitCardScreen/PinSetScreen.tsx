@@ -1,44 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import Screen from '../../components/Screen';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/core';
 import { RootStackParamList } from '../../types';
 import { useDebitCards } from '../../contexts/DebitCards';
 import { TextLink, Webview } from '../../components';
 import { Heading3 } from '../../components/Typography';
 import config from '../../config/config';
-
 interface PinSetScreenProps {
-  route: RouteProp<RootStackParamList, 'PinSet'>;
   navigation: StackNavigationProp<RootStackParamList, 'PinSet'>;
 }
 
-export default function PinSetScreen({ navigation, route }: PinSetScreenProps): JSX.Element {
-  const { pinSetToken, loadPinSetToken, refetchDebitCards } = useDebitCards();
-  const [debitCardUid] = useState(route.params?.debitCardUid);
+export default function PinSetScreen({ navigation }: PinSetScreenProps): JSX.Element {
+  const { pinSetToken, loadPinSetToken, activeCard } = useDebitCards();
 
   useEffect(() => {
-    loadPinSetToken(debitCardUid);
-  }, []);
+    loadPinSetToken(activeCard.uid);
+  }, [activeCard]);
 
   useEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <TextLink onPress={handleBackButton}>&lt; Debit·Card</TextLink>,
+      headerLeft: () => <TextLink onPress={handleBackButton}>&lt; Debit Card</TextLink>,
     });
   }, []);
 
   const handleBackButton = () => {
-    refetchDebitCards();
     navigation.navigate('DebitCard');
   };
 
   const styles = StyleSheet.create({
     heading: {
       marginBottom: 25,
-    },
-    webview: {
-      marginTop: 200,
     },
   });
 
@@ -49,7 +41,7 @@ export default function PinSetScreen({ navigation, route }: PinSetScreenProps): 
       <Heading3 textAlign="center" style={styles.heading}>
         Set Pin
       </Heading3>
-      {pinSetToken && <Webview uri={pinSetUrl} style={styles.webview} height={400} />}
+      <Webview uri={pinSetUrl} height={300} width={510} />
     </Screen>
   );
 }
