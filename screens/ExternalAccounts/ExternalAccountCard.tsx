@@ -17,12 +17,12 @@ const AccountCard = ({ account, onHandleArchive }: AccountCard) => {
       <View style={styles.cardDetails}>
         <View style={styles.detail}>
           <Body fontWeight="semibold">Account</Body>
-          <Body>{account.account_number || account.account_number_last_four}</Body>
+          <Body>{account.account_number || account.account_number_last_four || 'Pending'}</Body>
         </View>
 
         <View style={styles.detail}>
           <Body fontWeight="semibold">Routing</Body>
-          <Body>{account.routing_number}</Body>
+          <Body>{account.routing_number || 'Pending'}</Body>
         </View>
       </View>
 

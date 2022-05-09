@@ -46,7 +46,7 @@ const AccountsScreen = StyleSheet.create({
 
 const AccountCard = StyleSheet.create({
   link: {
-    marginBottom: 30,
+    marginBottom: 5,
   },
   cardContainer: {
     marginTop: 25,
