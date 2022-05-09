@@ -135,6 +135,7 @@ const ConnectOneWayScreen = ({ navigation }: ConnectOneWayScreenProps): JSX.Elem
               onChangeText={handleChange('accountNumber')}
               onBlur={handleBlur('accountNumber')}
               errorText={!touched.accountNumber ? '' : errors.accountNumber}
+              maxLength={21}
             />
             <Input
               label="Routing Number"
@@ -142,6 +143,7 @@ const ConnectOneWayScreen = ({ navigation }: ConnectOneWayScreenProps): JSX.Elem
               onChangeText={handleChange('routingNumber')}
               onBlur={handleBlur('routingNumber')}
               errorText={!touched.routingNumber ? '' : errors.routingNumber}
+              maxLength={9}
             />
             <Button
               title="Connect ACH Account"

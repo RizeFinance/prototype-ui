@@ -46,6 +46,12 @@ const ConnectAccountScreen = ({ navigation }: ConnectAccountScreenProps): JSX.El
   }, [navigation]);
 
   const ExternalAccountForm = (): JSX.Element => {
+    useEffect(() => {
+      if (selectableAccounts?.length === 1) {
+        onCreateAccount(selectableAccounts[0]);
+      }
+    }, [selectableAccounts]);
+
     const onCreateAccount = async (account): Promise<void> => {
       setIsLoading(true);
 
@@ -186,7 +192,7 @@ const ConnectAccountScreen = ({ navigation }: ConnectAccountScreenProps): JSX.El
           </Body>
           <Body style={styles.list}>
             <Body style={styles.bullet}>{'\u2022'}</Body>
-            Over your lifetime as a customer with Rize, only 6 bank accounts can be connected.
+            Over your lifetime as a customer with Rize, only 5 bank accounts can be connected.
           </Body>
           <Body style={styles.list}>
             <Body style={styles.bullet}>{'\u2022'}</Body>
