@@ -1,6 +1,6 @@
 export { ComplianceDocumentAcknowledgementRequest } from './ComplianceWorkflow';
 export { Customer, CustomerDetails, CustomerProduct } from './Customer';
-export { DebitCard } from './DebitCard';
+export { DebitCard, DebitCardAccessToken, DebitCardListQuery } from './DebitCard';
 export { RizeList } from './Common';
 export {
   SyntheticAccount,

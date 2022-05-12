@@ -13,9 +13,15 @@ web-build/
 yarn-error.log
 .eslintcache
 .vscode
+.yalc
+yalc.lock
 
 # macOS
 .DS_Store
 
 # Local Netlify folder
 .netlify
+
+# MSW Mocks
+utils/mocks/
+web

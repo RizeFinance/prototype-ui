@@ -1,5 +1,5 @@
 import api from '../utils/api';
-import { RizeList, DebitCard } from '../models';
+import { RizeList, DebitCard, DebitCardAccessToken } from '../models';
 
 const getDebitCards = async (accessToken: string): Promise<RizeList<DebitCard>> => {
   return await api
@@ -78,6 +78,45 @@ const getPinSetToken = async (
     .then((response) => response.data);
 };
 
+const getAccessToken = async (
+  accessToken: string,
+  debitCardUid: string
+): Promise<DebitCardAccessToken> => {
+  return await api
+    .get(`/debit_cards/${debitCardUid}/access_token`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => response.data);
+};
+
+const getVirtualCardImage = async (
+  accessToken: string,
+  configId: string,
+  token: string
+): Promise<string> => {
+  return await api
+    .get(`debit_cards/assets/virtual_card_image?config=${configId}&token=${token}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => response.data);
+};
+
+const getDebitCardByUid = async (accessToken: string, uid: string): Promise<DebitCard> => {
+  return await api
+    .get(`debit_cards/${uid}`, { headers: { Authorization: `Bearer ${accessToken}` } })
+    .then((response) => response.data);
+};
+
+const migrateVirtualCardtoPhysical = async ({ accessToken, uid, customerUid, poolUid }) => {
+  return await api
+    .put(
+      `debit_cards/${uid}/migrate`,
+      { customerUid, poolUid },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    )
+    .then((response) => response.data);
+};
+
 export default {
   getDebitCards,
   lockDebitCard,
@@ -86,4 +125,8 @@ export default {
   createDebitCard,
   getPinSetToken,
   activateDebitCard,
+  getAccessToken,
+  getVirtualCardImage,
+  migrateVirtualCardtoPhysical,
+  getDebitCardByUid,
 };

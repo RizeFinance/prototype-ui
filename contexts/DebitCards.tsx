@@ -1,175 +1,334 @@
-import React, { useContext } from 'react';
-import { DebitCard } from '../models';
+import React, { useContext, useState, createContext, useMemo, useCallback } from 'react';
+import { DebitCard, DebitCardAccessToken } from '../models';
 import DebitCardService from '../services/DebitCardService';
-import { AuthContext } from './Auth';
+import { useAuth } from './Auth';
+import { isNil } from 'lodash';
+import { compareAsc } from 'date-fns';
 
-export type DebitCardsContextProps = {
+export interface IDebitCardsResp<T> {
+  data: T;
+  success: boolean;
+}
+
+interface IMigrate {
+  uid: string;
+  customerUid: string;
+  poolUid: string;
+}
+
+export interface IDebitCards {
   isLoading: boolean;
   debitCards?: DebitCard[];
   pinSetToken?: string;
-  refetchDebitCards: () => Promise<DebitCard[]>;
-  lockDebitCard: (uid: string) => Promise<DebitCard[]>;
-  unlockDebitCard: (uid: string) => Promise<DebitCard[]>;
-  reissueDebitCard: (uid: string, reason: string) => Promise<DebitCard[]>;
-  createDebitCard: (pool_uid: string) => Promise<DebitCard[]>;
+  activeCard?: DebitCard;
+  refetchDebitCards: () => Promise<IDebitCardsResp<DebitCard[]>>;
+  getActiveCard: () => Promise<IDebitCardsResp<DebitCard>>;
+  lockDebitCard: (uid: string) => Promise<IDebitCardsResp<DebitCard>>;
+  unlockDebitCard: (uid: string) => Promise<IDebitCardsResp<DebitCard>>;
+  reissueDebitCard: (uid: string, reason: string) => Promise<IDebitCardsResp<DebitCard>>;
+  createDebitCard: (pool_uid: string) => Promise<IDebitCardsResp<DebitCard[]>>;
   activateDebitCard: (
     uid: string,
     cardLastFourDigits: string,
     cvv: string,
     expiryDate: string
-  ) => Promise<DebitCard[]>;
-  loadPinSetToken: (uid: string) => Promise<string>;
-};
+  ) => Promise<IDebitCardsResp<DebitCard[]> | void>;
+  loadPinSetToken: (uid: string) => Promise<void>;
+  fetchVirtualImage: (uid: string) => Promise<IDebitCardsResp<string>>;
+  migrateVirtualCardtoPhysical: ({
+    uid,
+    customerUid,
+    poolUid,
+  }: IMigrate) => Promise<IDebitCardsResp<{ success: boolean; data: string }>>;
+  getCardByUid: (uid: string) => Promise<IDebitCardsResp<DebitCard>>;
+}
 
-export const DebitCardsContext = React.createContext<DebitCardsContextProps>({
-  isLoading: false,
-  debitCards: [],
-  pinSetToken: null,
-  refetchDebitCards: () => Promise.resolve([]),
-  lockDebitCard: () => Promise.resolve([]),
-  unlockDebitCard: () => Promise.resolve([]),
-  reissueDebitCard: () => Promise.resolve([]),
-  createDebitCard: () => Promise.resolve([]),
-  activateDebitCard: () => Promise.resolve([]),
-  loadPinSetToken: () => Promise.resolve([]),
-});
+export const DebitCardsContext = createContext({} as IDebitCards);
 
 export type DebitCardProviderState = {
   isLoading: boolean;
   debitCards?: DebitCard[];
 };
 
-const initialState = {
-  isLoading: false,
-  debitCards: [],
-};
-
-export interface DebitCardsProviderProps {
-  children?: JSX.Element;
+export interface IDebitCardsContext {
+  children?: React.ReactNode;
 }
 
-export class DebitCardsProvider extends React.Component<
-  DebitCardsProviderProps,
-  DebitCardProviderState
-> {
-  static contextType = AuthContext;
-  context: React.ContextType<typeof AuthContext>;
+const DebitCardsProvider = ({ children }: IDebitCardsContext) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [debitCards, setDebitCards] = useState<DebitCard[]>([]);
+  const [pinSetToken, setPinTokenSet] = useState<string | undefined>(undefined);
+  const [activeCard, setActiveCard] = useState<DebitCard | undefined>(undefined);
+  const { accessToken } = useAuth();
 
-  constructor(props: DebitCardsProviderProps) {
-    super(props);
-
-    this.state = initialState;
-  }
-
-  refetchDebitCards = async (): Promise<DebitCard[]> => {
-    this.setState({ isLoading: true });
+  const refetchDebitCards = useCallback(async (): Promise<IDebitCardsResp<DebitCard[]>> => {
+    setIsLoading(true);
 
     try {
-      const { data: debitCards } = await DebitCardService.getDebitCards(this.context.accessToken);
-      this.setState({ debitCards });
+      const { data: debitCards } = await DebitCardService.getDebitCards(accessToken);
+      setDebitCards(debitCards);
       return { success: true, data: debitCards };
     } catch (err) {
       return { success: false, data: err };
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
-  };
+  }, [accessToken]);
 
-  lockDebitCard = async (uid: string): Promise<DebitCard[]> => {
-    await DebitCardService.lockDebitCard(this.context.accessToken, uid);
-    const response = await this.refetchDebitCards();
-    return response;
-  };
+  const lockDebitCard = useCallback(
+    async (uid: string): Promise<IDebitCardsResp<DebitCard>> => {
+      try {
+        const card = await DebitCardService.lockDebitCard(accessToken, uid);
+        if (card.lock_reason) {
+          setActiveCard(card);
+          return { success: true, data: card };
+        } else {
+          return { success: false, data: null };
+        }
+      } catch (err) {
+        return { success: false, data: err };
+      }
+    },
+    [accessToken]
+  );
 
-  unlockDebitCard = async (uid: string): Promise<DebitCard[]> => {
-    await DebitCardService.unlockDebitCard(this.context.accessToken, uid);
-    const response = await this.refetchDebitCards();
-    return response;
-  };
+  const unlockDebitCard = useCallback(
+    async (uid: string): Promise<IDebitCardsResp<DebitCard>> => {
+      try {
+        const card = await DebitCardService.unlockDebitCard(accessToken, uid);
+        if (!card.lock_reason) {
+          setActiveCard(card);
+          return { success: true, data: card };
+        } else {
+          return { success: false, data: null };
+        }
+      } catch (err) {
+        return { success: false, data: err };
+      }
+    },
+    [accessToken]
+  );
 
-  reissueDebitCard = async (uid: string, reason: string): Promise<DebitCard[]> => {
-    this.setState({ isLoading: true });
+  const reissueDebitCard = useCallback(
+    async (uid: string, reason: string): Promise<IDebitCardsResp<DebitCard>> => {
+      setIsLoading(true);
+      try {
+        const card = await DebitCardService.reissueDebitCard(accessToken, uid, reason);
+        setActiveCard(card);
+        return { success: true, data: card };
+      } catch (err) {
+        return { success: false, data: err };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [accessToken, refetchDebitCards]
+  );
+
+  const createDebitCard = useCallback(
+    async (pool_uid: string): Promise<IDebitCardsResp<DebitCard[]>> => {
+      setIsLoading(true);
+
+      try {
+        await DebitCardService.createDebitCard(accessToken, pool_uid);
+        return await refetchDebitCards();
+      } catch (err) {
+        return { success: false, data: [] };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [accessToken, refetchDebitCards]
+  );
+
+  const activateDebitCard = useCallback(
+    async (
+      uid: string,
+      cardLastFourDigits: string,
+      cvv: string,
+      expiryDate: string
+    ): Promise<IDebitCardsResp<DebitCard[]> | void> => {
+      setIsLoading(true);
+
+      try {
+        await DebitCardService.activateDebitCard(
+          accessToken,
+          uid,
+          cardLastFourDigits,
+          cvv,
+          expiryDate
+        );
+        await refetchDebitCards();
+      } catch (err) {
+        return { success: false, data: err };
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [accessToken, refetchDebitCards]
+  );
+
+  const loadPinSetToken = useCallback(
+    async (uid: string): Promise<void> => {
+      const { pin_change_token } = await DebitCardService.getPinSetToken(accessToken, uid);
+      setPinTokenSet(pin_change_token);
+    },
+    [accessToken]
+  );
+
+  const getAccessToken = useCallback(
+    async (uid: string): Promise<IDebitCardsResp<DebitCardAccessToken>> => {
+      try {
+        const cardAccessToken = await DebitCardService.getAccessToken(accessToken, uid);
+        return { success: true, data: cardAccessToken };
+      } catch (err) {
+        return { success: false, data: err };
+      }
+    },
+    [accessToken]
+  );
+
+  const getActiveCard = useCallback(async (): Promise<IDebitCardsResp<DebitCard>> => {
+    setIsLoading(true);
 
     try {
-      await DebitCardService.reissueDebitCard(this.context.accessToken, uid, reason);
-      const response = await this.refetchDebitCards();
-      return response;
+      const { data: debitCards } = await DebitCardService.getDebitCards(accessToken);
+      const activeCard = debitCards?.find((x) => isNil(x.closed_at));
+
+      if (activeCard) {
+        setActiveCard(activeCard);
+        return { success: true, data: activeCard };
+      } else {
+        const latest = debitCards.sort((a, b) =>
+          compareAsc(new Date(b.closed_at), new Date(a.closed_at))
+        )[0];
+        setActiveCard(latest);
+        return { success: false, data: latest };
+      }
     } catch (err) {
-      return { success: false, error: err };
+      return { success: false, data: err };
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
     }
-  };
+  }, [accessToken]);
 
-  createDebitCard = async (pool_uid: string): Promise<DebitCard[]> => {
-    this.setState({ isLoading: true });
-
+  const getVirtualCardImage = async (
+    configId: string,
+    token: string
+  ): Promise<IDebitCardsResp<string>> => {
     try {
-      await DebitCardService.createDebitCard(this.context.accessToken, pool_uid);
-      const response = await this.refetchDebitCards();
-      return response;
+      const image = await DebitCardService.getVirtualCardImage(accessToken, configId, token);
+      return { success: true, data: image };
     } catch (err) {
-      return { success: false, error: err };
-    } finally {
-      this.setState({ isLoading: false });
+      return { success: false, data: err };
     }
   };
 
-  activateDebitCard = async (
-    uid: string,
-    cardLastFourDigits: string,
-    cvv: string,
-    expiryDate: string
-  ): Promise<DebitCard[]> => {
-    this.setState({ isLoading: true });
+  const fetchVirtualImage = useCallback(
+    async (uid: string): Promise<IDebitCardsResp<string>> => {
+      try {
+        setIsLoading(true);
+        const { data: tokenData } = await getAccessToken(uid);
+        try {
+          const { data } = await getVirtualCardImage(tokenData.config_id, tokenData.token);
+          setIsLoading(false);
+          return { success: true, data };
+        } catch (err) {
+          setIsLoading(false);
 
-    try {
-      await DebitCardService.activateDebitCard(
-        this.context.accessToken,
-        uid,
-        cardLastFourDigits,
-        cvv,
-        expiryDate
-      );
-      const response = await this.refetchDebitCards();
-      return response;
-    } catch (err) {
-      return { success: false, error: err };
-    } finally {
-      this.setState({ isLoading: false });
-    }
-  };
+          return { success: false, data: err };
+        }
+      } catch (err) {
+        setIsLoading(false);
 
-  loadPinSetToken = async (uid: string): Promise<string> => {
-    const response = await DebitCardService.getPinSetToken(this.context.accessToken, uid);
-    this.setState({ pinSetToken: response.pin_change_token });
-  };
+        return { success: false, data: err };
+      }
+    },
+    [accessToken]
+  );
 
-  render(): JSX.Element {
-    const { isLoading, debitCards, pinSetToken } = this.state;
+  const getCardByUid = useCallback(
+    async (uid: string): Promise<IDebitCardsResp<DebitCard>> => {
+      try {
+        setIsLoading(true);
+        const card = await DebitCardService.getDebitCardByUid(accessToken, uid);
+        setIsLoading(false);
+        setActiveCard(card);
+        return { success: true, data: card };
+      } catch (err) {
+        setIsLoading(false);
+        return { success: false, data: err };
+      }
+    },
+    [accessToken]
+  );
 
-    return (
-      <DebitCardsContext.Provider
-        value={{
-          isLoading: isLoading,
-          debitCards: debitCards,
-          pinSetToken: pinSetToken,
-          enabled: true,
-          refetchDebitCards: this.refetchDebitCards,
-          lockDebitCard: this.lockDebitCard,
-          unlockDebitCard: this.unlockDebitCard,
-          reissueDebitCard: this.reissueDebitCard,
-          createDebitCard: this.createDebitCard,
-          loadPinSetToken: this.loadPinSetToken,
-          activateDebitCard: this.activateDebitCard,
-        }}
-      >
-        {this.props.children}
-      </DebitCardsContext.Provider>
-    );
+  const migrateVirtualCardtoPhysical = useCallback(
+    async ({ uid, customerUid, poolUid }): Promise<IDebitCardsResp<string>> => {
+      try {
+        setIsLoading(true);
+        await DebitCardService.migrateVirtualCardtoPhysical({
+          accessToken,
+          uid,
+          customerUid,
+          poolUid,
+        });
+        setIsLoading(false);
+        return { success: true, data: null };
+      } catch (err) {
+        setIsLoading(false);
+        return { success: false, data: err };
+      }
+    },
+    [accessToken]
+  );
+
+  const value = useMemo(
+    () => ({
+      isLoading,
+      debitCards,
+      pinSetToken,
+      refetchDebitCards,
+      lockDebitCard,
+      unlockDebitCard,
+      reissueDebitCard,
+      createDebitCard,
+      loadPinSetToken,
+      activateDebitCard,
+      fetchVirtualImage,
+      migrateVirtualCardtoPhysical,
+      getActiveCard,
+      activeCard,
+      getCardByUid,
+    }),
+    [
+      isLoading,
+      debitCards,
+      pinSetToken,
+      refetchDebitCards,
+      lockDebitCard,
+      unlockDebitCard,
+      reissueDebitCard,
+      createDebitCard,
+      loadPinSetToken,
+      activateDebitCard,
+      fetchVirtualImage,
+      migrateVirtualCardtoPhysical,
+      getActiveCard,
+      activeCard,
+      getCardByUid,
+    ]
+  );
+
+  return <DebitCardsContext.Provider value={value}>{children}</DebitCardsContext.Provider>;
+};
+
+const useDebitCards = () => {
+  const context = useContext(DebitCardsContext);
+  if (context === undefined) {
+    throw new Error('useDebitCards must be used within a DebitCardsProvider');
   }
-}
+  return context;
+};
 
-export const DebitCardsConsumer = DebitCardsContext.Consumer;
-
-export const useDebitCards = (): DebitCardsContextProps => useContext(DebitCardsContext);
+export { DebitCardsProvider, useDebitCards };
