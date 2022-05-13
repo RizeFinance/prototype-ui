@@ -108,5 +108,9 @@
   },
   "msw": {
     "workerDirectory": "web"
+  },
+  "engines": {
+    "npm": "please-use-yarn",
+    "yarn": ">= 1.22.10"
   }
 }
