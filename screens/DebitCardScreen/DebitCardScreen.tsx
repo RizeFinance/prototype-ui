@@ -32,9 +32,10 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
   const [requestIsLoading, setRequestIsLoading] = useState(false);
   const [physicalRequested, setPhysicalRequested] = useState(false);
   const [cardLoading, setCardLoading] = useState(true);
-  const [reportBtnDisabled, setReportBtnDisabled] = useState(false);
+  const [btnDisabled, setBtnDisabled] = useState(false);
 
   const isVirtualCard = activeCard?.type === 'virtual';
+  const isPhysicalCard = activeCard?.type === 'physical';
 
   const isCardActive = [
     'normal',
@@ -44,17 +45,12 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     'usable_without_pin',
   ].includes(activeCard?.status);
 
-  const cardIsShipped = activeCard?.type === 'physical' && activeCard?.status === 'shipped';
-
-  const showRequestBtn = activeCard?.type === 'virtual' || cardIsShipped;
+  const cardIsShipped = isPhysicalCard && activeCard?.status === 'shipped';
+  const showRequestBtn = isVirtualCard || cardIsShipped;
 
   const unableToLock = ['closed', 'closed_by_administrator', 'lost', 'stolen', 'queued'].includes(
     activeCard?.status
   );
-
-  useEffect(() => {
-    isFocused && setReissueReason('Select Issue');
-  }, [isFocused]);
 
   useEffect(() => {
     if (activeCard) {
@@ -125,7 +121,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
         clearInterval(checkCard);
         setAlert(alertDefault);
         setReissueReason('Issue');
-        setReportBtnDisabled(false);
+        setBtnDisabled(false);
       }
     }, 3000);
 
@@ -133,7 +129,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
   };
 
   const handleSubmitReissue = async () => {
-    setReportBtnDisabled(true);
+    setBtnDisabled(true);
 
     const reason = reissueReason || 'stolen';
     const { success } = await reissueDebitCard(activeCard?.uid, reason);
@@ -144,7 +140,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
       checkCardAfterReissue();
     } else {
       setAlert({ text: 'Request for new card failed.', success: false });
-      setReportBtnDisabled(false);
+      setBtnDisabled(false);
     }
   };
 
@@ -241,6 +237,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
             title={isVirtualCard ? 'Request Physical Card' : 'Activate Physical Card'}
             onPress={isVirtualCard ? requestPhysicalCard : sendToActivation}
             loading={requestIsLoading || physicalRequested}
+            disabled={btnDisabled}
           />
         )}
       </View>
@@ -269,11 +266,7 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
                 ? 'Report Stolen'
                 : `Report ${reissueReason !== 'Select Issue' ? capitalize(reissueReason) : 'Issue'}`
             }
-            disabled={
-              isVirtualCard
-                ? reportBtnDisabled
-                : reissueReason === 'Select Issue' || reissueReason === 'Issue'
-            }
+            disabled={btnDisabled || !reissueReason}
             onPress={handleSubmitReissue}
           />
         </View>
