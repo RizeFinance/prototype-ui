@@ -134,7 +134,9 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
 
   const handleSubmitReissue = async () => {
     setReportBtnDisabled(true);
-    const { success } = await reissueDebitCard(activeCard?.uid, 'stolen');
+
+    const reason = reissueReason || 'stolen';
+    const { success } = await reissueDebitCard(activeCard?.uid, reason);
 
     if (success) {
       setAlert({ text: 'New card has been successfully requested.', success: true });
