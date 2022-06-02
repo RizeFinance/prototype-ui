@@ -107,16 +107,6 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     }
   }, [isFocused]);
 
-  useEffect(() => {
-    if (cardIsShipped) {
-      setPhysicalRequested(true);
-      setAlert({ text: 'Physical Card has been successfully requested', success: true });
-    } else {
-      setAlert(alertDefault);
-      setPhysicalRequested(false);
-    }
-  }, [cardIsShipped]);
-
   const checkCardAfterReissue = () => {
     const checkCard = setInterval(async () => {
       const { success, data: card } = await getActiveCard();
