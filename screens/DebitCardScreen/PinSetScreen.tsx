@@ -12,7 +12,7 @@ interface PinSetScreenProps {
 }
 
 export default function PinSetScreen({ navigation }: PinSetScreenProps): JSX.Element {
-  const { pinSetToken, loadPinSetToken, activeCard } = useDebitCards();
+  const { pinSetToken, loadPinSetToken, activeCard, refetchDebitCards } = useDebitCards();
 
   useEffect(() => {
     loadPinSetToken(activeCard.uid);
@@ -24,7 +24,8 @@ export default function PinSetScreen({ navigation }: PinSetScreenProps): JSX.Ele
     });
   }, []);
 
-  const handleBackButton = () => {
+  const handleBackButton = async () => {
+    await refetchDebitCards();
     navigation.navigate('DebitCard');
   };
 

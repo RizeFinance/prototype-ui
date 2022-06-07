@@ -19,7 +19,7 @@ export default function DebitCardActivationScreen({
   navigation,
 }: DebitCardActivationScreenProps): JSX.Element {
   const { accessToken } = useAuth();
-  const { activeCard } = useDebitCards();
+  const { activeCard, refetchDebitCards } = useDebitCards();
 
   const [showFailedMessage, setShowFailedMessage] = useState<boolean>(false);
 
@@ -45,6 +45,8 @@ export default function DebitCardActivationScreen({
       navigation.navigate('PinSet');
     } catch {
       setShowFailedMessage(true);
+    } finally {
+      refetchDebitCards();
     }
   };
 
