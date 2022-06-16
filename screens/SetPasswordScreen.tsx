@@ -10,6 +10,7 @@ import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../contexts/Auth';
 import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
+import { result } from 'lodash';
 
 const logo = require('../assets/images/logo.png');
 
@@ -86,15 +87,9 @@ export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps
       const result = await auth.setPassword(username, oldPassword, newPassword);
 
       if (result.success) {
-        const customer = await CustomerService.getCustomer(result.data.accessToken);
-        const workflow = await ComplianceWorkflowService.viewLatestWorkflow(
-          result.data.accessToken
-        );
-
-        await setCustomer(customer);
-        await setComplianceWorkflow(workflow);
-        await evaluateCurrentStep();
+        navigation.navigate('CustomerType');
       } else {
+        console.log(result);
         setMesage('Failed reset password.');
       }
     } catch (err) {

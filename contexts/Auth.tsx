@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState, createContext, useMemo, useCall
 import AuthService, { IConfirmPW } from '../services/AuthService';
 import { storeData, getData, removeValue } from '../utils/asyncStorage';
 import CustomerService from '../services/CustomerService';
-import { Customer } from '../models';
+import { Customer, CustomerDetails } from '../models';
 
 export type AuthContextProps = {
   accessToken?: string;
@@ -14,6 +14,8 @@ export type AuthContextProps = {
   forgotPassword: (email: string) => Promise<any>;
   confirmPassword: (data: IConfirmPW) => Promise<any>;
   setPassword: (username: string, oldPassword: string, newPassword: string) => Promise<any>;
+  createCustomer: (username: string, customerType: string) => Promise<Customer>;
+  updateCustomer: (username: string, details: CustomerDetails) => Promise<Customer>;
   refreshCustomer: () => Promise<Customer>;
   customer?: Customer;
   customerProducts?: any;
@@ -29,6 +31,8 @@ export const AuthContext = createContext<AuthContextProps>({
   register: () => Promise.resolve(null),
   forgotPassword: () => Promise.resolve(null),
   setPassword: () => Promise.resolve(null),
+  createCustomer: () => Promise.resolve(null),
+  updateCustomer: () => Promise.resolve(null),
   refreshCustomer: () => Promise.resolve(null),
   confirmPassword: () => Promise.resolve(null),
   customer: undefined,
@@ -40,7 +44,7 @@ export type AuthProviderState = {
   accessToken?: string;
   refreshToken?: string;
   userName?: string;
-  customer: Customer;
+  customer?: Customer;
   customerProducts?: any;
 };
 
@@ -62,7 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
   useEffect(() => {
     const getTokens = async () => {
       try {
-        const { accessToken, refreshToken } = await getData({ storageKey: '@tokens' });
+        const { accessToken, refreshToken, userName } = await getData({ storageKey: '@tokens' });
 
         if (accessToken) {
           try {
@@ -92,6 +96,10 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     }
   }, [authData.customer]);
 
+  useEffect(() => {
+    console.log('CHANGED: ', authData);
+  }, [authData]);
+
   const logout = useCallback(() => {
     setAuthData(initialState);
     removeValue({ storageKey: '@tokens' });
@@ -104,25 +112,28 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       const response = await AuthService.authorize(userName, password);
       const { data } = response;
 
-      if (data && data.accessToken) {
+      const auth: AuthProviderState = {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        userName,
+      };
+      try {
         const customer = await CustomerService.getCustomer(data.accessToken);
-
-        if (customer) {
-          const customerData = {
-            customer,
-            accessToken: data.accessToken,
-            refreshToken: data.refreshToken,
-          };
-          setAuthData(customerData);
-        }
-
-        const tokens = {
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken,
-        };
-
-        storeData({ storageKey: '@tokens', data: tokens });
+        auth.customer = customer;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log('Customer not found, assume new customer init');
+      } finally {
+        setAuthData(auth);
       }
+
+      const tokens = {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        userName,
+      };
+
+      storeData({ storageKey: '@tokens', data: tokens });
 
       return response;
     } catch (err) {
@@ -207,6 +218,14 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
           }));
         }
 
+        const tokens = {
+          accessToken: result.data.accessToken,
+          refreshToken: result.data.refreshToken,
+          userName: username,
+        };
+
+        storeData({ storageKey: '@tokens', data: tokens });
+
         return result;
       } catch (err) {
         return err;
@@ -214,6 +233,32 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     },
     []
   );
+
+  const createCustomer = async (username: string, customer_type: string): Promise<Customer> => {
+    if (!authData.accessToken) {
+      throw Error('No Auth');
+    }
+
+    try {
+      await CustomerService.createCustomer(authData.accessToken, username, customer_type);
+      return this.refreshCustomer();
+    } catch (err) {
+      return err;
+    }
+  };
+
+  const updateCustomer = async (username: string, details: CustomerDetails): Promise<Customer> => {
+    if (!authData.accessToken) {
+      throw Error('No Auth');
+    }
+
+    try {
+      await CustomerService.updateCustomer(authData.accessToken, username, details);
+      return this.refreshCustomer();
+    } catch (err) {
+      return err;
+    }
+  };
 
   const refreshCustomer = useCallback(async (): Promise<Customer> => {
     if (!authData.customer) {
@@ -233,6 +278,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
         customerProducts,
       }));
     }
+
+    return customer;
   }, [authData.accessToken, authData.customer]);
 
   const setCustomer = useCallback(async (customer: Customer) => {
@@ -256,6 +303,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       logout,
       customer,
       customerProducts,
+      createCustomer,
+      updateCustomer,
       refreshCustomer,
       setCustomer,
       confirmPassword,
@@ -271,6 +320,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       logout,
       customer,
       customerProducts,
+      createCustomer,
+      updateCustomer,
       refreshCustomer,
       setCustomer,
       confirmPassword,

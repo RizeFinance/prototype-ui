@@ -55,6 +55,7 @@ import {
   AccountsSetupScreen,
   ConnectAccountScreen,
   ConnectOneWayScreen,
+  CustomerTypeScreen,
 } from '../screens';
 
 // Contexts
@@ -152,6 +153,7 @@ function MainStackScreen() {
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
           <Stack.Screen name="SetPassword" component={SetPasswordScreen} />
+          <Stack.Screen name="CustomerType" component={CustomerTypeScreen} />
         </Stack.Navigator>
       ) : (
         <ComplianceWorkflowProvider navigation={navigation} auth={auth}>

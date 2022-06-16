@@ -1,4 +1,4 @@
-import React, { useState, PropsWithChildren } from 'react';
+import React, { useState, PropsWithChildren, useEffect } from 'react';
 import { Pressable, View, StyleSheet } from 'react-native';
 import { Body } from './Typography';
 import * as Svg from '../assets/svg';
@@ -40,6 +40,10 @@ const Checkbox = (props: PropsWithChildren<CheckboxProps>): JSX.Element => {
     }
     setChecked(newCheckedValue);
   };
+
+  useEffect(() => {
+    setChecked(props.checked);
+  }, [props.checked]);
 
   const renderChildren = (props: PropsWithChildren<CheckboxProps>): JSX.Element => {
     return (

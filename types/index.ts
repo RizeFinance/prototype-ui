@@ -74,6 +74,7 @@ export type RootStackParamList = {
   Agreements: undefined;
   Main: any;
   AccountsSetup: any;
+  CustomerType: undefined;
   DebitCardActivation: any;
   PinSet: any;
   BrokerageOverview: any;
