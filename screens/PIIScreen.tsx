@@ -2,7 +2,7 @@ import { Formik, useFormikContext } from 'formik';
 import React, { useEffect } from 'react';
 import { StyleSheet, View, Platform } from 'react-native';
 import { Button, DatePickerInput, Input, Screen, Dropdown } from '../components';
-import { Heading3 } from '../components/Typography';
+import { Heading3, Body } from '../components/Typography';
 import * as Yup from 'yup';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { PIIFields, RootStackParamList } from '../types';
@@ -159,6 +159,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                   editable={!isSubmitting}
                 />
               )}
+              <Body>&nbsp;</Body>
               <Input
                 label="First Name"
                 placeholder="First Name"
