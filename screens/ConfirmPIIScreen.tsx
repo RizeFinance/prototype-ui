@@ -9,7 +9,7 @@ import CustomerService from '../services/CustomerService';
 import { ProductType } from '../contexts/ComplianceWorkflow';
 import { useBrokerageWorkflow, BrokerageProductType } from '../contexts/BrokerageWorkflow';
 import { useAuth } from '../contexts/Auth';
-import { get } from 'lodash';
+import { get, set } from 'lodash';
 
 interface ConfirmPIIScreenProps {
   route: RouteProp<RootStackParamList, 'ConfirmPII'>;
@@ -54,7 +54,7 @@ export default function ConfirmPIIScreen({
         return;
       }
 
-      await CustomerService.updateCustomer(accessToken, customer.email, {
+      const proposedChanged = {
         first_name: data.first_name,
         middle_name: data.middle_name,
         last_name: data.last_name,
@@ -69,7 +69,13 @@ export default function ConfirmPIIScreen({
           state: data.state,
           postal_code: data.postal_code,
         },
-      }).then(
+      };
+
+      if (customer.type === 'sole_proprietor') {
+        set(proposedChanged, 'business_name', data.business_name);
+      }
+
+      await CustomerService.updateCustomer(accessToken, customer.email, proposedChanged).then(
         () => {
           navigation.navigate('BankingDisclosures');
         },
@@ -89,6 +95,13 @@ export default function ConfirmPIIScreen({
     <Screen useScrollView>
       <Heading3 textAlign="center">Confirm Your Personal Information</Heading3>
       <Body>&nbsp;</Body>
+      <Body>&nbsp;</Body>
+      {data.business_name && (
+        <>
+          <Body fontWeight="semibold">Business name</Body>
+          <Body style={{ color: gray }}>{data.business_name}</Body>
+        </>
+      )}
       <Body>&nbsp;</Body>
       <Body fontWeight="semibold">First name</Body>
       <Body style={{ color: gray }}>{data.first_name}</Body>

@@ -156,8 +156,8 @@ function MainStackScreen() {
           <Stack.Screen name="CustomerType" component={CustomerTypeScreen} />
         </Stack.Navigator>
       ) : (
-        <ComplianceWorkflowProvider navigation={navigation} auth={auth}>
-          <BrokerageWorkflowProvider navigation={navigation}>
+        <ComplianceWorkflowProvider auth={auth} navigation={navigation}>
+          <BrokerageWorkflowProvider auth={auth} navigation={navigation}>
             {customer.status === 'initiated' ? (
               <Stack.Navigator screenOptions={screenOptions.withoutHeader}>
                 <Stack.Screen name="Disclosures" component={DisclosuresScreen} />

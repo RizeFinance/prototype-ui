@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Input, Screen, Checkbox } from '../components';
+import { Button, Screen, Checkbox } from '../components';
 import { Body, Heading3 } from '../components/Typography';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types';
+import { MessageStatus, RootStackParamList } from '../types';
 import { useAuth } from '../contexts/Auth';
-import { useComplianceWorkflow } from '../contexts';
 import config from '../config/config';
+import Message, { useMessage } from '../components/Message';
 
 interface CustomerTypeScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'ÇustomerType'>;
@@ -14,18 +14,17 @@ interface CustomerTypeScreenProps {
 
 enum CustomerType {
   Individual = 'unaffiliated',
-  SoleProprieter = 'sole_proprietor',
+  SoleProprietor = 'sole_proprietor',
 }
 
 export default function SignupScreen({ navigation }: CustomerTypeScreenProps): JSX.Element {
-  const { userName, createCustomer, updateCustomer } = useAuth();
-  const { createComplianceWorkflow, evaluateCurrentStep } = useComplianceWorkflow();
+  const { userName, createCustomer } = useAuth();
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
-  const [customerType, setCustomerType] = useState(null);
-  const [buisness, setBuisness] = useState(null);
+  const [customerType, setCustomerType] = useState<CustomerType | null>(null);
+  const { message: alert, setMessage } = useMessage();
 
-  const isBuisness = customerType === CustomerType.SoleProprieter;
+  const isBusiness = customerType === CustomerType.SoleProprietor;
   const isIndividual = customerType === CustomerType.Individual;
 
   const styles = StyleSheet.create({
@@ -50,27 +49,25 @@ export default function SignupScreen({ navigation }: CustomerTypeScreenProps): J
     if (!userName || !customerType) return;
     setLoading(true);
     try {
-      const newCustomer = await createCustomer(userName, customerType);
-      if (isBuisness && buisness) {
-        await updateCustomer(newCustomer.email, { business_name: buisness });
-      }
-
-      await createComplianceWorkflow(config.application.defaultProductUid);
-      await evaluateCurrentStep();
+      await createCustomer(userName, customerType, config.application.defaultProductUid);
     } catch (err) {
-      console.log(err);
+      setMessage({
+        status: MessageStatus.ERROR,
+        copy: 'Something went wrong! Reach out to our Support Team',
+      });
     }
   };
 
   useEffect(() => {
-    const isValid = (isBuisness && buisness) || isIndividual;
+    const isValid = isBusiness || isIndividual;
     setDisabled(!isValid);
-  }, [isBuisness, isIndividual, buisness]);
+  }, [isBusiness, isIndividual]);
 
   return (
     <Screen style={styles.container}>
       <View>
         <Heading3 textAlign="center">Account Type</Heading3>
+        <Message message={alert} />
         <Body style={styles.subCopy}>I am signing up for an account as a:</Body>
         <Checkbox
           checked={isIndividual}
@@ -79,21 +76,13 @@ export default function SignupScreen({ navigation }: CustomerTypeScreenProps): J
           <Body>Individual</Body>
         </Checkbox>
         <Checkbox
-          checked={isBuisness}
+          checked={isBusiness}
           onChange={(checked): void =>
-            setCustomerType(checked ? CustomerType.SoleProprieter : null)
+            setCustomerType(checked ? CustomerType.SoleProprietor : null)
           }
         >
           <Body>Sole Proprietor</Body>
         </Checkbox>
-        {isBuisness && (
-          <Input
-            label="Buisness Name"
-            placeholder="Buisness Name"
-            defaultValue={buisness}
-            onChangeText={(value: string) => setBuisness(value?.trim())}
-          />
-        )}
       </View>
       <Button
         title="Continue"

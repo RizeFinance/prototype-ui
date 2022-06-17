@@ -37,7 +37,8 @@ const getCustomerProducts = async (
 const createCustomer = async (
   accessToken: string,
   customerEmail: string,
-  customerType: string
+  customerType: string,
+  productUid: string
 ): Promise<Customer> => {
   return await api
     .post(
@@ -45,6 +46,7 @@ const createCustomer = async (
       {
         email: customerEmail,
         customer_type: customerType,
+        product_uid: productUid,
       },
       { headers: { Authorization: `Bearer ${accessToken}` } }
     )

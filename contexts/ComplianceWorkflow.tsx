@@ -8,7 +8,6 @@ import { AuthContext } from './Auth';
 import { AuthContextProps } from '../contexts/Auth';
 import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 import CustomerService from '../services/CustomerService';
-import { ProductService } from '../services';
 import config from '../config/config';
 import { find } from 'lodash';
 
@@ -105,11 +104,6 @@ export class ComplianceWorkflowProvider extends React.Component<
 
   evaluateCurrentStep = async (): Promise<void> => {
     const customer = this.context.customer;
-    const workflow = this.state.complianceWorkflow;
-
-    if (customer?.status === 'active' && workflow) {
-      await this.redirectToProductStep(workflow, customer);
-    }
 
     if (customer?.status === 'initiated') {
       // Get the latest workflow of the customer
@@ -118,7 +112,7 @@ export class ComplianceWorkflowProvider extends React.Component<
       );
 
       if (latestWorkflow.summary.status === 'expired') {
-        await this.renewComplianceWorkflow();
+        await this.createComplianceWorkflow(config.application.defaultProductUid);
       } else {
         await this.setComplianceWorkflow(latestWorkflow);
       }
@@ -160,16 +154,16 @@ export class ComplianceWorkflowProvider extends React.Component<
     }
   };
 
-  loadComplianceWorkflows = async (query: any = {}): Promise<void> => {
+  loadComplianceWorkflows = async (query: any = {}): Promise<ComplianceWorkflow[] | Error> => {
     try {
       const { data: customerWorkflows } = await ComplianceWorkflowService.getCustomerWorkflows(
         this.props.auth.accessToken,
         query
       );
       this.setState({ customerWorkflows });
-      return { data: customerWorkflows };
+      return customerWorkflows;
     } catch (err) {
-      return { data: err };
+      return new Error(err);
     }
   };
 
@@ -228,37 +222,6 @@ export class ComplianceWorkflowProvider extends React.Component<
       });
 
     await this.promisedSetState({ bankingDisclosures: allDisclosures });
-  };
-
-  redirectToProductStep = async (): Promise<void> => {
-    const brokerageProductUid = config.application.brokerageProductUid;
-    const navigation = this.props.navigation;
-
-    let currentScreen: keyof RootStackParamList = 'ProfileQuestions';
-    const routeParams = {
-      productType: ProductType.Brokerage,
-      productId: brokerageProductUid,
-    };
-
-    const { data: products } = await ProductService.getProducts(this.props.auth.accessToken);
-
-    const brokerageProduct = find(products, { uid: brokerageProductUid });
-
-    if (brokerageProduct.profile_requirements.length >= 1) {
-      currentScreen = 'ProfileQuestions';
-    }
-
-    const steps: (keyof RootStackParamList)[] = ['ProfileQuestions', 'BrokerageDisclosures'];
-
-    if (currentScreen && steps.includes(currentScreen)) {
-      for (const step of steps) {
-        navigation.navigate(step, routeParams);
-
-        if (step === currentScreen) {
-          break;
-        }
-      }
-    }
   };
 
   redirectToCurrentStep = async (

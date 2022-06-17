@@ -5,12 +5,8 @@ import { Body, BodySmall, Heading3 } from '../components/Typography';
 import { Formik } from 'formik';
 import validator from 'validator';
 import { RootStackParamList } from '../types';
-import CustomerService from '../services/CustomerService';
-import ComplianceWorkflowService from '../services/ComplianceWorkflowService';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../contexts/Auth';
-import { useComplianceWorkflow } from '../contexts/ComplianceWorkflow';
-import { result } from 'lodash';
 
 const logo = require('../assets/images/logo.png');
 
@@ -25,8 +21,7 @@ interface SetPasswordFields {
 }
 
 export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps): JSX.Element {
-  const { setCustomer, ...auth } = useAuth();
-  const { setComplianceWorkflow, evaluateCurrentStep } = useComplianceWorkflow();
+  const { ...auth } = useAuth();
 
   const [message, setMesage] = useState<string>('');
 
@@ -89,7 +84,6 @@ export default function SetPasswordScreen({ navigation }: SetPasswordScreenProps
       if (result.success) {
         navigation.navigate('CustomerType');
       } else {
-        console.log(result);
         setMesage('Failed reset password.');
       }
     } catch (err) {

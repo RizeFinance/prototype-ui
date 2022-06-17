@@ -83,7 +83,12 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
 
       if (!customer) navigation.navigate('CustomerType');
     } catch (err) {
-      setCommonError('Something went wrong! Try again later');
+      const {
+        data: {
+          data: { message },
+        },
+      } = err;
+      setCommonError(`Something went wrong! \n ${message || 'Try again later'}`);
     }
   };
 

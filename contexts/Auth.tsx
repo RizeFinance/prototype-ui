@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
   useEffect(() => {
     const getTokens = async () => {
       try {
-        const { accessToken, refreshToken, userName } = await getData({ storageKey: '@tokens' });
+        const { accessToken, refreshToken } = await getData({ storageKey: '@tokens' });
 
         if (accessToken) {
           try {
@@ -95,10 +95,6 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
       getTokens();
     }
   }, [authData.customer]);
-
-  useEffect(() => {
-    console.log('CHANGED: ', authData);
-  }, [authData]);
 
   const logout = useCallback(() => {
     setAuthData(initialState);
@@ -234,14 +230,24 @@ export const AuthProvider = ({ children }: AuthProviderProps): AuthProviderProps
     []
   );
 
-  const createCustomer = async (username: string, customer_type: string): Promise<Customer> => {
+  const createCustomer = async (
+    username: string,
+    customer_type: string,
+    product_uid: string
+  ): Promise<Customer> => {
     if (!authData.accessToken) {
       throw Error('No Auth');
     }
 
     try {
-      await CustomerService.createCustomer(authData.accessToken, username, customer_type);
-      return this.refreshCustomer();
+      const { customer } = await CustomerService.createCustomer(
+        authData.accessToken,
+        username,
+        customer_type,
+        product_uid
+      );
+      await setCustomer(customer);
+      return customer;
     } catch (err) {
       return err;
     }
