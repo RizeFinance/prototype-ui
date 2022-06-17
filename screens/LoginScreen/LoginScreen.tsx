@@ -25,7 +25,7 @@ interface LoginFields {
 }
 
 export default function LoginScreen({ navigation, route }: LoginScreenProps): JSX.Element {
-  const { setCustomer, ...auth } = useAuth();
+  const { customer, setCustomer, ...auth } = useAuth();
 
   const [commonError, setCommonError] = useState<string>('');
 
@@ -71,7 +71,6 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
 
     try {
       const authData = await auth.login(values.email, values.password);
-
       if (!authData.success) {
         setCommonError(authData.message);
         return;
@@ -81,8 +80,15 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
         navigation.navigate('SetPassword');
         return;
       }
+
+      if (!customer) navigation.navigate('CustomerType');
     } catch (err) {
-      setCommonError('Something went wrong! Try again later');
+      const {
+        data: {
+          data: { message },
+        },
+      } = err;
+      setCommonError(`Something went wrong! \n ${message || 'Try again later'}`);
     }
   };
 

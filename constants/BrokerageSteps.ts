@@ -37,7 +37,7 @@ const steps = [
       {
         name: 'Number of Dependents',
         placeholder: 'Enter Number of Dependents',
-        pattern: '^([0-9]|10)$',
+        pattern: '^[0-9]*$',
       },
       {
         name: 'Net Worth',

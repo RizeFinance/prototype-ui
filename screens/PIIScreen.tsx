@@ -10,7 +10,7 @@ import moment from 'moment';
 import states from '../constants/States';
 import { useAuth } from '../contexts/Auth';
 import formatStringByPattern from 'format-string-by-pattern';
-
+import { set } from 'lodash';
 interface PIIScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'PII'>;
 }
@@ -21,7 +21,6 @@ type PIIScreenFields = Omit<PIIFields, 'dob'> & {
 
 function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
   const { refreshCustomer } = useAuth();
-
   const { setFieldValue } = useFormikContext<PIIScreenFields>();
 
   useEffect(() => {
@@ -55,6 +54,8 @@ function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
 }
 
 export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
+  const { customer } = useAuth();
+
   const styles = StyleSheet.create({
     heading: {
       marginBottom: 10,
@@ -85,7 +86,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
   const maxDob = new Date();
   maxDob.setFullYear(maxDob.getFullYear() - 18);
 
-  const piiSchema = Yup.object().shape({
+  const initSchema = {
     first_name: Yup.string().required('First Name is required.'),
     last_name: Yup.string().required('Last Name is required.'),
     dob: Yup.date()
@@ -108,7 +109,13 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
       .required('SSN is required.')
       .max(11, 'Invalid Social Security Number.')
       .matches(/[A-Za-z0-9]{3}-[A-Za-z0-9]{2}-[A-Za-z0-9]{4}/, 'Invalid Social Security Number.'),
-  });
+  };
+
+  if (customer.type === 'sole_proprietor') {
+    set(initSchema, 'business_name', Yup.string().required('Business Name is required.'));
+  }
+
+  const piiSchema = Yup.object().shape(initSchema);
 
   const onSubmit = async (values: PIIScreenFields): Promise<void> => {
     navigation.navigate('ConfirmPII', {
@@ -141,6 +148,17 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
           <>
             <FetchPreviousValues navigation={navigation} />
             <View style={styles.formGroup}>
+              {customer.type === 'sole_proprietor' && (
+                <Input
+                  label="Business Name"
+                  placeholder="Business Name"
+                  onChangeText={handleChange('business_name')}
+                  onBlur={handleBlur('business_name')}
+                  value={values.business_name}
+                  errorText={!touched.business_name ? '' : errors.business_name}
+                  editable={!isSubmitting}
+                />
+              )}
               <Input
                 label="First Name"
                 placeholder="First Name"

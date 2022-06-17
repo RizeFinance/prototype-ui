@@ -6,7 +6,7 @@ const getCustomer = async (accessToken: string): Promise<Customer> => {
     .get('/customer', { headers: { Authorization: `Bearer ${accessToken}` } })
     .then((response) => response.data)
     .catch((error) => {
-      throw new Error(error);
+      return Promise.reject(error);
     });
 };
 
@@ -32,6 +32,30 @@ const getCustomerProducts = async (
       headers: { Authorization: `Bearer ${accessToken}` },
     })
     .then((response) => response.data);
+};
+
+const createCustomer = async (
+  accessToken: string,
+  customerEmail: string,
+  customerType: string,
+  productUid: string
+): Promise<Customer> => {
+  return await api
+    .post(
+      '/customer',
+      {
+        email: customerEmail,
+        customer_type: customerType,
+        product_uid: productUid,
+      },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      throw error.data.errors;
+    });
 };
 
 const updateCustomer = async (
@@ -84,6 +108,7 @@ export default {
   verifyCustomer,
   getCustomerProducts,
   createCustomerProduct,
+  createCustomer,
   updateCustomer,
   updateCustomerProfileAnswers,
 };

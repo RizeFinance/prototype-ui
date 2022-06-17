@@ -10,6 +10,7 @@ export default {
           Signup: 'signup',
           ForgotPassword: 'forgot-password',
           SetPassword: 'set-password',
+          CustomerType: 'set-type',
           Accounts: 'accounts',
           ExternalAccounts: 'external-accounts',
           ArchiveExternalAccount: 'archive-external-account',

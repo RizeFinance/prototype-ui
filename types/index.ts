@@ -10,6 +10,7 @@ export type ApplicationUnapprovedParams = {
 };
 
 export type PIIFields = {
+  business_name?: string;
   first_name: string;
   middle_name: string;
   last_name: string;
@@ -74,6 +75,7 @@ export type RootStackParamList = {
   Agreements: undefined;
   Main: any;
   AccountsSetup: any;
+  CustomerType: undefined;
   DebitCardActivation: any;
   PinSet: any;
   BrokerageOverview: any;
