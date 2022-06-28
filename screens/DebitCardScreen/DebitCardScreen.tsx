@@ -94,6 +94,10 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
     navigation.push('DebitCardActivation');
   };
 
+  const sendToPinSet = (): void => {
+    navigation.push('PinSet');
+  };
+
   useEffect(() => {
     const clearAlert = () => {
       setAlert(alertDefault);
@@ -230,6 +234,8 @@ export default function DebitCardScreen({ navigation }: DebitCardScreenProps): J
             disabled={btnDisabled}
           />
         )}
+
+        {isPhysicalCard && isCardActive && <Button title={'Set Card Pin'} onPress={sendToPinSet} />}
       </View>
 
       {!cardLoading && (
