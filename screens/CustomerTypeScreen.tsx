@@ -13,7 +13,7 @@ interface CustomerTypeScreenProps {
 }
 
 enum CustomerType {
-  Individual = 'unaffiliated',
+  Individual = 'primary',
   SoleProprietor = 'sole_proprietor',
 }
 
