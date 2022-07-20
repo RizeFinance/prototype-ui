@@ -13,7 +13,7 @@ interface CustomerTypeScreenProps {
 }
 
 enum CustomerType {
-  Individual = 'primary',
+  Primary = 'primary',
   SoleProprietor = 'sole_proprietor',
 }
 
@@ -25,7 +25,7 @@ export default function SignupScreen({ navigation }: CustomerTypeScreenProps): J
   const { message: alert, setMessage } = useMessage();
 
   const isBusiness = customerType === CustomerType.SoleProprietor;
-  const isIndividual = customerType === CustomerType.Individual;
+  const isPrimary = customerType === CustomerType.Primary;
 
   const styles = StyleSheet.create({
     container: {
@@ -59,9 +59,9 @@ export default function SignupScreen({ navigation }: CustomerTypeScreenProps): J
   };
 
   useEffect(() => {
-    const isValid = isBusiness || isIndividual;
+    const isValid = isBusiness || isPrimary;
     setDisabled(!isValid);
-  }, [isBusiness, isIndividual]);
+  }, [isBusiness, isPrimary]);
 
   return (
     <Screen style={styles.container}>
@@ -70,10 +70,10 @@ export default function SignupScreen({ navigation }: CustomerTypeScreenProps): J
         <Message message={alert} />
         <Body style={styles.subCopy}>I am signing up for an account as a:</Body>
         <Checkbox
-          checked={isIndividual}
-          onChange={(checked): void => setCustomerType(checked ? CustomerType.Individual : null)}
+          checked={isPrimary}
+          onChange={(checked): void => setCustomerType(checked ? CustomerType.Primary : null)}
         >
-          <Body>Individual</Body>
+          <Body>Primary</Body>
         </Checkbox>
         <Checkbox
           checked={isBusiness}
