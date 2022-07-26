@@ -110,7 +110,11 @@ export default function ConfirmPIIScreen({
       <Body style={{ color: gray }}>{data.last_name}</Body>
       <Body>&nbsp;</Body>
       <Body fontWeight="semibold">Date of Birth</Body>
-      <Body style={{ color: gray }}>{data.dob}</Body>
+      <Body style={{ color: gray }}>
+        {data.dob
+          ? `${data.dob.substring(5, 7)}-${data.dob.substring(8, 10)}-${data.dob.substring(0, 4)}`
+          : 'null'}
+      </Body>
       <Body>&nbsp;</Body>
       <Body fontWeight="semibold">Address</Body>
       <Body style={{ color: gray }}>{`${data.street1} ${data.street2}`}</Body>
