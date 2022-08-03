@@ -1,12 +1,19 @@
 import { Formik, useFormikContext } from 'formik';
-import React, { useEffect } from 'react';
-import { StyleSheet, View, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  Platform,
+  NativeSyntheticEvent,
+  TextInputChangeEventData,
+  TextInputSelectionChangeEventData,
+} from 'react-native';
 import { Button, DatePickerInput, Input, Screen, Dropdown } from '../components';
 import { Heading3, Body } from '../components/Typography';
 import * as Yup from 'yup';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { PIIFields, RootStackParamList } from '../types';
-import moment from 'moment';
+import IMask from 'imask';
 import states from '../constants/States';
 import { useAuth } from '../contexts/Auth';
 import formatStringByPattern from 'format-string-by-pattern';
@@ -55,7 +62,8 @@ function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
 
 export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
   const { customer } = useAuth();
-
+  const [cursor, setCursor] = useState(0);
+  const [textLen, setTextLen] = useState(0);
   const styles = StyleSheet.create({
     heading: {
       marginBottom: 10,
@@ -121,7 +129,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
     navigation.navigate('ConfirmPII', {
       fieldValues: {
         ...values,
-        dob: moment(values.dob).format('yyyy-MM-DD'),
+        dob: values.dob,
       },
     });
   };
@@ -200,18 +208,46 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
 
             <View style={styles.formGroup}>
               {Platform.OS === 'web' ? (
-                <Input
-                  label="Date of Birth"
-                  placeholder="MM-DD-YYYY"
-                  onChangeText={(e) => {
-                    const value = formatStringByPattern('MM-DD-YYYY', e);
-                    setFieldValue('dob', value);
-                  }}
-                  onBlur={handleBlur('dob')}
-                  value={values.dob}
-                  errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
-                  editable={!isSubmitting}
-                />
+                <>
+                  <Input
+                    label="Date of Birth"
+                    placeholder="MM-DD-YYYY"
+                    onChange={(e: NativeSyntheticEvent<TextInputChangeEventData>) => {
+                      const masked = IMask.createMask({
+                        mask: '00-00-0000',
+                        lazy: true,
+                        overwrite: true,
+                      });
+                      const value = masked.resolve(e.target.value);
+                      //deleting a character
+                      if (textLen > value.length) {
+                        setCursor((prevState) => {
+                          return prevState;
+                        });
+                        // moved the cursor and adding characters
+                      } else if (cursor !== textLen) {
+                        setCursor((prevState) => {
+                          return prevState + 1;
+                        });
+                      } else {
+                        setCursor(value.length);
+                      }
+                      setTextLen(value.length);
+                      console.log(value);
+                      setFieldValue('dob', value);
+                    }}
+                    selection={{ start: cursor, end: cursor }}
+                    onSelectionChange={(
+                      e: NativeSyntheticEvent<TextInputSelectionChangeEventData>
+                    ) => {
+                      setCursor(e.target.selectionStart);
+                    }}
+                    onBlur={handleBlur('dob')}
+                    value={values.dob}
+                    errorText={(!touched.dob as boolean) ? '' : (errors.dob as string)}
+                    editable={!isSubmitting}
+                  />
+                </>
               ) : (
                 <DatePickerInput
                   label="Date of Birth"

@@ -47,6 +47,7 @@
     "expo-web-browser": "~10.0.3",
     "format-string-by-pattern": "^1.2.2",
     "formik": "^2.2.9",
+    "imask": "^6.4.2",
     "lodash": "^4.17.21",
     "modal-enhanced-react-native-web": "^0.2.0",
     "moment": "^2.29.1",
