@@ -10,6 +10,7 @@ import { ProductType } from '../contexts/ComplianceWorkflow';
 import { useBrokerageWorkflow, BrokerageProductType } from '../contexts/BrokerageWorkflow';
 import { useAuth } from '../contexts/Auth';
 import { get, set } from 'lodash';
+import moment from 'moment';
 
 interface ConfirmPIIScreenProps {
   route: RouteProp<RootStackParamList, 'ConfirmPII'>;
@@ -61,7 +62,7 @@ export default function ConfirmPIIScreen({
         suffix: data.suffix,
         phone: data.phone.replace(/\D/g, ''),
         ssn: data.ssn,
-        dob: data.dob,
+        dob: moment(data.dob).format('yyyy-MM-DD'),
         address: {
           street1: data.street1,
           street2: data.street2,

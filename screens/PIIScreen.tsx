@@ -233,7 +233,6 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                         setCursor(value.length);
                       }
                       setTextLen(value.length);
-                      console.log(value);
                       setFieldValue('dob', value);
                     }}
                     selection={{ start: cursor, end: cursor }}
