@@ -138,6 +138,7 @@ export class BrokerageWorkflowProvider extends React.Component<
 
   loadBrokerageProduct = async (): Promise<void> => {
     const productUid = this.state.brokerageProductUid;
+    if (!productUid) return;
     const product = await ProductService.getProduct(this.context.accessToken, productUid);
 
     this.setBrokerageProduct(product);

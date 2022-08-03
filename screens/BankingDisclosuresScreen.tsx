@@ -23,9 +23,6 @@ export default function BankingDisclosuresScreen(): JSX.Element {
   const { accessToken } = useAuth();
   const [checkboxSelected, setCheckboxSelected] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const depositAgreement = bankingDisclosures.find(
-    (x) => x.name === 'Deposit Agreement and Disclosures'
-  );
   const primary = useThemeColor('primary');
 
   const styles = StyleSheet.create({
@@ -45,6 +42,8 @@ export default function BankingDisclosuresScreen(): JSX.Element {
     },
   });
 
+  const unsignedDocs = complianceWorkflow?.current_step_documents_pending || [];
+
   useEffect(() => {
     if (complianceWorkflow && bankingDisclosures.length === 0) {
       loadBankingDisclosures();
@@ -57,7 +56,7 @@ export default function BankingDisclosuresScreen(): JSX.Element {
   }, [bankingDisclosures]);
 
   const setDocSelected = (docIndex: number, selected: boolean): void => {
-    const docsClone = cloneDeep(bankingDisclosures);
+    const docsClone = cloneDeep(unsignedDocs);
     docsClone[docIndex].selected = selected;
     setBankingDisclosures(docsClone);
   };
@@ -72,7 +71,7 @@ export default function BankingDisclosuresScreen(): JSX.Element {
     setIsSubmitting(true);
 
     try {
-      const unacceptedDocs = complianceWorkflow.current_step_documents_pending;
+      const unacceptedDocs = unsignedDocs;
       if (unacceptedDocs.length > 0) {
         const ipAddress = await Network.getIpAddressAsync();
         const updatedComplianceWorkflow = await ComplianceWorkflowService.acknowledgeDocuments(
@@ -106,7 +105,10 @@ export default function BankingDisclosuresScreen(): JSX.Element {
               onPressButton(doc.compliance_document_url);
             }}
           >
-            <Checkbox checked={false} onChange={(checked): void => setDocSelected(index, checked)}>
+            <Checkbox
+              checked={doc.selected || false}
+              onChange={(checked): void => setDocSelected(index, checked)}
+            >
               <Body>
                 I agree to <Body style={styles.underline}>{doc.name}</Body>
               </Body>
@@ -124,8 +126,9 @@ export default function BankingDisclosuresScreen(): JSX.Element {
       <Body>&nbsp;</Body>
 
       <View style={styles.checkboxesContainer}>
-        {depositAgreement &&
-          generateCheckBox(depositAgreement, bankingDisclosures.indexOf(depositAgreement))}
+        {unsignedDocs.map((document, index) => {
+          return generateCheckBox(document, index);
+        })}
       </View>
 
       <View style={styles.footer}>
