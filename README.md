@@ -1,5 +1,7 @@
 # Rize Boilerplate UI
 
+**Have you watched the ["Build a Banking Application In Less Than 30 Minutes"](https://www.youtube.com/watch?v=m_uHTh8009c&t=1s) video?**
+
 ## Prerequisites
 
 - NodeJS v12 and up
