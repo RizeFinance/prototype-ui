@@ -75,29 +75,6 @@ To confirm you should see the following lines when you run npm config list
 ```
 
 
-
-## Getting Started
-
-1. [Log in to GitHub Package Registry](#logging-in-to-the-github-package-registry)
-
-2. Install the `@rizefinance/cli` package 
-
-   ```sh
-   npm i -g @rizefinance/cli
-   ```
-
-3. Create and run a new app
-
-   ```sh
-   rize create my-project
-   cd my-project
-   docker-compose up
-   ```
-
-4. Check if Application is running at `http://localhost/api/health-check`
-
-
-
 ## Running the App
 
 1. Clone or fork the [RizeFinance/compliance-demo-ui](https://github.com/RizeFinance/compliance-demo-ui) repository on your machine
