@@ -19,7 +19,7 @@
 
 ## Warning!
 
-This application is not an codeless solution for you and your team. Rize used this app to demo off new features such as Debit Cards and Brokerage accounts. 
+This application is not a codeless solution for you and your team. Rize uses this app to test and demo new features such as Debit Cards and Brokerage accounts before they get to our clients. 
 
 This application requires a server application built by the [Rize CLI](https://github.com/RizeFinance/rize-cli) tool to support it's requests.
 
@@ -60,7 +60,7 @@ This boilerplate requires specifically the `3.27.8` version of the Expo CLI in o
 
 
 
-## Logging in to the GitHub Package Registry
+## Logging into the GitHub Package Registry
 
 1. Run `npm login --scope=@rizefinance --registry=https://npm.pkg.github.com`
 2. Input your GitHub Username.
@@ -79,7 +79,7 @@ To confirm you should see the following lines when you run npm config list
 
 1. Clone or fork the [RizeFinance/compliance-demo-ui](https://github.com/RizeFinance/compliance-demo-ui) repository on your machine
 
-2. [Log in to GitHub Package Registry](#logging-in-to-the-github-package-registry)
+2. [Log in to GitHub Package Registry](#logging-into-the-github-package-registry)
 
 3. If working locally, please spin up an application via the CLI tool
 
