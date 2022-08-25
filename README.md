@@ -13,7 +13,7 @@
 
 
 
-# Rize Prototype UI ![](https://img.shields.io/badge/CLI-NodeApp-blue![](https://img.shields.io/badge/Version-1.0.13-green)
+# Rize Prototype UI
 
 
 
