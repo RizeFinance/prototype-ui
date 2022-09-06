@@ -14,6 +14,7 @@ import * as Yup from 'yup';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { PIIFields, RootStackParamList } from '../types';
 import IMask from 'imask';
+import { parse, format, isDate } from 'date-fns';
 import states from '../constants/States';
 import { useAuth } from '../contexts/Auth';
 import formatStringByPattern from 'format-string-by-pattern';
@@ -25,6 +26,13 @@ interface PIIScreenProps {
 type PIIScreenFields = Omit<PIIFields, 'dob'> & {
   dob?: Date;
 };
+
+function parseDateString(value, originalValue) {
+  const parsedDate = isDate(originalValue)
+    ? originalValue
+    : parse(originalValue, 'MM-dd-yyyy', new Date());
+  return parsedDate;
+}
 
 function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
   const { refreshCustomer } = useAuth();
@@ -93,12 +101,15 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
 
   const maxDob = new Date();
   maxDob.setFullYear(maxDob.getFullYear() - 18);
-
+  const minDob = new Date();
+  minDob.setFullYear(minDob.getFullYear() - 130);
   const initSchema = {
     first_name: Yup.string().required('First Name is required.'),
     last_name: Yup.string().required('Last Name is required.'),
     dob: Yup.date()
+      .transform(parseDateString)
       .required('Date of Birth is required.')
+      .min(minDob, 'You must enter a valid Date of Birth')
       .max(maxDob, 'You should be at least 18 years old.')
       .typeError('You must enter a valid Date of Birth'),
     street1: Yup.string().required('Address is required.'),
@@ -129,7 +140,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
     navigation.navigate('ConfirmPII', {
       fieldValues: {
         ...values,
-        dob: values.dob,
+        dob: format(values.dob, 'yyyy-dd-MM'),
       },
     });
   };
@@ -219,6 +230,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                         overwrite: true,
                       });
                       const value = masked.resolve(e.target.value);
+
                       //deleting a character
                       if (textLen > value.length) {
                         setCursor((prevState) => {
