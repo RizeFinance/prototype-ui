@@ -5,29 +5,19 @@
   <br />
 </p>
 
-
-
-
-
-*Make financial services simple and accessible. Rize enables fintechs, financial institutions and brands to build across multiple account types with one API.* *If you want to join us [<kbd>**Check out our open positions**</kbd>](https://rizefs.com/careers/)_*
-
-
+_Make financial services simple and accessible. Rize enables fintechs, financial institutions and brands to build across multiple account types with one API._ _If you want to join us [<kbd>**Check out our open positions**</kbd>](https://rizefs.com/careers/)\__
 
 # Rize Prototype UI
 
-
-
 ## Warning!
 
-This application is not a codeless solution for you and your team. Rize uses this app to test and demo new features such as Debit Cards and Brokerage accounts before they get to our clients. 
+This application is not a codeless solution for you and your team. Rize uses this app to test and demo new features such as Debit Cards and Brokerage accounts before they get to our clients.
 
 This application requires a server application built by the [Rize CLI](https://github.com/RizeFinance/rize-cli) tool to support it's requests.
 
 This application is supported by Rize in a web environment so you may need to make adjustments for IOS or Android.
 
 **Have you watched the ["Build a Banking Application In Less Than 30 Minutes"](https://www.youtube.com/watch?v=m_uHTh8009c&t=1s) video?**
-
-
 
 ## Prerequisites
 
@@ -40,15 +30,11 @@ This application is supported by Rize in a web environment so you may need to ma
 - [iOS Simulator (macOS only)](https://docs.expo.io/workflow/ios-simulator/)
 - [Android Emulator](https://docs.expo.io/workflow/android-studio-emulator/)
 
-
-
 ## Recommeded Tools
 
 - [VSCode Editor](https://code.visualstudio.com/download)
 - [Yarn](https://classic.yarnpkg.com/en/docs/install)
 - Windows users: [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows) or Bash via WSL
-
-
 
 ## Installing Expo CLI
 
@@ -57,8 +43,6 @@ This boilerplate requires specifically the `3.27.8` version of the Expo CLI in o
 1. If you have Expo CLI already installed, check the version by running `expo --version`
 2. If you have a different version installed, uninstall it first by running `npm uninstall -g expo-cli`
 3. Install the `3.27.8` version by running `npm install -g expo-cli@3.27.8`
-
-
 
 ## Logging into the GitHub Package Registry
 
@@ -73,7 +57,6 @@ To confirm you should see the following lines when you run npm config list
 @rizefinance:registry = "https://npm.pkg.github.com"
 //npm.pkg.github.com/:_authToken = (protected)
 ```
-
 
 ## Running the App
 
@@ -116,8 +99,6 @@ To confirm you should see the following lines when you run npm config list
       ```
       yarn android
       ```
-
-
 
 ## Troubleshooting
 
