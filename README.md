@@ -5,7 +5,7 @@
   <br />
 </p>
 
-_Make financial services simple and accessible. Rize enables fintechs, financial institutions and brands to build across multiple account types with one API._ _If you want to join us [<kbd>**Check out our open positions**</kbd>](https://rizefs.com/careers/)\__
+_Make financial services simple and accessible. Rize enables fintechs, financial institutions and brands to build across multiple account types with one API._ \_If you want to join us [<kbd>**Check out our open positions**</kbd>](https://rizefs.com/careers/)\_\_
 
 # Rize Prototype UI
 
