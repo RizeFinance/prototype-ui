@@ -10,7 +10,7 @@ import { ProductType } from '../contexts/ComplianceWorkflow';
 import { useBrokerageWorkflow, BrokerageProductType } from '../contexts/BrokerageWorkflow';
 import { useAuth } from '../contexts/Auth';
 import { get, set } from 'lodash';
-import moment from 'moment';
+import { parse } from 'date-fns';
 
 interface ConfirmPIIScreenProps {
   route: RouteProp<RootStackParamList, 'ConfirmPII'>;
@@ -62,7 +62,7 @@ export default function ConfirmPIIScreen({
         suffix: data.suffix,
         phone: data.phone.replace(/\D/g, ''),
         ssn: data.ssn,
-        dob: moment(data.dob).format('yyyy-MM-DD'),
+        dob: parse(data.dob, 'MM-dd-yyyy', new Date()).toISOString().split('T')[0], //the API takes the DOB in ISO format
         address: {
           street1: data.street1,
           street2: data.street2,

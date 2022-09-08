@@ -14,7 +14,7 @@ import * as Yup from 'yup';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { PIIFields, RootStackParamList } from '../types';
 import IMask from 'imask';
-import { parse, format, isDate } from 'date-fns';
+import { parse, isDate } from 'date-fns';
 import states from '../constants/States';
 import { useAuth } from '../contexts/Auth';
 import formatStringByPattern from 'format-string-by-pattern';
@@ -22,10 +22,6 @@ import { set } from 'lodash';
 interface PIIScreenProps {
   navigation: StackNavigationProp<RootStackParamList, 'PII'>;
 }
-
-type PIIScreenFields = Omit<PIIFields, 'dob'> & {
-  dob?: Date;
-};
 
 function parseDateString(value, originalValue) {
   const parsedDate = isDate(originalValue)
@@ -36,7 +32,7 @@ function parseDateString(value, originalValue) {
 
 function FetchPreviousValues({ navigation }: PIIScreenProps): JSX.Element {
   const { refreshCustomer } = useAuth();
-  const { setFieldValue } = useFormikContext<PIIScreenFields>();
+  const { setFieldValue } = useFormikContext<PIIFields>();
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
@@ -84,12 +80,12 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
     },
   });
 
-  const initialValues: PIIScreenFields = {
+  const initialValues: PIIFields = {
     first_name: '',
     middle_name: '',
     last_name: '',
     suffix: '',
-    dob: undefined,
+    dob: '',
     street1: '',
     street2: '',
     city: '',
@@ -136,11 +132,10 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
 
   const piiSchema = Yup.object().shape(initSchema);
 
-  const onSubmit = async (values: PIIScreenFields): Promise<void> => {
+  const onSubmit = async (values: PIIFields): Promise<void> => {
     navigation.navigate('ConfirmPII', {
       fieldValues: {
         ...values,
-        dob: format(values.dob, 'yyyy-dd-MM'),
       },
     });
   };
