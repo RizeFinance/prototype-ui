@@ -87,6 +87,13 @@ const steps = [
         name: 'My goal for my portfolio is to:',
         note: 'Note: This product is designed to not lose money, grow slightly, or grow moderately. If you are looking for a financial product that will grow significantly, you should seek out an alternative financial product that would meet your goals.',
         placeholder: 'Select Portfolio Goal',
+        validations: [
+          {
+            choice: 'Not lose money',
+            errorMessage:
+              'This investment product is not suitable for you. If you have selected: ‘not lose money.’ In order to open an account, select another goal.',
+          },
+        ],
       },
       {
         name: 'I expect my portfolio to:',
