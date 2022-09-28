@@ -23,6 +23,7 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
   const [step, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [validQuestions, setValidQuestions] = useState({});
 
   const currentStep = useMemo(() => {
     const questions = [];
@@ -61,7 +62,7 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
       return (
         <>
           <InputLabel question={question} />
-          <OrderedCheckboxGroup data={responses} onChange={handleOnChange} />
+          <OrderedCheckboxGroup data={responses} value={value} onChange={handleOnChange} />
         </>
       );
     } else if (responses && responses.includes('yes')) {
@@ -78,6 +79,22 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
         </Checkbox>
       );
     } else if (!isEmpty(responses)) {
+      const validate = (newValue) => {
+        const failedValidation = find(
+          question.validations,
+          (validation) => validation.choice === newValue
+        );
+        const questionValidation = { [question.profile_requirement_uid]: !!failedValidation };
+        setValidQuestions((validQuestions) => ({
+          ...validQuestions,
+          ...questionValidation,
+        }));
+      };
+      const failedValidation = find(
+        question.validations,
+        (validation) => validation.choice === value
+      );
+      const errorText = failedValidation ? failedValidation.errorMessage : '';
       const items = responses.map((value) => ({
         label: value,
         value: value,
@@ -90,9 +107,13 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
             items={items}
             value={value}
             placeholder={question.placeholder || ''}
-            onChange={onChange}
+            onChange={(val) => {
+              onChange(val);
+              validate(val);
+            }}
             onBlur={onBlur}
             inputStyle={styles.input}
+            errorText={errorText}
           />
         </>
       );
@@ -113,6 +134,11 @@ export default function ({ navigation }: BrokerageProductQuestionsScreenProps): 
   };
   const renderCurrentStepForm = () => {
     const onSubmit = async (values, { resetForm }) => {
+      const cannotContinue = Object.values(validQuestions).some((question) => question);
+      if (cannotContinue) {
+        navigation.navigate('UnableOpenBrokerageAccount');
+        return;
+      }
       setLoading(true);
       const data = map(values, (value, index) => ({
         profile_requirement_uid: index,

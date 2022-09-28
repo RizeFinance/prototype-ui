@@ -29,4 +29,5 @@ export { default as BrokerageDisclosuresScreen } from './BrokerageOnboarding/Bro
 export { default as BrokerageProcessingScreen } from './BrokerageOnboarding/BrokerageProcessingScreen';
 export { default as BrokerageOverviewScreen } from './BrokerageOnboarding/BrokerageOverviewScreen';
 export { default as BrokerageProductQuestionsScreen } from './BrokerageOnboarding/BrokerageProductQuestionsScreen';
+export { default as UnableOpenBrokerageAccountScreen } from './BrokerageOnboarding/UnableOpenBrokerageAccountScreen';
 export { default as CustomerTypeScreen } from './CustomerTypeScreen';

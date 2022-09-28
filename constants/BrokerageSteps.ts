@@ -107,6 +107,13 @@ const steps = [
       {
         name: 'Which of the following statements best describes me?',
         placeholder: 'Select Description',
+        validations: [
+          {
+            choice: 'I cannot tolerate any fluctuations in the value of my portfolio',
+            errorMessage:
+              'This investment product is not suitable for you. If you have selected: ‘I cannot tolerate any fluctuations in the value of my portfolio.’ In order to open an account, select another statement.',
+          },
+        ],
       },
       {
         name: 'If the investments in my portfolio dropped more than 20 percent in value, I would:',
