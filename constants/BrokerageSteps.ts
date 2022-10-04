@@ -91,7 +91,7 @@ const steps = [
           {
             choice: 'Not lose money',
             errorMessage:
-              'This investment product is not suitable for you. If you have selected: ‘not lose money.’ In order to open an account, select another goal.',
+              'This investment product is not suitable for you if you have selected: ‘not lose money.’ In order to open an account, select another goal.',
           },
         ],
       },
@@ -118,7 +118,7 @@ const steps = [
           {
             choice: 'I cannot tolerate any fluctuations in the value of my portfolio',
             errorMessage:
-              'This investment product is not suitable for you. If you have selected: ‘I cannot tolerate any fluctuations in the value of my portfolio.’ In order to open an account, select another statement.',
+              'This investment product is not suitable for you if you have selected: ‘I cannot tolerate any fluctuations in the value of my portfolio.’ In order to open an account, select another statement.',
           },
         ],
       },
