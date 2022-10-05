@@ -69,6 +69,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
       color: error,
       marginHorizontal: 8,
       marginTop: 4,
+      fontStyle: 'italic',
     },
   });
 
