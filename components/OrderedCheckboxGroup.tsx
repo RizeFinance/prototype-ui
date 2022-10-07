@@ -5,6 +5,7 @@ import { Body } from './Typography';
 
 export type OrderCheckboxGroupProps = {
   data: any;
+  value: any;
   onChange?: (checked: any) => void;
 };
 
@@ -15,8 +16,14 @@ const defaultStyles = StyleSheet.create({
 });
 
 const OrderedCheckboxGroup = (props: PropsWithChildren<OrderCheckboxGroupProps>): JSX.Element => {
-  const { data, onChange } = props;
-  const [currentOrder, setOrder] = useState<string[]>([]);
+  const { data, onChange, value } = props;
+  const startingOrder = [];
+  if (value) {
+    for (let i = 0; i < Object.keys(value).length; i++) {
+      startingOrder.push(value[i]);
+    }
+  }
+  const [currentOrder, setOrder] = useState<string[]>(startingOrder);
 
   const onChangeOrder = (elm, adding): void => {
     if (adding) {
@@ -41,7 +48,11 @@ const OrderedCheckboxGroup = (props: PropsWithChildren<OrderCheckboxGroupProps>)
       {data.map((elm: string, index: number) => {
         const currentIndex = currentOrder.indexOf(elm) >= 0 ? currentOrder.indexOf(elm) + 1 : null;
         return (
-          <Checkbox key={index} checked={false} onChange={(value) => onChangeOrder(elm, value)}>
+          <Checkbox
+            key={index}
+            checked={currentOrder.includes(elm)}
+            onChange={(value) => onChangeOrder(elm, value)}
+          >
             <Body>
               {currentIndex ? currentIndex + ': ' : ''} {elm}
             </Body>

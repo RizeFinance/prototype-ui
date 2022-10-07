@@ -69,18 +69,16 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
       color: error,
       marginHorizontal: 8,
       marginTop: 4,
+      fontStyle: 'italic',
     },
   });
 
-  let actualInputStyle: TextStyle = {
-    ...fontStyles.body,
-    ...defaultStyles.input,
-  };
+  let actualInputStyle: TextStyle = StyleSheet.flatten([fontStyles.body, defaultStyles.input]);
 
   if (errorText) {
     actualInputStyle = {
       ...actualInputStyle,
-      ...defaultStyles.errorInput,
+      ...StyleSheet.flatten(defaultStyles.errorInput),
     };
   }
 
@@ -111,7 +109,7 @@ const Dropdown = (props: DropdownProps): JSX.Element => {
           inputAndroid: actualInputStyle,
           inputWeb: disabled
             ? { ...StyleSheet.flatten(defaultStyles.input), backgroundColor: '#F0F0F0' }
-            : defaultStyles.input,
+            : actualInputStyle,
         }}
         placeholder={{ label: placeholder, value: placeholder }}
         items={items}

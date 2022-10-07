@@ -56,6 +56,7 @@ import {
   ConnectAccountScreen,
   ConnectOneWayScreen,
   CustomerTypeScreen,
+  UnableOpenBrokerageAccountScreen,
 } from '../screens';
 
 // Contexts
@@ -220,6 +221,10 @@ function MainStackScreen() {
                 <Stack.Screen
                   name="BrokerageProductQuestions"
                   component={BrokerageProductQuestionsScreen}
+                />
+                <Stack.Screen
+                  name="UnableOpenBrokerageAccount"
+                  component={UnableOpenBrokerageAccountScreen}
                 />
               </Stack.Navigator>
             )}
