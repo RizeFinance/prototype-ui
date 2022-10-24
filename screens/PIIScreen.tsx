@@ -124,7 +124,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
     ssn: Yup.string()
       .required('SSN is required.')
       .max(11, 'Invalid Social Security Number.')
-      .matches(/[A-Za-z0-9]{3}-[A-Za-z0-9]{2}-[A-Za-z0-9]{4}/, 'Invalid Social Security Number.'),
+      .matches(/\d{3}-\d{2}-\d{4}/, 'Invalid Social Security Number.'),
   };
 
   if (customer.type === 'sole_proprietor') {
@@ -346,7 +346,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
                 errorText={!touched.ssn ? '' : errors.ssn}
                 editable={!isSubmitting}
                 maxLength={11}
-                autoCapitalize={'none'}
+                keyboardType="number-pad"
               />
             </View>
 
