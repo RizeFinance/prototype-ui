@@ -110,6 +110,13 @@ export default function ConfirmPIIScreen({
       <Body fontWeight="semibold">Last name</Body>
       <Body style={{ color: gray }}>{data.last_name}</Body>
       <Body>&nbsp;</Body>
+      {data.suffix && (
+        <>
+          <Body fontWeight="semibold">Suffix</Body>
+          <Body style={{ color: gray }}>{data.suffix}</Body>
+          <Body>&nbsp;</Body>
+        </>
+      )}
       <Body fontWeight="semibold">Date of Birth</Body>
       <Body style={{ color: gray }}>{data.dob}</Body>
       <Body>&nbsp;</Body>

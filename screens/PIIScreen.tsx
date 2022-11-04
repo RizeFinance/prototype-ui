@@ -102,6 +102,7 @@ export default function PIIScreen({ navigation }: PIIScreenProps): JSX.Element {
   const initSchema = {
     first_name: Yup.string().required('First Name is required.'),
     last_name: Yup.string().required('Last Name is required.'),
+    suffix: Yup.string().max(30, 'Invalid Suffix'),
     dob: Yup.date()
       .transform(parseDateString)
       .required('Date of Birth is required.')
