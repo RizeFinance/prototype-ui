@@ -55,11 +55,15 @@ export default function LoginScreen({ navigation, route }: LoginScreenProps): JS
   useEffect(() => {
     const fetchCustomer = async () => {
       if (auth.accessToken !== '') {
-        const customer = await CustomerService.getCustomer(auth.accessToken);
-        if (customer) {
-          setCustomer(customer);
-        } else {
-          removeValue({ storageKey: '@tokens' });
+        try {
+          const customer = await CustomerService.getCustomer(auth.accessToken);
+          if (customer) {
+            setCustomer(customer);
+          } else {
+            removeValue({ storageKey: '@tokens' });
+          }
+        } catch (err) {
+          setCommonError(`Error fetching customer! \n ${err || 'Try again later'}`);
         }
       }
     };

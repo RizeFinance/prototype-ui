@@ -21,7 +21,7 @@ This application is supported by Rize in a web environment so you may need to ma
 
 ## Prerequisites
 
-- NodeJS v12 and up
+- NodeJS v18 and up
   - Check [nvm](https://github.com/creationix/nvm) to manage multiple versions of node/npm on your local
 - Expo CLI version `3.27.8`
 - [Git](https://git-scm.com/)
@@ -30,7 +30,7 @@ This application is supported by Rize in a web environment so you may need to ma
 - [iOS Simulator (macOS only)](https://docs.expo.io/workflow/ios-simulator/)
 - [Android Emulator](https://docs.expo.io/workflow/android-studio-emulator/)
 
-## Recommeded Tools
+## Recommended Tools
 
 - [VSCode Editor](https://code.visualstudio.com/download)
 - [Yarn](https://classic.yarnpkg.com/en/docs/install)
