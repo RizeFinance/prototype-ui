@@ -30,7 +30,7 @@ This application is supported by Rize in a web environment so you may need to ma
 - [iOS Simulator (macOS only)](https://docs.expo.io/workflow/ios-simulator/)
 - [Android Emulator](https://docs.expo.io/workflow/android-studio-emulator/)
 
-## Recommeded Tools
+## Recommended Tools
 
 - [VSCode Editor](https://code.visualstudio.com/download)
 - [Yarn](https://classic.yarnpkg.com/en/docs/install)

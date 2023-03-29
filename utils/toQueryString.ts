@@ -1,4 +1,4 @@
-const querystring = require('query-string');
+import querystring from 'query-string';
 
 const toQueryString = (
   object: Record<string, unknown>,
